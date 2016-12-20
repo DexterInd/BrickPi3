@@ -3,7 +3,7 @@ License Information
 
 Software License
 ----------------
-**All code (including all scripts, firmware, drivers, examples, and any other software) is released under the MIT License(http://choosealicense.com/licenses/mit/).**
+**All code (including all scripts, firmware, drivers, examples, and any other software) is released under the [MIT License](http://choosealicense.com/licenses/mit/).**
 
 MIT License
 
