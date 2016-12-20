@@ -1,9 +1,7 @@
 #!/bin/bash
 
-cd /home/pi
-
 # unzip the compiled OpenOCD
-unzip /home/pi/Dexter/BrickPi3/Firmware/openocd/openocd_compiled.zip
+unzip /home/pi/Dexter/BrickPi3/Firmware/openocd/openocd_compiled.zip -d /home/pi/Dexter/BrickPi3/Firmware/openocd
 
 # Put the configuration files into /usr/local/share
 sudo cp -rn /home/pi/Dexter/BrickPi3/Firmware/openocd/openocd_compiled/files/openocd /usr/local/share

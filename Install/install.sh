@@ -43,22 +43,22 @@ fi
 
 echo "Welcome to BrickPi3 Installer.";
 
-git clone https://mattallen37@github.com/mattallen37/BrickPi3 /home/pi/Dexter/BrickPi3
+#git clone https://mattallen37@github.com/mattallen37/BrickPi3 /home/pi/Dexter/BrickPi3
 
 sudo chmod 755 /home/pi/Dexter/BrickPi3/Firmware/openocd/install_openocd_compiled.sh
 sudo bash /home/pi/Dexter/BrickPi3/Firmware/openocd/install_openocd_compiled.sh
 
 # Adding in /etc/modules
-echo " "
-echo "Adding spi-dev in /etc/modules . . ."
+echo ""
 if grep -q "spi-dev" /etc/modules; then
-    echo "spi-dev already present"
+    echo "spi-dev already present in /etc/modules"
 else
     echo spi-dev >> /etc/modules
-    echo "spi-dev added"
+    echo "spi-dev added to /etc/modules"
 fi
 
 # Enable SPI
+echo ""
 if grep -q "#dtparam=spi=on" /boot/config.txt; then
     sudo sed -i 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
     echo "SPI enabled"
@@ -69,8 +69,11 @@ else
     echo "SPI enabled"
 fi
 
-sudo python /home/pi/Dexter/BrickPi3/Software/Python/setup.py install
-sudo python3 /home/pi/Dexter/BrickPi3/Software/Python/setup.py install
+echo ""
+cd /home/pi/Dexter/BrickPi3/Software/Python/
+sudo python setup.py install
+sudo python3 setup.py install
 
+echo ""
 echo "Installation complete"
 echo "Please reboot to make settings take effect"
