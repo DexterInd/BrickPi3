@@ -29,4 +29,4 @@ SOFTWARE.
 
 Hardware License
 ----------------
-**The hardware is released under the [Creative Commons Attribution NonCommercial ShareAlike 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).**
+**The hardware schematics are released under the [Creative Commons Attribution NonCommercial ShareAlike 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).**
