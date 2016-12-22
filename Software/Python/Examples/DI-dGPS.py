@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
@@ -6,16 +8,20 @@
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for reading a Dexter Industries GPS connected to the BrickPi3
+# 
+# Hardware: Connect a Dexter Industries dGPS to sensor port 3 of the BrickPi3.
+# 
+# Results:  When you run this program, the GPS is read, and the values are printed.
 
-from __future__ import print_function
-from __future__ import division
+from __future__ import print_function # use python 3 syntax but make it compatible with python 2
+from __future__ import division       #                           ''
 
-import time
+import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
 
-BP = brickpi3.BrickPi3()
+BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
-GPS_PORT = BP.PORT_3
+GPS_PORT = BP.PORT_3 # GPS will be on sensor port 3
 
 BP.set_sensor_type(GPS_PORT, BP.SENSOR_TYPE.I2C, [BP.SENSOR_I2C_SETTINGS.MID_CLOCK, 0]) # Configure for a Dexter Industries GPS (I2C device with clock pulse between the write and read bytes).
 

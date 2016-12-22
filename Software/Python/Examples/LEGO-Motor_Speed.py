@@ -7,11 +7,11 @@
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
-# This code is an example for reading a touch sensor connected to PORT_1 of the BrickPi3
+# This code is an example for running a motor to a target position set by the encoder of another motor.
 # 
-# Hardware: Connect an EV3 or NXT touch sensor to BrickPi3 Port 1.
-# 
-# Results:  When you run this program, you should see a 0 when the touch sensor is not pressed, and a 1 when the touch sensor is pressed.
+# Hardware: Connect EV3 or NXT motors to the BrickPi3 motor ports B and C. Make sure that the BrickPi3 is running on a 9v power supply.
+#
+# Results:  When you run this program, motor C speed will be controlled by the position of motor B. Manually rotate motor B, and motor C's speed will change.
 
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       #                           ''
@@ -21,22 +21,13 @@ import brickpi3 # import the BrickPi3 drivers
 
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
-# Configure for a touch sensor.
-# If an EV3 touch sensor is connected, it will be configured for EV3 touch, otherwise it's configured for NXT touch.
-# BP.set_sensor_type configures the BrickPi3 for a specific sensor.
-# BP.PORT_1 specifies that the sensor will be on sensor port 1.
-# BP.Sensor_TYPE.TOUCH specifies that the sensor will be a touch sensor.
-BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.TOUCH)
-
 try:
     while True:
-        # read and display the sensor value
-        # BP.get_sensor retrieves a sensor value.
-        # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is the sensor value (what we want to display).
+        # The following BP.get_motor_encoder function returns a list of 2 values
+        #     The first item in the list is the value (what we want to use to control motor C's speed).
         #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        print(BP.get_sensor(BP.PORT_1)[0])
+        speed = BP.get_motor_encoder(BP.PORT_B)[0]
+        BP.set_motor_speed(BP.PORT_C, speed)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 
