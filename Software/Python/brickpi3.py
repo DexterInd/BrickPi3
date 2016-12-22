@@ -60,76 +60,78 @@ class BrickPi3(object):
     I2CInBytes = [0, 0, 0, 0]
     
     BPSPI_MESSAGE_TYPE = Enumeration("""
-      NONE,
-      
-      READ_HARDWARE_VERSION,
-      READ_FIRMWARE_VERSION,
-      READ_ID,
-      SET_LED,
-      READ_VOLTAGE_3V3,
-      READ_VOLTAGE_5V,
-      READ_VOLTAGE_9V,
-      READ_VOLTAGE_VCC,
-      
-      SET_SENSOR_TYPE = 10,
-      SET_SENSOR_1_TYPE = 10,
-      SET_SENSOR_2_TYPE,
-      SET_SENSOR_3_TYPE,
-      SET_SENSOR_4_TYPE,
-      
-      READ_SENSOR = 15,
-      READ_SENSOR_1 = 15,
-      READ_SENSOR_2,
-      READ_SENSOR_3,
-      READ_SENSOR_4,
-      
-      WRITE_MOTOR_SPEED = 20,
-      WRITE_MOTOR_A_SPEED = 20,
-      WRITE_MOTOR_B_SPEED,
-      WRITE_MOTOR_C_SPEED,
-      WRITE_MOTOR_D_SPEED,
-      
-      WRITE_MOTOR_POSITION = 25,
-      WRITE_MOTOR_A_POSITION = 25,
-      WRITE_MOTOR_B_POSITION,
-      WRITE_MOTOR_C_POSITION,
-      WRITE_MOTOR_D_POSITION,
-      
-      WRITE_MOTOR_POSITION_KP = 30,
-      WRITE_MOTOR_A_POSITION_KP = 30,
-      WRITE_MOTOR_B_POSITION_KP,
-      WRITE_MOTOR_C_POSITION_KP,
-      WRITE_MOTOR_D_POSITION_KP,
-      
-      WRITE_MOTOR_POSITION_KD = 35,
-      WRITE_MOTOR_A_POSITION_KD = 35,
-      WRITE_MOTOR_B_POSITION_KD,
-      WRITE_MOTOR_C_POSITION_KD,
-      WRITE_MOTOR_D_POSITION_KD,
-      
-      WRITE_MOTOR_DPS = 45,
-      WRITE_MOTOR_A_DPS = 45,
-      WRITE_MOTOR_B_DPS,
-      WRITE_MOTOR_C_DPS,
-      WRITE_MOTOR_D_DPS,
-      
-      OFFSET_MOTOR_ENCODER = 50,
-      OFFSET_MOTOR_A_ENCODER = 50,
-      OFFSET_MOTOR_B_ENCODER,
-      OFFSET_MOTOR_C_ENCODER,
-      OFFSET_MOTOR_D_ENCODER,
-      
-      READ_MOTOR_ENCODER = 55,
-      READ_MOTOR_A_ENCODER = 55,
-      READ_MOTOR_B_ENCODER,
-      READ_MOTOR_C_ENCODER,
-      READ_MOTOR_D_ENCODER,
-      
-      I2C_TRANSACT = 60,
-      I2C_TRANSACT_1 = 60,
-      I2C_TRANSACT_2,
-      I2C_TRANSACT_3,
-      I2C_TRANSACT_4,
+        NONE,
+        
+        READ_MANUFACTURER,
+        READ_NAME,
+        READ_HARDWARE_VERSION,
+        READ_FIRMWARE_VERSION,
+        READ_ID,
+        SET_LED,
+        READ_VOLTAGE_3V3,
+        READ_VOLTAGE_5V,
+        READ_VOLTAGE_9V,
+        READ_VOLTAGE_VCC,
+        
+        SET_SENSOR_TYPE = 20,
+        SET_SENSOR_1_TYPE = 20,
+        SET_SENSOR_2_TYPE,
+        SET_SENSOR_3_TYPE,
+        SET_SENSOR_4_TYPE,
+        
+        READ_SENSOR = 24,
+        READ_SENSOR_1 = 24,
+        READ_SENSOR_2,
+        READ_SENSOR_3,
+        READ_SENSOR_4,
+        
+        WRITE_MOTOR_SPEED = 28,
+        WRITE_MOTOR_A_SPEED = 28,
+        WRITE_MOTOR_B_SPEED,
+        WRITE_MOTOR_C_SPEED,
+        WRITE_MOTOR_D_SPEED,
+        
+        WRITE_MOTOR_POSITION = 32,
+        WRITE_MOTOR_A_POSITION = 32,
+        WRITE_MOTOR_B_POSITION,
+        WRITE_MOTOR_C_POSITION,
+        WRITE_MOTOR_D_POSITION,
+        
+        WRITE_MOTOR_POSITION_KP = 36,
+        WRITE_MOTOR_A_POSITION_KP = 36,
+        WRITE_MOTOR_B_POSITION_KP,
+        WRITE_MOTOR_C_POSITION_KP,
+        WRITE_MOTOR_D_POSITION_KP,
+        
+        WRITE_MOTOR_POSITION_KD = 40,
+        WRITE_MOTOR_A_POSITION_KD = 40,
+        WRITE_MOTOR_B_POSITION_KD,
+        WRITE_MOTOR_C_POSITION_KD,
+        WRITE_MOTOR_D_POSITION_KD,
+        
+        WRITE_MOTOR_DPS = 44,
+        WRITE_MOTOR_A_DPS = 44,
+        WRITE_MOTOR_B_DPS,
+        WRITE_MOTOR_C_DPS,
+        WRITE_MOTOR_D_DPS,
+        
+        OFFSET_MOTOR_ENCODER = 48,
+        OFFSET_MOTOR_A_ENCODER = 48,
+        OFFSET_MOTOR_B_ENCODER,
+        OFFSET_MOTOR_C_ENCODER,
+        OFFSET_MOTOR_D_ENCODER,
+        
+        READ_MOTOR_ENCODER = 52,
+        READ_MOTOR_A_ENCODER = 52,
+        READ_MOTOR_B_ENCODER,
+        READ_MOTOR_C_ENCODER,
+        READ_MOTOR_D_ENCODER,
+        
+        I2C_TRANSACT = 56,
+        I2C_TRANSACT_1 = 56,
+        I2C_TRANSACT_2,
+        I2C_TRANSACT_3,
+        I2C_TRANSACT_4,
     """)
     
     SENSOR_TYPE = Enumeration("""
@@ -221,6 +223,13 @@ class BrickPi3(object):
         subprocess.call('gpio mode 13 ALT0', shell=True) # Make sure the SPI lines are configured for mode ALT0 so that the hardware SPI controller can use them
         subprocess.call('gpio mode 14 ALT0', shell=True) #                                                  ''
         self.SPI_Address = addr
+        manufacturer, merr = self.get_manufacturer()
+        board, berr = self.get_board()
+        vfw, verr = self.get_version_firmware()
+        if merr != self.SUCCESS or berr != self.SUCCESS or verr != self.SUCCESS or manufacturer != "Dexter Industries" or board != "BrickPi3":
+            raise IOError("BrickPi3 not connected")
+        if vfw != "0.0.4":
+            raise IOError("BrickPi3 firmware needs to be updated to version 0.0.4")
     
     def spi_transfer_array(self, data_out):
         """
@@ -324,6 +333,44 @@ class BrickPi3(object):
         """
         outArray = [self.SPI_Address, MessageType, ((Value >> 24) & 0xFF), ((Value >> 16) & 0xFF), ((Value >> 8) & 0xFF), (Value & 0xFF)]
         self.spi_transfer_array(outArray)
+    
+    def get_manufacturer(self):
+        """
+        Read the 20 charactor BrickPi3 manufacturer name
+        
+        Returns touple:
+        BrickPi3 manufacturer name string, error
+        """
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.READ_MANUFACTURER, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        reply = self.spi_transfer_array(outArray)
+        if(reply[3] == 0xA5):
+            name = ""
+            for c in range(4, 24):
+                if reply[c] != 0:
+                    name += chr(reply[c])
+                else:
+                    break
+            return name, self.SUCCESS
+        return "", self.SPI_ERROR
+    
+    def get_board(self):
+        """
+        Read the 20 charactor BrickPi3 board name
+        
+        Returns touple:
+        BrickPi3 board name string, error
+        """
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.READ_NAME, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        reply = self.spi_transfer_array(outArray)
+        if(reply[3] == 0xA5):
+            name = ""
+            for c in range(4, 24):
+                if reply[c] != 0:
+                    name += chr(reply[c])
+                else:
+                    break
+            return name, self.SUCCESS
+        return "", self.SPI_ERROR
     
     def get_version_hardware(self):
         """
