@@ -16,15 +16,11 @@ import brickpi3 # import the BrickPi3 drivers
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
 try:
-    sn, sne = BP.get_id()
-    vh, vhe = BP.get_version_hardware()
-    vf, vfe = BP.get_version_firmware()
+    manufacturer, merr = BP.get_manufacturer()
+    board, berr = BP.get_board()
     
-    if(sne == BP.SUCCESS and vhe == BP.SUCCESS and vfe == BP.SUCCESS):
+    if(merr == BP.SUCCESS and berr == BP.SUCCESS and manufacturer == "Dexter Industries" and board == "BrickPi3"):
         print("BrickPi3 connected and running")
-        print("Serial Number   : ", sn) # display the serial number
-        print("Hardware version: ", vh) # display the hardware version
-        print("Firmware version: ", vf) # display the firmware version
     
     else:
         print("Communication with BrickPi3 unsuccessful")

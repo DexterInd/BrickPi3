@@ -22,6 +22,8 @@ try:
     # Each of the following BP.get functions return a list of 2 values
     #     The first item in the list is the value (what we want to display).
     #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
+    print("Manufacturer    : ", BP.get_manufacturer()[0]    ) # read and display the serial number
+    print("Board           : ", BP.get_board()[0]           ) # read and display the serial number
     print("Serial Number   : ", BP.get_id()[0]              ) # read and display the serial number
     print("Hardware version: ", BP.get_version_hardware()[0]) # read and display the hardware version
     print("Firmware version: ", BP.get_version_firmware()[0]) # read and display the firmware version
