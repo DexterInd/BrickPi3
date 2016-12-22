@@ -207,14 +207,17 @@ class BrickPi3(object):
     SENSOR_I2C_SETTINGS.MID_CLOCK         = 0x01 # Send the clock pulse between reading and writing. Required by the NXT US sensor.
     SENSOR_I2C_SETTINGS.PIN1_9V           = 0x02 # 9v pullup on pin 1
     SENSOR_I2C_SETTINGS.SAME              = 0x04 # Keep performing the same transaction e.g. keep polling a sensor
-    SENSOR_I2C_SETTINGS.ALLOW_STRETCH_ACK = 0x08 # Allow an I2C slave to stretch the clock after the ACK bit.
-    SENSOR_I2C_SETTINGS.ALLOW_STRETCH_ANY = 0x10 # Allow an I2C slave to stretch the clock at any time.
     
     SUCCESS = 0
     SPI_ERROR = 1
     SENSOR_ERROR = 2
     
     def __init__(self, addr = 1): # Configure for the BrickPi. Optionally set the address (default to 1).
+        """
+        Do any necessary configuration
+        
+        Optionally set the SPI address to something other than 1
+        """
         subprocess.call('gpio mode 13 ALT0', shell=True) # Make sure the SPI lines are configured for mode ALT0 so that the hardware SPI controller can use them
         subprocess.call('gpio mode 14 ALT0', shell=True) #                                                  ''
         self.SPI_Address = addr
@@ -713,6 +716,15 @@ class BrickPi3(object):
         self.spi_write_16((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_DPS + port), dps)
     
     def offset_motor_encoder(self, port, position):
+        """
+        Offset a motor encoder
+        
+        Keyword arguments:
+        port -- The motor port
+        offset -- The encoder offset
+        
+        Zero the encoder by offsetting it by the current position
+        """
         self.spi_write_32((self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER + port), position)
     
     def get_motor_encoder(self, port):
