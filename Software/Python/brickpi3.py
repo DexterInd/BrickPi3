@@ -216,7 +216,7 @@ class BrickPi3(object):
     
     def __init__(self, addr = 1, detect = True): # Configure for the BrickPi. Optionally set the address (default to 1).
         """
-        Do any necessary configuration
+        Do any necessary configuration, and optionally detect the BrickPi3
         
         Optionally set the SPI address to something other than 1
         """
