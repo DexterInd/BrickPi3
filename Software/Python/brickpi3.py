@@ -214,7 +214,7 @@ class BrickPi3(object):
     SPI_ERROR = 1
     SENSOR_ERROR = 2
     
-    def __init__(self, addr = 1): # Configure for the BrickPi. Optionally set the address (default to 1).
+    def __init__(self, addr = 1, detect = True): # Configure for the BrickPi. Optionally set the address (default to 1).
         """
         Do any necessary configuration
         
@@ -223,13 +223,14 @@ class BrickPi3(object):
         subprocess.call('gpio mode 13 ALT0', shell=True) # Make sure the SPI lines are configured for mode ALT0 so that the hardware SPI controller can use them
         subprocess.call('gpio mode 14 ALT0', shell=True) #                                                  ''
         self.SPI_Address = addr
-        manufacturer, merr = self.get_manufacturer()
-        board, berr = self.get_board()
-        vfw, verr = self.get_version_firmware()
-        if merr != self.SUCCESS or berr != self.SUCCESS or verr != self.SUCCESS or manufacturer != "Dexter Industries" or board != "BrickPi3":
-            raise IOError("BrickPi3 not connected")
-        if vfw != "0.0.4":
-            raise IOError("BrickPi3 firmware needs to be updated to version 0.0.4")
+        if detect == True:
+            manufacturer, merr = self.get_manufacturer()
+            board, berr = self.get_board()
+            vfw, verr = self.get_version_firmware()
+            if merr != self.SUCCESS or berr != self.SUCCESS or verr != self.SUCCESS or manufacturer != "Dexter Industries" or board != "BrickPi3":
+                raise IOError("BrickPi3 not connected")
+            if vfw != "0.0.4":
+                raise IOError("BrickPi3 firmware needs to be updated to version 0.0.4")
     
     def spi_transfer_array(self, data_out):
         """
@@ -741,6 +742,10 @@ class BrickPi3(object):
         """
         outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_SPEED + port), speed]
         self.spi_transfer_array(outArray)
+    
+    def set_tank_drive(self, ):
+        self.set_motor_speed(port, speed)
+        self.set_motor_speed(port, speed)
     
     def set_motor_position(self, port, position):
         """
