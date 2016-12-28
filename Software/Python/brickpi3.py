@@ -213,6 +213,7 @@ class BrickPi3(object):
     SUCCESS = 0
     SPI_ERROR = 1
     SENSOR_ERROR = 2
+    SENSOR_TYPE_ERROR = 3
     
     def __init__(self, addr = 1, detect = True): # Configure for the BrickPi. Optionally set the address (default to 1).
         """
@@ -495,6 +496,18 @@ class BrickPi3(object):
         else:
             self.spi_write_8((self.BPSPI_MESSAGE_TYPE.SET_SENSOR_TYPE + port), type)
     
+#    def check_sensor_type(self, port):
+#        """
+#        Check the sensor type
+#        
+#        Keyword arguments:
+#        port -- The sensor port
+#        
+#        Returns:
+#        type -- The sensor type
+#        """
+#        return self.SensorType[port]
+    
     def transact_i2c(self, port, Address, OutArray, InBytes):
         """
         Conduct an I2C transaction
@@ -730,7 +743,7 @@ class BrickPi3(object):
             else:
                 return [[0 for b in range(5)] for v in range(4)], self.SPI_ERROR
         
-        return "Error, sensor not configured or not supported."#int(0) # not configured
+        return 0, self.SENSOR_TYPE_ERROR #"Error, sensor not configured or not supported."#int(0) # not configured
     
     def set_motor_speed(self, port, speed):
         """
