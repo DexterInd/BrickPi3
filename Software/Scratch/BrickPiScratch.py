@@ -127,7 +127,10 @@ def set_regex_string():
         "S3",
         "S4"]
 
-    regex_set_motor = "(?:M)(?:OTOR)?\s*([A-D])\s*(ON|FULL|STOP|OFF|-?[0-9.]+)\s*%?"
+    # Nicole's regex
+    # (?:M)(?:OTOR)?\s*([A-D])\s*(?:(ON|FULL|STOP|OFF|-?[0-9.]+\s*%?)|(?:(P)(?:osition|os)?\s*(-?[0-9.]+)))
+    
+    regex_set_motor = "(?:M)(?:OTOR)?\s*([A-D])\s*(P(?:osition|os)?)?\s*(ON|FULL|STOP|OFF|-?[0-9.]+)\s*%?"
     # group 4 -> motor port
     # group 5 -> motor speed
     test_msgs += [
@@ -183,18 +186,18 @@ def read_sensor(port):
         type = SensorType[port]
         value, error = BP3.get_sensor(port)
         
-        if error == BP3.SUCCESS:
-            return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
-        if error == BP3.SPI_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SPI_ERROR"
-        if error == BP3.SENSOR_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
-        if error == BP3.SENSOR_TYPE_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
-        
-        if type == 'NONE':
+        if type != 'NONE':
             return_dict["Sensor {}".format((port + 1))] = 0
-        elif type == 'EV3US' or type == 'EV3USCM':
+            if error == BP3.SUCCESS:
+                return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
+            if error == BP3.SPI_ERROR:
+                return_dict["Sensor {} Error".format((port + 1))] = "SPI_ERROR"
+            if error == BP3.SENSOR_ERROR:
+                return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
+            if error == BP3.SENSOR_TYPE_ERROR:
+                return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
+        
+        if type == 'EV3US' or type == 'EV3USCM':
             return_dict["Sensor {}".format((port + 1))] = value
             return_dict["Sensor {} US CM".format((port + 1))] = value
         elif type == 'EV3USIN':
@@ -284,10 +287,12 @@ def handle_BrickPi_msg(msg):
     incoming_sensor_type = regObj.group(2)
     incoming_sensor_port_read = regObj.group(3)
     incoming_motor_port = regObj.group(4)
-    incoming_motor_speed = regObj.group(5)
-    incoming_update_all = regObj.group(6)
+    incoming_motor_poscmd = regObj.group(5)
+    incoming_motor_target = regObj.group(6)
+    incoming_update_all = regObj.group(7)
     
     motor_name_to_number = {'A':0, 'B':1, 'C':2, 'D':3}
+    motor_number_to_name = ['A', 'B', 'C', 'D']
     
     # READ A SPECIFIC SENSOR
     if incoming_sensor_port_read != None:
@@ -324,33 +329,68 @@ def handle_BrickPi_msg(msg):
 
     # SET MOTOR SPEED
     elif incoming_motor_port != None :
-        if en_debug:
-            print("Got speed {}".format(incoming_motor_speed))
-        
         port = motor_name_to_number[incoming_motor_port.upper()] # convert A-D to 0-3
         
-        if incoming_motor_speed == "on" or incoming_motor_speed == "full":
-            incoming_motor_speed = 100
-        elif incoming_motor_speed == "off" or incoming_motor_speed == "stop":
-            incoming_motor_speed = 0
+        if incoming_motor_poscmd == None: # speed control
+            if en_debug:
+                print("Motor speed {}".format(incoming_motor_target))
+            
+            if incoming_motor_target == "on" or incoming_motor_target == "full":
+                incoming_motor_target = 100
+            elif incoming_motor_target == "off" or incoming_motor_target == "stop":
+                incoming_motor_target = 0
+            else:
+                #try:
+                #    incoming_motor_target = int(float(incoming_motor_target))
+                incoming_motor_target = int(float(incoming_motor_target))
+                #except TypeError:
+                #    incoming_motor_target = "target error"
+            
+            if incoming_motor_target != "target error":
+                if en_brickpi3:
+                    BP3.set_motor_speed(port, incoming_motor_target)
+                elif en_brickpi:
+                    # add BrickPi+ support
+                    pass
+            else:
+                if en_brickpi3:
+                    BP3.set_motor_speed(port, 0)
+                elif en_brickpi:
+                    # add BrickPi+ support
+                    pass   
         else:
-            incoming_motor_speed = int(float(incoming_motor_speed))
+            if en_debug:
+                print("Motor position {}".format(incoming_motor_target))
+            
+            try:
+                incoming_motor_target = int(float(incoming_motor_target))
+            except TypeError:
+                incoming_motor_target = "target error"
+            
+            if incoming_motor_target != "target error":
+                if en_brickpi3:
+                    BP3.set_motor_position(port, incoming_motor_target)
+                elif en_brickpi:
+                    # add BrickPi+ support
+                    pass
+            else:
+                if en_brickpi3:
+                    BP3.set_motor_speed(port, 0)
+                elif en_brickpi:
+                    # add BrickPi+ support
+                    pass
         
-        if en_brickpi3:
-            BP3.set_motor_speed(port, incoming_motor_speed)
-        elif en_brickpi:
-            # add BrickPi+ support
-            pass
+        return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
         
-        return_dict["Motor {}".format(incoming_motor_port.upper())] = incoming_motor_speed
         
         if en_debug:
-            print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_speed))
+            print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_target))
 
     # UPDATE ALL SENSOR VALUES
     elif incoming_update_all != None:
         for port in range(0, 4):
             return_dict.update(read_sensor(port))
+            return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)
         
         if en_debug:
             print("Update all sensor values")
@@ -416,6 +456,7 @@ if __name__ == '__main__':
                 print("BrickPi Scratch: Disconnected from Scratch")
             break
         except (scratch.scratch.ScratchConnectionError,NameError) as e:
+            print("exception error: ", e)
             while True:
                 #thread1.join(0)
                 if en_debug:
