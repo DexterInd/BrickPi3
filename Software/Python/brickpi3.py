@@ -14,7 +14,7 @@ from __future__ import division
 import subprocess # for executing system calls
 import spidev
 
-FIRMWARE_VERSION_REQUIRED = "1.0.0"
+FIRMWARE_VERSION_REQUIRED = "1.0.1"
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
