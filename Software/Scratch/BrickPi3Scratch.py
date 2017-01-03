@@ -13,9 +13,6 @@ import sys
 # Set to 0 to go into quiet mode
 en_debug = 1
 
-en_brickpi3 = False
-en_brickpi = False
-
 try:
     with open("/home/pi/Dexter/detected_robot.txt") as file_handle:
         file_string = file_handle.read()
@@ -23,7 +20,6 @@ try:
             import brickpi3 
             try:
                 BP3 = brickpi3.BrickPi3()
-                en_brickpi3 = True
                 
                 sensor_types = {
                 'NONE'          : BP3.SENSOR_TYPE.NONE,
@@ -52,26 +48,14 @@ try:
                 'FLEX'          : BP3.SENSOR_TYPE.CUSTOM 
                 }
             except:
-                en_brickpi3 = False
-        elif file_string.find("BrickPi") != -1:
-            from BrickPi import *
-            en_brickpi = True
-            sensor_types = {
-            'EV3US' : TYPE_SENSOR_EV3_US_M0,        # Continuous measurement, distance, cm
-            'EV3GYRO' : TYPE_SENSOR_EV3_GYRO_M0,            # Angle
-            'EV3IR' : TYPE_SENSOR_EV3_INFRARED_M0,          # Proximity, 0 to 100
-            'EV3TOUCH' : TYPE_SENSOR_EV3_TOUCH_DEBOUNCE,    # EV3 Touch sensor, debounced.
-            'EV3COLOR' : TYPE_SENSOR_EV3_COLOR_M2,
-            'ULTRASONIC' : TYPE_SENSOR_ULTRASONIC_CONT ,
-            'TOUCH' : TYPE_SENSOR_TOUCH ,
-            'COLOR' : TYPE_SENSOR_COLOR_FULL ,
-            'RAW' : TYPE_SENSOR_RAW,
-            'TEMP' : TYPE_SENSOR_RAW,
-            'FLEX' : TYPE_SENSOR_RAW 
-            }
+                if en_debug:
+                    print("BrickPi3 not detected. Exiting...")
+                sys.exit()
         else:
             if en_debug:
-                print("no BrickPi or BrickPi3 detected at startup")
+                print("BrickPi3 not detected at startup. Exiting...")
+            sys.exit()
+    
 except IOError:
     if en_debug:
         print("error reading the detected robot from /home/pi/Dexter/detected_robot.txt")
@@ -107,18 +91,13 @@ def set_regex_string():
     regex_set_sensor = "S([1-4])\s*({})".format(get_regex_sensors())
     # group 1 -> sensor port
     # group 2 -> sensor type (as a string)
-    if en_brickpi:
-        test_msgs += ["S1 EV3US",
-            "S2EV3TOUCH",
-            "S3  ULTRASONIC",
-            "S4 TEMP "]
+
 
     # TODO: Adjust for BrickPi3
-    if en_brickpi3:
-        test_msgs += ["S1 EV3US",
-            "S2EV3TOUCH",
-            "S3  ULTRASONIC",
-            "S4 TEMP "]
+    test_msgs += ["S1 EV3US",
+        "S2EV3TOUCH",
+        "S3  ULTRASONIC",
+        "S4 TEMP "]
 
     regex_read_single_sensor = "S([1-4])\s*$"
     # group 3 -> sensor port
@@ -182,80 +161,76 @@ _d = [-0.000000064957311, -0.000000072405219, -0.000000069383563, -0.00000008791
 
 def read_sensor(port):
     return_dict={}
-    if en_brickpi3:
-        type = SensorType[port]
-        value, error = BP3.get_sensor(port)
-        
-        if type != 'NONE':
-            return_dict["Sensor {}".format((port + 1))] = 0
-            if error == BP3.SUCCESS:
-                return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
-            if error == BP3.SPI_ERROR:
-                return_dict["Sensor {} Error".format((port + 1))] = "SPI_ERROR"
-            if error == BP3.SENSOR_ERROR:
-                return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
-            if error == BP3.SENSOR_TYPE_ERROR:
-                return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
-        
-        if type == 'EV3US' or type == 'EV3USCM':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} US CM".format((port + 1))] = value
-        elif type == 'EV3USIN':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} US Inch".format((port + 1))] = value
-        elif type == 'EV3USLISTEN':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} US Listen".format((port + 1))] = value
-        elif type == 'EV3GYRO' or type == 'EV3GYROABS':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} Gyro ABS".format((port + 1))] = value
-        elif type == 'EV3GYRODPS':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} Gyro DPS".format((port + 1))] = value
-        elif type == 'EV3GYROABSDPS':
-            return_dict["Sensor {}".format((port + 1))] = value[0]
-            return_dict["Sensor {} Gyro ABS".format((port + 1))] = value[0]
-            return_dict["Sensor {} Gyro DPS".format((port + 1))] = value[1]
-        elif type == 'EV3IR' or type == 'EV3IRPROX':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} IR Prox".format((port + 1))] = value
-        elif type == 'EV3TOUCH' or type == 'NXTTOUCH' or type == 'TOUCH':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} Touch".format((port + 1))] = value
-        elif type == 'EV3COLOR' or type == 'COLOR' or type == 'NXTCOLOR':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} Color".format((port + 1))] = value
-        elif type == 'NXTUS' or type == 'ULTRASONIC':
-            return_dict["Sensor {}".format((port + 1))] = value
-            return_dict["Sensor {} US CM".format((port + 1))] = value
-        elif type == 'RAW':
-            return_dict["Sensor {}".format((port + 1))] = value[0]
-            return_dict["Sensor {} Raw".format((port + 1))] = value[0]
-        elif type == 'TEMP':
-            temp = 0
-            if value[0] == 4095:
-                return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
-            elif error == BP3.SUCCESS:
-                RtRt25 = (float)(value[0]) / (4095 - value[0])
-                lnRtRt25 = math.log(RtRt25)
-                if (RtRt25 > 3.277):
-                    i = 0
-                elif (RtRt25 > 0.3599):
-                    i = 1
-                elif (RtRt25 > 0.06816):
-                    i = 2
-                else:
-                    i = 3
-                temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
-                temp = temp - 273.15
-            return_dict["Sensor {}".format((port + 1))] = temp
-            return_dict["Sensor {} Temp".format((port + 1))] = temp
-        elif type == 'FLEX':
-            return_dict["Sensor {}".format((port + 1))] = value[0]
-            return_dict["Sensor {} Flex".format((port + 1))] = value[0]
-    elif en_brickpi:
-        # add BrickPi+ support
-        pass
+    type = SensorType[port]
+    value, error = BP3.get_sensor(port)
+    
+    if type != 'NONE':
+        return_dict["Sensor {}".format((port + 1))] = 0
+        if error == BP3.SUCCESS:
+            return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
+        if error == BP3.SPI_ERROR:
+            return_dict["Sensor {} Error".format((port + 1))] = "SPI_ERROR"
+        if error == BP3.SENSOR_ERROR:
+            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
+        if error == BP3.SENSOR_TYPE_ERROR:
+            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
+    
+    if type == 'EV3US' or type == 'EV3USCM':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} US CM".format((port + 1))] = value
+    elif type == 'EV3USIN':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} US Inch".format((port + 1))] = value
+    elif type == 'EV3USLISTEN':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} US Listen".format((port + 1))] = value
+    elif type == 'EV3GYRO' or type == 'EV3GYROABS':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} Gyro ABS".format((port + 1))] = value
+    elif type == 'EV3GYRODPS':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} Gyro DPS".format((port + 1))] = value
+    elif type == 'EV3GYROABSDPS':
+        return_dict["Sensor {}".format((port + 1))] = value[0]
+        return_dict["Sensor {} Gyro ABS".format((port + 1))] = value[0]
+        return_dict["Sensor {} Gyro DPS".format((port + 1))] = value[1]
+    elif type == 'EV3IR' or type == 'EV3IRPROX':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} IR Prox".format((port + 1))] = value
+    elif type == 'EV3TOUCH' or type == 'NXTTOUCH' or type == 'TOUCH':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} Touch".format((port + 1))] = value
+    elif type == 'EV3COLOR' or type == 'COLOR' or type == 'NXTCOLOR':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} Color".format((port + 1))] = value
+    elif type == 'NXTUS' or type == 'ULTRASONIC':
+        return_dict["Sensor {}".format((port + 1))] = value
+        return_dict["Sensor {} US CM".format((port + 1))] = value
+    elif type == 'RAW':
+        return_dict["Sensor {}".format((port + 1))] = value[0]
+        return_dict["Sensor {} Raw".format((port + 1))] = value[0]
+    elif type == 'TEMP':
+        temp = 0
+        if value[0] == 4095:
+            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
+        elif error == BP3.SUCCESS:
+            RtRt25 = (float)(value[0]) / (4095 - value[0])
+            lnRtRt25 = math.log(RtRt25)
+            if (RtRt25 > 3.277):
+                i = 0
+            elif (RtRt25 > 0.3599):
+                i = 1
+            elif (RtRt25 > 0.06816):
+                i = 2
+            else:
+                i = 3
+            temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
+            temp = temp - 273.15
+        return_dict["Sensor {}".format((port + 1))] = temp
+        return_dict["Sensor {} Temp".format((port + 1))] = temp
+    elif type == 'FLEX':
+        return_dict["Sensor {}".format((port + 1))] = value[0]
+        return_dict["Sensor {} Flex".format((port + 1))] = value[0]
     
     return return_dict
 
@@ -310,17 +285,14 @@ def handle_BrickPi_msg(msg):
         # set that port to that sensor
         port = int(incoming_sensor_port) - 1 # convert the 1-4 to 0-3
         sensor_type_string = incoming_sensor_type.upper()
-        if en_brickpi3:
-            if (sensor_type_string == "RAW"
-             or sensor_type_string == "TEMP"
-             or sensor_type_string == "FLEX"):
-                BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
-            else:
-                BP3.set_sensor_type(port, sensor_types[sensor_type_string])
-            SensorType[port] = sensor_type_string
-        elif en_brickpi:
-            # add BrickPi+ support
-            pass
+        
+        if (sensor_type_string == "RAW"
+         or sensor_type_string == "TEMP"
+         or sensor_type_string == "FLEX"):
+            BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
+        else:
+            BP3.set_sensor_type(port, sensor_types[sensor_type_string])
+        SensorType[port] = sensor_type_string
         
         return_dict["Sensor {} Type".format(incoming_sensor_port)] = sensor_type_string
         
@@ -347,17 +319,9 @@ def handle_BrickPi_msg(msg):
                 #    incoming_motor_target = "target error"
             
             if incoming_motor_target != "target error":
-                if en_brickpi3:
-                    BP3.set_motor_speed(port, incoming_motor_target)
-                elif en_brickpi:
-                    # add BrickPi+ support
-                    pass
+                BP3.set_motor_speed(port, incoming_motor_target)
             else:
-                if en_brickpi3:
-                    BP3.set_motor_speed(port, 0)
-                elif en_brickpi:
-                    # add BrickPi+ support
-                    pass   
+                BP3.set_motor_speed(port, 0)  
         else:
             if en_debug:
                 print("Motor position {}".format(incoming_motor_target))
@@ -368,17 +332,9 @@ def handle_BrickPi_msg(msg):
                 incoming_motor_target = "target error"
             
             if incoming_motor_target != "target error":
-                if en_brickpi3:
-                    BP3.set_motor_position(port, incoming_motor_target)
-                elif en_brickpi:
-                    # add BrickPi+ support
-                    pass
+                BP3.set_motor_position(port, incoming_motor_target)
             else:
-                if en_brickpi3:
-                    BP3.set_motor_speed(port, 0)
-                elif en_brickpi:
-                    # add BrickPi+ support
-                    pass
+                BP3.set_motor_speed(port, 0)
         
         return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
         
