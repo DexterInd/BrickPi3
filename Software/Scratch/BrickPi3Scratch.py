@@ -13,52 +13,39 @@ import sys
 # Set to 0 to go into quiet mode
 en_debug = 1
 
+import brickpi3
 try:
-    with open("/home/pi/Dexter/detected_robot.txt") as file_handle:
-        file_string = file_handle.read()
-        if file_string.find("BrickPi3") != -1:
-            import brickpi3 
-            try:
-                BP3 = brickpi3.BrickPi3()
-                
-                sensor_types = {
-                'NONE'          : BP3.SENSOR_TYPE.NONE,
-                'EV3US'         : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
-                'EV3USCM'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
-                'EV3USIN'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_INCHES,
-                'EV3USLISTEN'   : BP3.SENSOR_TYPE.EV3_ULTRASONIC_LISTEN,
-                'EV3GYRO'       : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
-                'EV3GYROABS'    : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
-                'EV3GYRODPS'    : BP3.SENSOR_TYPE.EV3_GYRO_DPS,
-                'EV3GYROABSDPS' : BP3.SENSOR_TYPE.EV3_GYRO_ABS_DPS,
-                'EV3IR'         : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
-                'EV3IRPROX'     : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
-                'EV3IRSEEK'     : BP3.SENSOR_TYPE.EV3_INFRARED_SEEK,
-                'EV3IRREMOTE'   : BP3.SENSOR_TYPE.EV3_INFRARED_REMOTE,
-                'EV3TOUCH'      : BP3.SENSOR_TYPE.EV3_TOUCH,
-                'EV3COLOR'      : BP3.SENSOR_TYPE.EV3_COLOR_COLOR,
-                'NXTUS'         : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
-                'ULTRASONIC'    : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
-                'NXTTOUCH'      : BP3.SENSOR_TYPE.NXT_TOUCH,
-                'TOUCH'         : BP3.SENSOR_TYPE.TOUCH,
-                'NXTCOLOR'      : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
-                'COLOR'         : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
-                'RAW'           : BP3.SENSOR_TYPE.CUSTOM,
-                'TEMP'          : BP3.SENSOR_TYPE.CUSTOM,
-                'FLEX'          : BP3.SENSOR_TYPE.CUSTOM 
-                }
-            except:
-                if en_debug:
-                    print("BrickPi3 not detected. Exiting...")
-                sys.exit()
-        else:
-            if en_debug:
-                print("BrickPi3 not detected at startup. Exiting...")
-            sys.exit()
+    BP3 = brickpi3.BrickPi3()
     
-except IOError:
-    if en_debug:
-        print("error reading the detected robot from /home/pi/Dexter/detected_robot.txt")
+    sensor_types = {
+    'NONE'          : BP3.SENSOR_TYPE.NONE,
+    'EV3US'         : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
+    'EV3USCM'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
+    'EV3USIN'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_INCHES,
+    'EV3USLISTEN'   : BP3.SENSOR_TYPE.EV3_ULTRASONIC_LISTEN,
+    'EV3GYRO'       : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
+    'EV3GYROABS'    : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
+    'EV3GYRODPS'    : BP3.SENSOR_TYPE.EV3_GYRO_DPS,
+    'EV3GYROABSDPS' : BP3.SENSOR_TYPE.EV3_GYRO_ABS_DPS,
+    'EV3IR'         : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
+    'EV3IRPROX'     : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
+    'EV3IRSEEK'     : BP3.SENSOR_TYPE.EV3_INFRARED_SEEK,
+    'EV3IRREMOTE'   : BP3.SENSOR_TYPE.EV3_INFRARED_REMOTE,
+    'EV3TOUCH'      : BP3.SENSOR_TYPE.EV3_TOUCH,
+    'EV3COLOR'      : BP3.SENSOR_TYPE.EV3_COLOR_COLOR,
+    'NXTUS'         : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
+    'ULTRASONIC'    : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
+    'NXTTOUCH'      : BP3.SENSOR_TYPE.NXT_TOUCH,
+    'TOUCH'         : BP3.SENSOR_TYPE.TOUCH,
+    'NXTCOLOR'      : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
+    'COLOR'         : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
+    'RAW'           : BP3.SENSOR_TYPE.CUSTOM,
+    'TEMP'          : BP3.SENSOR_TYPE.CUSTOM,
+    'FLEX'          : BP3.SENSOR_TYPE.CUSTOM 
+    }
+except IOError as error:
+    print(error.args[0], ". Exiting...")
+    sys.exit()
 
 def get_regex_sensors():
     '''
