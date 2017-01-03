@@ -43,8 +43,8 @@ try:
     'TEMP'          : BP3.SENSOR_TYPE.CUSTOM,
     'FLEX'          : BP3.SENSOR_TYPE.CUSTOM 
     }
-except:
-    print("BrickPi3 not detected. Exiting...")
+except IOError as error:
+    print(error.args[0], ". Exiting...")
     sys.exit()
 
 def get_regex_sensors():
