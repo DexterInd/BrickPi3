@@ -7,9 +7,9 @@
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
-# This code is an example for reading the battery voltage of the BrickPi3
+# This code is an example for reading BrickPi3 information
 #
-# Results: Print the serial number, hardware version, firmware version, battery voltage, and onboard 9v, 5v, and 3.3v voltages.
+# Results: Print information about the attached BrickPi3.
 
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       #                           ''
