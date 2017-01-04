@@ -152,7 +152,6 @@ def read_sensor(port):
     value, error = BP3.get_sensor(port)
     
     if type != 'NONE':
-        return_dict["Sensor {}".format((port + 1))] = 0
         if error == BP3.SUCCESS:
             return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
         if error == BP3.SPI_ERROR:
@@ -163,38 +162,27 @@ def read_sensor(port):
             return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
     
     if type == 'EV3US' or type == 'EV3USCM':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} US CM".format((port + 1))] = value
     elif type == 'EV3USIN':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} US Inch".format((port + 1))] = value
     elif type == 'EV3USLISTEN':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} US Listen".format((port + 1))] = value
     elif type == 'EV3GYRO' or type == 'EV3GYROABS':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} Gyro ABS".format((port + 1))] = value
     elif type == 'EV3GYRODPS':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} Gyro DPS".format((port + 1))] = value
     elif type == 'EV3GYROABSDPS':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
         return_dict["Sensor {} Gyro ABS".format((port + 1))] = value[0]
         return_dict["Sensor {} Gyro DPS".format((port + 1))] = value[1]
     elif type == 'EV3IR' or type == 'EV3IRPROX':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} IR Prox".format((port + 1))] = value
     elif type == 'EV3TOUCH' or type == 'NXTTOUCH' or type == 'TOUCH':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} Touch".format((port + 1))] = value
     elif type == 'EV3COLOR' or type == 'COLOR' or type == 'NXTCOLOR':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} Color".format((port + 1))] = value
     elif type == 'NXTUS' or type == 'ULTRASONIC':
-        return_dict["Sensor {}".format((port + 1))] = value
         return_dict["Sensor {} US CM".format((port + 1))] = value
     elif type == 'RAW':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
         return_dict["Sensor {} Raw".format((port + 1))] = value[0]
     elif type == 'TEMP':
         temp = 0
@@ -213,10 +201,8 @@ def read_sensor(port):
                 i = 3
             temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
             temp = temp - 273.15
-        return_dict["Sensor {}".format((port + 1))] = temp
         return_dict["Sensor {} Temp".format((port + 1))] = temp
     elif type == 'FLEX':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
         return_dict["Sensor {} Flex".format((port + 1))] = value[0]
     
     return return_dict
@@ -273,18 +259,23 @@ def handle_BrickPi_msg(msg):
         port = int(incoming_sensor_port) - 1 # convert the 1-4 to 0-3
         sensor_type_string = incoming_sensor_type.upper()
         
-        if (sensor_type_string == "RAW"
-         or sensor_type_string == "TEMP"
-         or sensor_type_string == "FLEX"):
-            BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
-        else:
-            BP3.set_sensor_type(port, sensor_types[sensor_type_string])
-        SensorType[port] = sensor_type_string
+        if SensorType[port] != sensor_type_string:
+            if (sensor_type_string == "RAW"
+             or sensor_type_string == "TEMP"
+             or sensor_type_string == "FLEX"):
+                BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
+            else:
+                BP3.set_sensor_type(port, sensor_types[sensor_type_string])
+            SensorType[port] = sensor_type_string
+            return_dict["Sensor {} Type".format(incoming_sensor_port)] = sensor_type_string
+            if en_debug:
+                print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
+            time.sleep(0.010)
         
-        return_dict["Sensor {} Type".format(incoming_sensor_port)] = sensor_type_string
+        return_dict.update(read_sensor(port))
         
         if en_debug:
-            print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
+            print("Reading sensor port {}".format(incoming_sensor_port))
 
     # SET MOTOR SPEED
     elif incoming_motor_port != None :
