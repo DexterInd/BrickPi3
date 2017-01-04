@@ -166,7 +166,7 @@ def read_sensor(port):
         # in other words, value was a number, not a list
         except TypeError:
             # for a sensor returning just one value:
-            return_dict["s{} {}".format((port + 1),sensor_types[type][1])] = value
+            return_dict["S{} {}".format((port + 1),sensor_types[type][1])] = value
     elif type == 'TEMP':
         temp = 0
         if value[0] == 4095:
