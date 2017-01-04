@@ -8,44 +8,63 @@ import string
 import math
 import time
 import sys
+import brickpi3
+
+
+
+##################################################################
+# GLOBAL VARIABLES
+##################################################################
 
 # Set to 1 to have debugging information printed out
 # Set to 0 to go into quiet mode
 en_debug = 1
 
-import brickpi3
 try:
     BP3 = brickpi3.BrickPi3()
     
     sensor_types = {
-    'NONE'          : BP3.SENSOR_TYPE.NONE,
-    'EV3US'         : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
-    'EV3USCM'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,
-    'EV3USIN'       : BP3.SENSOR_TYPE.EV3_ULTRASONIC_INCHES,
-    'EV3USLISTEN'   : BP3.SENSOR_TYPE.EV3_ULTRASONIC_LISTEN,
-    'EV3GYRO'       : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
-    'EV3GYROABS'    : BP3.SENSOR_TYPE.EV3_GYRO_ABS,
-    'EV3GYRODPS'    : BP3.SENSOR_TYPE.EV3_GYRO_DPS,
-    'EV3GYROABSDPS' : BP3.SENSOR_TYPE.EV3_GYRO_ABS_DPS,
-    'EV3IR'         : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
-    'EV3IRPROX'     : BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,
-    'EV3IRSEEK'     : BP3.SENSOR_TYPE.EV3_INFRARED_SEEK,
-    'EV3IRREMOTE'   : BP3.SENSOR_TYPE.EV3_INFRARED_REMOTE,
-    'EV3TOUCH'      : BP3.SENSOR_TYPE.EV3_TOUCH,
-    'EV3COLOR'      : BP3.SENSOR_TYPE.EV3_COLOR_COLOR,
-    'NXTUS'         : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
-    'ULTRASONIC'    : BP3.SENSOR_TYPE.NXT_ULTRASONIC,
-    'NXTTOUCH'      : BP3.SENSOR_TYPE.NXT_TOUCH,
-    'TOUCH'         : BP3.SENSOR_TYPE.TOUCH,
-    'NXTCOLOR'      : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
-    'COLOR'         : BP3.SENSOR_TYPE.NXT_COLOR_FULL,
-    'RAW'           : BP3.SENSOR_TYPE.CUSTOM,
-    'TEMP'          : BP3.SENSOR_TYPE.CUSTOM,
-    'FLEX'          : BP3.SENSOR_TYPE.CUSTOM 
+    'NONE'          : [BP3.SENSOR_TYPE.NONE,"None"],
+    'EV3US'         : [BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,"US cm"],
+    'EV3USCM'       : [BP3.SENSOR_TYPE.EV3_ULTRASONIC_CM,"US cm"],
+    'EV3USIN'       : [BP3.SENSOR_TYPE.EV3_ULTRASONIC_INCHES,"US Inch"],
+    'EV3USLISTEN'   : [BP3.SENSOR_TYPE.EV3_ULTRASONIC_LISTEN,"US Listen"],
+    'EV3GYRO'       : [BP3.SENSOR_TYPE.EV3_GYRO_ABS,"Gyro ABS"],
+    'EV3GYROABS'    : [BP3.SENSOR_TYPE.EV3_GYRO_ABS,"Gyro ABS"],
+    'EV3GYRODPS'    : [BP3.SENSOR_TYPE.EV3_GYRO_DPS,"Gyro DPS"],
+    'EV3GYROABSDPS' : [BP3.SENSOR_TYPE.EV3_GYRO_ABS_DPS,"Gyro ABS","Gyro DPS"],
+    'EV3IR'         : [BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,"IR Prox"],
+    'EV3IRPROX'     : [BP3.SENSOR_TYPE.EV3_INFRARED_PROXIMITY,"IR Prox"],
+    'EV3IRSEEK'     : [BP3.SENSOR_TYPE.EV3_INFRARED_SEEK,"None"],
+    'EV3IRREMOTE'   : [BP3.SENSOR_TYPE.EV3_INFRARED_REMOTE,"None"],
+    'EV3TOUCH'      : [BP3.SENSOR_TYPE.EV3_TOUCH,"Touch"],
+    'EV3COLOR'      : [BP3.SENSOR_TYPE.EV3_COLOR_COLOR,"Color"],
+    'NXTUS'         : [BP3.SENSOR_TYPE.NXT_ULTRASONIC,"US cm"],
+    'ULTRASONIC'    : [BP3.SENSOR_TYPE.NXT_ULTRASONIC,"US cm"],
+    'NXTTOUCH'      : [BP3.SENSOR_TYPE.NXT_TOUCH,"Touch"],
+    'TOUCH'         : [BP3.SENSOR_TYPE.TOUCH,"Touch"],
+    'NXTCOLOR'      : [BP3.SENSOR_TYPE.NXT_COLOR_FULL,"Color"],
+    'COLOR'         : [BP3.SENSOR_TYPE.NXT_COLOR_FULL,"Color"],
+    'RAW'           : [BP3.SENSOR_TYPE.CUSTOM,"Raw"],
+    'TEMP'          : [BP3.SENSOR_TYPE.CUSTOM,"Temp"],
+    'FLEX'          : [BP3.SENSOR_TYPE.CUSTOM,"Flex"]
     }
 except IOError as error:
     print(error.args[0], ". Exiting...")
     sys.exit()
+
+SensorType = ["NONE", "NONE", "NONE", "NONE"]
+
+# temperature conversion lists for the dTemp sensor
+_a = [0.003357042,         0.003354017,        0.0033530481,       0.0033536166]
+_b = [0.00025214848,       0.00025617244,      0.00025420230,      0.000253772]
+_c = [0.0000033743283,     0.0000021400943,    0.0000011431163,    0.00000085433271]
+_d = [-0.000000064957311, -0.000000072405219, -0.000000069383563, -0.000000087912262]
+
+
+##################################################################
+# HELPER FUNCTIONS
+##################################################################
 
 def get_regex_sensors():
     '''
@@ -59,8 +78,7 @@ def get_regex_sensors():
         list_of_sensors += key
     return list_of_sensors
 
-# test_msgs is used to assert the regex messages
-test_msgs = []
+
 def set_regex_string():
     '''
     Sets up the regex string, and the test_msgs for asserting
@@ -73,25 +91,12 @@ def set_regex_string():
             followed by keywords ON, FULL, STOP, OFF, or a value with or without a % sign
     4. UPDATE keyword
     '''
-    global test_msgs
-
     regex_set_sensor = "S([1-4])\s*({})".format(get_regex_sensors())
     # group 1 -> sensor port
     # group 2 -> sensor type (as a string)
 
-
-    # TODO: Adjust for BrickPi3
-    test_msgs += ["S1 EV3US",
-        "S2EV3TOUCH",
-        "S3  ULTRASONIC",
-        "S4 TEMP "]
-
     regex_read_single_sensor = "S([1-4])\s*$"
     # group 3 -> sensor port
-    test_msgs += ["S1",
-        "S2",
-        "S3",
-        "S4"]
 
     # Nicole's regex
     # (?:M)(?:OTOR)?\s*([A-D])\s*(?:(ON|FULL|STOP|OFF|-?[0-9.]+\s*%?)|(?:(P)(?:osition|os)?\s*(-?[0-9.]+)))
@@ -99,29 +104,14 @@ def set_regex_string():
     regex_set_motor = "(?:M)(?:OTOR)?\s*([A-D])\s*(P(?:osition|os)?)?\s*(ON|FULL|STOP|OFF|-?[0-9.]+)\s*%?"
     # group 4 -> motor port
     # group 5 -> motor speed
-    test_msgs += [
-        "MAON",
-        "MA FULL",
-        "MOTOR A -50",
-        "MB STOP",
-        "MOTORBOFF",
-        "MOTOR C 50",
-        "MC50.5",
-        "MOTOR D 100%",
-        "MOTOR D 100 %",
-        "MD-100"]
 
     regex_set_update_all = "(UPDATE)"
     # group 6 -> "UPDATE"
-    test_msgs += ["Update"]
 
     return ("^"+regex_set_sensor+"|"+ \
                 regex_read_single_sensor+"|"+ \
                 regex_set_motor+"|"+  \
                 regex_set_update_all)
-
-
-compiled_regexBP = re.compile(set_regex_string(), re.IGNORECASE)
 
 
 def is_BrickPi_msg(msg):
@@ -138,13 +128,6 @@ def is_BrickPi_msg(msg):
     else:
         return True
 
-SensorType = ["NONE", "NONE", "NONE", "NONE"]
-
-# temperature conversion lists for the dTemp sensor
-_a = [0.003357042,         0.003354017,        0.0033530481,       0.0033536166]
-_b = [0.00025214848,       0.00025617244,      0.00025420230,      0.000253772]
-_c = [0.0000033743283,     0.0000021400943,    0.0000011431163,    0.00000085433271]
-_d = [-0.000000064957311, -0.000000072405219, -0.000000069383563, -0.000000087912262]
 
 def read_sensor(port):
     return_dict={}
@@ -152,54 +135,25 @@ def read_sensor(port):
     value, error = BP3.get_sensor(port)
     
     if type != 'NONE':
-        return_dict["Sensor {}".format((port + 1))] = 0
         if error == BP3.SUCCESS:
-            return_dict["Sensor {} Error".format((port + 1))] = "SUCCESS"
+            return_dict["S{} Status".format((port + 1))] = "SUCCESS"
         if error == BP3.SPI_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SPI_ERROR"
+            return_dict["S{} Status".format((port + 1))] = "SPI_ERROR"
         if error == BP3.SENSOR_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
+            return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
         if error == BP3.SENSOR_TYPE_ERROR:
-            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_TYPE_ERROR"
+            return_dict["S{} Status".format((port + 1))] = "SENSOR_TYPE_ERROR"
     
-    if type == 'EV3US' or type == 'EV3USCM':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} US CM".format((port + 1))] = value
-    elif type == 'EV3USIN':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} US Inch".format((port + 1))] = value
-    elif type == 'EV3USLISTEN':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} US Listen".format((port + 1))] = value
-    elif type == 'EV3GYRO' or type == 'EV3GYROABS':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} Gyro ABS".format((port + 1))] = value
-    elif type == 'EV3GYRODPS':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} Gyro DPS".format((port + 1))] = value
-    elif type == 'EV3GYROABSDPS':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
-        return_dict["Sensor {} Gyro ABS".format((port + 1))] = value[0]
-        return_dict["Sensor {} Gyro DPS".format((port + 1))] = value[1]
-    elif type == 'EV3IR' or type == 'EV3IRPROX':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} IR Prox".format((port + 1))] = value
-    elif type == 'EV3TOUCH' or type == 'NXTTOUCH' or type == 'TOUCH':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} Touch".format((port + 1))] = value
-    elif type == 'EV3COLOR' or type == 'COLOR' or type == 'NXTCOLOR':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} Color".format((port + 1))] = value
-    elif type == 'NXTUS' or type == 'ULTRASONIC':
-        return_dict["Sensor {}".format((port + 1))] = value
-        return_dict["Sensor {} US CM".format((port + 1))] = value
-    elif type == 'RAW':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
-        return_dict["Sensor {} Raw".format((port + 1))] = value[0]
+    if type != 'TEMP':
+        try:
+            for i in range(0,len(sensor_types[type])):
+                return_dict["S{} {}".format((port + 1),sensor_types[type][i+1])] = value[i]
+        except:
+            return_dict["S{} {}".format((port + 1),sensor_types[type][1])] = value
     elif type == 'TEMP':
         temp = 0
         if value[0] == 4095:
-            return_dict["Sensor {} Error".format((port + 1))] = "SENSOR_ERROR"
+            return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
         elif error == BP3.SUCCESS:
             RtRt25 = (float)(value[0]) / (4095 - value[0])
             lnRtRt25 = math.log(RtRt25)
@@ -213,11 +167,8 @@ def read_sensor(port):
                 i = 3
             temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
             temp = temp - 273.15
-        return_dict["Sensor {}".format((port + 1))] = temp
-        return_dict["Sensor {} Temp".format((port + 1))] = temp
-    elif type == 'FLEX':
-        return_dict["Sensor {}".format((port + 1))] = value[0]
-        return_dict["Sensor {} Flex".format((port + 1))] = value[0]
+        return_dict["S{} Temp".format((port + 1))] = temp
+
     
     return return_dict
 
@@ -273,18 +224,23 @@ def handle_BrickPi_msg(msg):
         port = int(incoming_sensor_port) - 1 # convert the 1-4 to 0-3
         sensor_type_string = incoming_sensor_type.upper()
         
-        if (sensor_type_string == "RAW"
-         or sensor_type_string == "TEMP"
-         or sensor_type_string == "FLEX"):
-            BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
-        else:
-            BP3.set_sensor_type(port, sensor_types[sensor_type_string])
-        SensorType[port] = sensor_type_string
+        if SensorType[port] != sensor_type_string:
+            if (sensor_type_string == "RAW"
+             or sensor_type_string == "TEMP"
+             or sensor_type_string == "FLEX"):
+                BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
+            else:
+                BP3.set_sensor_type(port, sensor_types[sensor_type_string][0])
+            SensorType[port] = sensor_type_string
+            return_dict["S{} Type".format(incoming_sensor_port)] = sensor_type_string
+            if en_debug:
+                print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
+            time.sleep(0.010)
         
-        return_dict["Sensor {} Type".format(incoming_sensor_port)] = sensor_type_string
+        return_dict.update(read_sensor(port))
         
         if en_debug:
-            print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
+            print("Reading sensor port {}".format(incoming_sensor_port))
 
     # SET MOTOR SPEED
     elif incoming_motor_port != None :
@@ -348,14 +304,15 @@ def handle_BrickPi_msg(msg):
     return(return_dict)
 
 
-
+##################################################################
+# MAIN FUNCTION
+##################################################################
+compiled_regexBP = re.compile(set_regex_string(), re.IGNORECASE)
 
 if __name__ == '__main__':
 
-    for test_str in test_msgs:
-        assert(is_BrickPi_msg(test_str))
-
     connected = 0   # This variable tells us if we're successfully connected.
+
 
     while(connected == 0):
         startTime = time.time()
