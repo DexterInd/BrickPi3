@@ -71,6 +71,8 @@ cd /home/pi/Dexter/BrickPi3/Software/Python/
 sudo python setup.py install
 sudo python3 setup.py install
 
+sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
+
 echo ""
 echo "Installation complete"
 echo "Please reboot to make settings take effect"
