@@ -71,7 +71,11 @@ cd /home/pi/Dexter/BrickPi3/Software/Python/
 sudo python setup.py install
 sudo python3 setup.py install
 
-sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
+if [ ! -d /home/pi/Desktop/BrickPi3 ] 
+then
+	echo "Putting PivotPi folder on the desktop"
+    sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
+fi
 
 echo ""
 echo "Installation complete"
