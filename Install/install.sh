@@ -73,7 +73,7 @@ sudo python3 setup.py install
 
 if [ ! -d /home/pi/Desktop/BrickPi3 ] 
 then
-	echo "Putting PivotPi folder on the desktop"
+	echo "Putting BrickPi3 folder on the desktop"
     sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
 fi
 
