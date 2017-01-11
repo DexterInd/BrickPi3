@@ -14,7 +14,7 @@ from __future__ import division
 import subprocess # for executing system calls
 import spidev
 
-FIRMWARE_VERSION_REQUIRED = "1.0.1"
+FIRMWARE_VERSION_REQUIRED = "1.0.2"
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
@@ -755,12 +755,12 @@ class BrickPi3(object):
         port -- The Motor port
         speed -- The Speed from -100 to 100
         """
-        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_SPEED + port), speed]
+        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_SPEED + port), int(speed)]
         self.spi_transfer_array(outArray)
     
-    def set_tank_drive(self, ):
-        self.set_motor_speed(port, speed)
-        self.set_motor_speed(port, speed)
+    #def set_tank_drive(self, ):
+    #    self.set_motor_speed(port, speed)
+    #    self.set_motor_speed(port, speed)
     
     def set_motor_position(self, port, position):
         """
@@ -770,7 +770,7 @@ class BrickPi3(object):
         port -- The motor port
         position -- The target position
         """
-        self.spi_write_32((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_POSITION + port), position)
+        self.spi_write_32((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_POSITION + port), int(position))
     
     def set_motor_dps(self, port, dps):
         """
@@ -780,7 +780,7 @@ class BrickPi3(object):
         port -- The motor port
         position -- The target position
         """
-        self.spi_write_16((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_DPS + port), dps)
+        self.spi_write_16((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_DPS + port), int(dps))
     
     def offset_motor_encoder(self, port, position):
         """
@@ -792,7 +792,7 @@ class BrickPi3(object):
         
         Zero the encoder by offsetting it by the current position
         """
-        self.spi_write_32((self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER + port), position)
+        self.spi_write_32((self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER + port), int(position))
     
     def get_motor_encoder(self, port):
         """
@@ -821,10 +821,10 @@ class BrickPi3(object):
         self.set_sensor_type(self.PORT_4, self.SENSOR_TYPE.NONE)
         
         # turn off all motors
-        self.set_motor_speed(self.PORT_A, 0)
-        self.set_motor_speed(self.PORT_B, 0)
-        self.set_motor_speed(self.PORT_C, 0)
-        self.set_motor_speed(self.PORT_D, 0)
+        self.set_motor_speed(self.PORT_A, -128)
+        self.set_motor_speed(self.PORT_B, -128)
+        self.set_motor_speed(self.PORT_C, -128)
+        self.set_motor_speed(self.PORT_D, -128)
         
         # return the LED to the control of the FW
         self.set_led(-1)
