@@ -16,9 +16,9 @@ from __future__ import division       #                           ''
 
 import brickpi3 # import the BrickPi3 drivers
 
-BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
-
 try:
+    BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+    
     # Each of the following BP.get functions return a list of 2 values
     #     The first item in the list is the value (what we want to display).
     #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
@@ -32,5 +32,5 @@ try:
     print("5v voltage      : ", BP.get_voltage_5v()[0]      ) # read and display the current 5v regulator voltage
     print("3.3v voltage    : ", BP.get_voltage_3v3()[0]     ) # read and display the current 3.3v regulator voltage
     
-except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
-    pass
+except IOError as error:
+    print(error)
