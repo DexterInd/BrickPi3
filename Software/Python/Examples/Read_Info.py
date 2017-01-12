@@ -34,3 +34,6 @@ try:
     
 except IOError as error:
     print(error)
+
+except brickpi3.FirmwareVersionError as error:
+    print(error)
