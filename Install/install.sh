@@ -71,11 +71,14 @@ cd /home/pi/Dexter/BrickPi3/Software/Python/
 sudo python setup.py install
 sudo python3 setup.py install
 
-if [ ! -d /home/pi/Desktop/BrickPi3 ] 
-then
-	echo "Putting BrickPi3 folder on the desktop"
-    sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
-fi
+# not the job of this script. It's being done in fetch_brickpi3
+# and only for users who have the whole raspbian for robots
+# standalone users do not need the softlink
+# if [ ! -d /home/pi/Desktop/BrickPi3 ] 
+# then
+# 	echo "Putting BrickPi3 folder on the desktop"
+#     sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
+# fi
 
 echo ""
 echo "Installation complete"
