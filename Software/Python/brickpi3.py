@@ -47,6 +47,9 @@ class Enumeration(object):
                 setattr(self, name, number)
                 number = number + 1
 
+class FirmwareVersionError(Exception):
+    """Exception raised if the BrickPi3 firmware needs to be updated"""
+
 class BrickPi3(object):
     PORT_1 = 0
     PORT_2 = 1
@@ -223,8 +226,11 @@ class BrickPi3(object):
         
         Optionally set the SPI address to something other than 1
         """
+        
+        # note these two lines were a temporary work-around for older Raspbian For Robots.
         subprocess.call('gpio mode 13 ALT0', shell=True) # Make sure the SPI lines are configured for mode ALT0 so that the hardware SPI controller can use them
         subprocess.call('gpio mode 14 ALT0', shell=True) #                                                  ''
+        
         self.SPI_Address = addr
         if detect == True:
             manufacturer, merr = self.get_manufacturer()
@@ -233,7 +239,7 @@ class BrickPi3(object):
             if merr != self.SUCCESS or berr != self.SUCCESS or verr != self.SUCCESS or manufacturer != "Dexter Industries" or board != "BrickPi3":
                 raise IOError("BrickPi3 not connected")
             if vfw != FIRMWARE_VERSION_REQUIRED:
-                raise IOError("BrickPi3 firmware needs to be version %s but currently version %s" % (FIRMWARE_VERSION_REQUIRED, vfw))
+                raise FirmwareVersionError("BrickPi3 firmware needs to be version %s but is currently version %s" % (FIRMWARE_VERSION_REQUIRED, vfw))
     
     def spi_transfer_array(self, data_out):
         """

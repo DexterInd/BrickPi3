@@ -37,16 +37,16 @@ PORT_MOTOR_LEFT  = BP.PORT_D
 GYRO_EV3       = 1
 GYRO_HiTechnic = 2
 
-GYRO_TYPE = GYRO_EV3 # this can be set to GYRO_EV3 (for the Lego EV3 gyro sensor) or GYRO_HiTechnic (for the HiTechnic gyro sensor)
+GYRO_TYPE = GYRO_EV3   # this can be set to GYRO_EV3 (for the Lego EV3 gyro sensor) or GYRO_HiTechnic (for the HiTechnic gyro sensor)
 
-WHEEL_DIAMETER = 43.2 # Lego wheel diameter in mm. The size is moulded onto the sidewall of the Lego tires. The tires included with the EV3 retail set are 43.2mm, and the tires included with the EV3 education set are 56mm
+WHEEL_DIAMETER = 43.2  # Lego wheel diameter in mm. The size is moulded onto the sidewall of the Lego tires. The tires included with the EV3 retail set are 43.2mm, and the tires included with the EV3 education set are 56mm
 
-LOOP_SPEED = 120 # how fast to run the balance loop in Hz. Slower is less CPU intensive, but faster helps the balance bot to work better. Realistically anything over 120 doesn't make a difference.
+LOOP_SPEED = 120       # how fast to run the balance loop in Hz. Slower is less CPU intensive, but faster helps the balance bot to work better. Realistically anything over 120 doesn't make a difference.
 
-DRIVE_SPEED = 350 # how fast to drive when being controlled by the remote
-STEER_SPEED = 250 # how fast to steer when being controlled by the remote
+DRIVE_SPEED = 350      # how fast to drive when being controlled by the remote
+STEER_SPEED = 250      # how fast to steer when being controlled by the remote
 
-KCORRECTTIME = 0.001 # a constant used to correct the delay to try to maintain a perfect loop speed (defined by LOOP_SPEED)
+KCORRECTTIME = 0.001   # a constant used to correct the delay to try to maintain a perfect loop speed (defined by LOOP_SPEED)
 
 if GYRO_TYPE == GYRO_EV3:
     KGYROSPEEDCORRECT = 0.01 # a constant used to correct the gyro speed readings
