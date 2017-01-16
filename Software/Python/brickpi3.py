@@ -14,7 +14,7 @@ from __future__ import division
 import subprocess # for executing system calls
 import spidev
 
-FIRMWARE_VERSION_REQUIRED = "1.0.2"
+FIRMWARE_VERSION_REQUIRED = "1.1.x" # Make sure the top 2 of 3 numbers match
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
@@ -238,7 +238,7 @@ class BrickPi3(object):
             vfw, verr = self.get_version_firmware()
             if merr != self.SUCCESS or berr != self.SUCCESS or verr != self.SUCCESS or manufacturer != "Dexter Industries" or board != "BrickPi3":
                 raise IOError("BrickPi3 not connected")
-            if vfw != FIRMWARE_VERSION_REQUIRED:
+            if vfw.split('.')[0] != FIRMWARE_VERSION_REQUIRED.split('.')[0] or vfw.split('.')[1] != FIRMWARE_VERSION_REQUIRED.split('.')[1]:
                 raise FirmwareVersionError("BrickPi3 firmware needs to be version %s but is currently version %s" % (FIRMWARE_VERSION_REQUIRED, vfw))
     
     def spi_transfer_array(self, data_out):
