@@ -24,6 +24,28 @@ On Raspbian:
 
     `sudo reboot`
 
+Compatibility
+-------------
+The following Lego Sensor and Motors are supported by Python and Scratch:
+* Lego Sensors
+  * EV3
+    * Ultrasonic Sensor
+    * Gyro Sensor
+    * Color Sensor
+    * Touch Sensor
+    * Infrared Sensor
+  * NXT
+    * Ultrasonic Sensor
+    * Color Sensor
+    * Light Sensor
+    * Touch Sensor
+
+* Lego Motors
+  * EV3 Large Motor
+  * EV3 Medium Motor
+  * NXT Motor
+
+In addition, the BrickPi3 firmware and Python drivers support custom analog and I2C sensors. Most NXT and EV3 aftermarket sensors should work if you add custom python support. See [this python example for reading custom analog sensors](https://github.com/DexterInd/BrickPi3/blob/master/Software/Python/Examples/Analog_Sensor.py) and [this python example for reading custom I2C sensors](https://github.com/DexterInd/BrickPi3/blob/master/Software/Python/Examples/DI-dTIR.py).
 
 License
 -------
