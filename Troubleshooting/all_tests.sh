@@ -6,20 +6,11 @@ echo "==============================="
 echo "BrickPi3 Troubleshooting Script"
 echo "==============================="
 
-echo ""
-echo Adding permissions to the scripts
-echo =================================
-#chmod +x software_status.sh
-#chmod +x avrdude_test.sh
-#chmod +x i2c_test1.sh
-chmod +x hardware_and_firmware_test.sh
-#chmod +x motor_enc_led_test.sh
-
 echo "BrickPi3 Troubleshooting Script log" > log.txt
 #sudo ./software_status.sh 2>&1| tee log.txt
 #sudo ./avrdude_test.sh 2>&1| tee -a log.txt
 #sudo ./i2c_test1.sh 2>&1| tee -a log.txt
-sudo ./hardware_and_firmware_test.sh 2>&1| tee -a log.txt
+sudo bash hardware_and_firmware_test.sh 2>&1| tee -a log.txt
 #sudo ./motor_enc_led_test.sh 2>&1| tee -a log.txt
 
 echo ""

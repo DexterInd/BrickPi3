@@ -42,10 +42,7 @@ fi
 echo ""
 echo "Welcome to BrickPi3 Installer."
 
-sudo chmod +x /home/pi/Dexter/BrickPi3/Firmware/openocd/install_openocd_compiled.sh
 sudo bash /home/pi/Dexter/BrickPi3/Firmware/openocd/install_openocd_compiled.sh
-
-sudo chmod +x /home/pi/Dexter/BrickPi3/Firmware/brickpi3samd_flash_firmware.sh
 
 # Adding in /etc/modules
 echo ""
