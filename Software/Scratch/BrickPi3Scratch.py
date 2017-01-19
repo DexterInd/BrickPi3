@@ -409,11 +409,15 @@ if __name__ == '__main__':
             m = s.receive()
 
             while m is None or m[0] == 'sensor-update' :
-                if m == None:  # File/New
-                    print("Resetting everything")
-                    SensorType = ["None","None","None","None"]
-                    for port in range(4):
-                        BP3.set_sensor_type(port, sensor_types["NONE"][0])
+
+                # keep this for reference.
+                # may work to detect File/new, File/Open but needs a change in scratchpi
+                # to detect "send_vars" msg as being valid          
+                # if m[0] == "send_vars":  # File/New
+                #     print("Resetting everything")
+                #     SensorType = ["None","None","None","None"]
+                #     for port in range(4):
+                #         BP3.set_sensor_type(port, sensor_types["NONE"][0])
 
                 m = s.receive()
 
