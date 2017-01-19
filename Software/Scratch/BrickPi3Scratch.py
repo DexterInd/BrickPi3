@@ -17,6 +17,9 @@ import tkMessageBox
 import atexit
 
 def error_box(in_string):
+    '''
+    Code to generate popup window
+    '''
     window = Tk()
     window.wm_withdraw()
 
@@ -26,8 +29,13 @@ def error_box(in_string):
 
 @atexit.register
 def cleanup():
+    '''
+    Stop BrickPi3 and print out error msg
+    if I can figure out how to differentiate between normal exit and crash
+    then I'll consider having a popup window here.
+    '''
     try:
-        BP3.reset_all() # we want the gopigo to stop
+        BP3.reset_all() # we want the brickpi3 to stop if BrickPi3Scratch.py crashes
     except:
         pass
     print ("Scratch Interpreted closed")
@@ -250,7 +258,6 @@ def handle_BrickPi_msg(msg):
     returns a dictionary containing one or more sensor names
         and corresponding values
     '''
-
     return_string = "0"
     return_dict = {}
 
