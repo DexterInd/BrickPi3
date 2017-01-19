@@ -9,6 +9,9 @@ import math
 import time
 import sys
 import brickpi3
+
+## Add what's required to have modal popup windows
+## and handle crashes if any
 from Tkinter import *
 import tkMessageBox
 import atexit
@@ -67,6 +70,9 @@ try:
     'TEMP'          : [BP3.SENSOR_TYPE.CUSTOM, "Temp"],
     'FLEX'          : [BP3.SENSOR_TYPE.CUSTOM, "Flex"]
     }
+
+## Handle Firmware Version Error with a popup instead of quietly dying
+## and leaving the user wondering why their program isn't working
 except brickpi3.FirmwareVersionError as error:
     error_box("BrickPi Robot needs to be updated (see DI Update Software)")
     print ("Scratch Interpreted closed: {}".format(error.args[0]))
@@ -90,8 +96,6 @@ _d = [-0.000000064957311, -0.000000072405219, -0.000000069383563, -0.00000008791
 ##################################################################
 # HELPER FUNCTIONS
 ##################################################################
-
-
 
 def get_regex_sensors():
     '''
@@ -138,10 +142,11 @@ def set_regex_string():
     # group 4 -> motor port
     # group 5 -> motor speed
 
-    regex_set_update_all = "(UPDATE)"
+    regex_set_update_all = "\s*(UPDATE)\s*"
     # group 6 -> "UPDATE"
 
-    regex_reset = "(RESET)"
+    # Add a reset
+    regex_reset = "\s*(RESET)\s*"
 
     return ("^" + regex_set_sensor + "|" +
                 regex_read_single_sensor + "|" +
@@ -291,6 +296,7 @@ def handle_BrickPi_msg(msg):
         # set that port to that sensor
         port = int(incoming_sensor_port) - 1  # convert the 1-4 to 0-3
         sensor_type_string = incoming_sensor_type.upper()
+
         if SensorType[port] != sensor_type_string:
             if (sensor_type_string == "RAW"
              or sensor_type_string == "TEMP"
@@ -304,6 +310,7 @@ def handle_BrickPi_msg(msg):
             if en_debug:
                 print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
             time.sleep(0.010)
+
         return_dict.update(read_sensor(port))
 
         if en_debug:
