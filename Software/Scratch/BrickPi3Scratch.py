@@ -9,6 +9,26 @@ import math
 import time
 import sys
 import brickpi3
+from Tkinter import *
+import tkMessageBox
+import atexit
+
+def error_box(in_string):
+    window = Tk()
+    window.wm_withdraw()
+
+    #message at x:200,y:200
+    window.geometry("1x1+"+str(window.winfo_screenwidth()//2)+"+"+str(window.winfo_screenheight()//2))
+    tkMessageBox.showerror(title="error",message=in_string,parent=window)
+
+@atexit.register
+def cleanup():
+    try:
+        BP3.reset_all() # we want the gopigo to stop
+    except:
+        pass
+    print ("Scratch Interpreted closed")
+
 
 ##################################################################
 # GLOBAL VARIABLES
@@ -47,9 +67,16 @@ try:
     'TEMP'          : [BP3.SENSOR_TYPE.CUSTOM, "Temp"],
     'FLEX'          : [BP3.SENSOR_TYPE.CUSTOM, "Flex"]
     }
+except brickpi3.FirmwareVersionError as error:
+    error_box("BrickPi Robot needs to be updated (see DI Update Software)")
+    print ("Scratch Interpreted closed: {}".format(error.args[0]))
+    sys.exit()
 except IOError as error:
+    error_box("Connection Error: {}".format(error.args[0]))
     print(error.args[0], ". Exiting...")
     sys.exit()
+except:
+    error_box("Unknown Error, closing Scratch Interpreter")
 
 SensorType = ["NONE", "NONE", "NONE", "NONE"]
 
@@ -63,6 +90,8 @@ _d = [-0.000000064957311, -0.000000072405219, -0.000000069383563, -0.00000008791
 ##################################################################
 # HELPER FUNCTIONS
 ##################################################################
+
+
 
 def get_regex_sensors():
     '''
@@ -112,10 +141,13 @@ def set_regex_string():
     regex_set_update_all = "(UPDATE)"
     # group 6 -> "UPDATE"
 
+    regex_reset = "(RESET)"
+
     return ("^" + regex_set_sensor + "|" +
                 regex_read_single_sensor + "|" +
                 regex_set_motor + "|" +
-                regex_set_update_all)
+                regex_set_update_all + "|" +
+                regex_reset)
 
 
 def is_BrickPi_msg(msg):
@@ -196,12 +228,24 @@ def read_sensor(port):
     return return_dict
 
 
+def BP_reset():
+    '''
+    Resets the BrickPi3
+    '''
+
+    global SensorType
+    SensorType = ["NONE", "NONE", "NONE", "NONE"]
+    for port in range(4):
+        BP3.set_sensor_type(port, sensor_types["NONE"][0])
+
+
 def handle_BrickPi_msg(msg):
     '''
     parses the message
     returns a dictionary containing one or more sensor names
         and corresponding values
     '''
+
     return_string = "0"
     return_dict = {}
 
@@ -211,7 +255,7 @@ def handle_BrickPi_msg(msg):
     regObj = compiled_regexBP.match(msg.strip().lower())
     if regObj is None:
         if en_debug:
-            print ("BrickPi command is not recognized")
+            print ("BrickPi3 command is not recognized")
         return None
 
     # the following are set to None when they are not required
@@ -222,6 +266,7 @@ def handle_BrickPi_msg(msg):
     incoming_motor_poscmd = regObj.group(5)
     incoming_motor_target = regObj.group(6)
     incoming_update_all = regObj.group(7)
+    incoming_reset = regObj.group(8)
 
     motor_name_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
     motor_number_to_name = ['A', 'B', 'C', 'D']
@@ -246,7 +291,6 @@ def handle_BrickPi_msg(msg):
         # set that port to that sensor
         port = int(incoming_sensor_port) - 1  # convert the 1-4 to 0-3
         sensor_type_string = incoming_sensor_type.upper()
-
         if SensorType[port] != sensor_type_string:
             if (sensor_type_string == "RAW"
              or sensor_type_string == "TEMP"
@@ -260,7 +304,6 @@ def handle_BrickPi_msg(msg):
             if en_debug:
                 print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
             time.sleep(0.010)
-
         return_dict.update(read_sensor(port))
 
         if en_debug:
@@ -317,6 +360,10 @@ def handle_BrickPi_msg(msg):
         if en_debug:
             print("Update all sensor values")
 
+    # ADD A RESET - NP 19 Jan 2017
+    elif incoming_reset is not None:
+        BP_reset()
+
     else:
         if en_debug:
             print("Unexpected error: {}".format(msg))
@@ -342,7 +389,7 @@ if __name__ == '__main__':
             s = scratch.Scratch()
             if s.connected:
                 if en_debug:
-                    print("BrickPi Scratch: Connected to Scratch successfully")
+                    print("BrickPi3 Scratch: Connected to Scratch successfully")
             connected = 1   # We are succesfully connected!  Exit Away!
             # time.sleep(1)
 
@@ -362,6 +409,12 @@ if __name__ == '__main__':
             m = s.receive()
 
             while m is None or m[0] == 'sensor-update' :
+                if m == None:  # File/New
+                    print("Resetting everything")
+                    SensorType = ["None","None","None","None"]
+                    for port in range(4):
+                        BP3.set_sensor_type(port, sensor_types["NONE"][0])
+
                 m = s.receive()
 
             msg = m[1]
