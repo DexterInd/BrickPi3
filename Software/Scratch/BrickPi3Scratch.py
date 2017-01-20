@@ -10,6 +10,37 @@ import time
 import sys
 import brickpi3
 
+## Add what's required to have modal popup windows
+## and handle crashes if any
+from Tkinter import *
+import tkMessageBox
+import atexit
+
+def error_box(in_string):
+    '''
+    Code to generate popup window
+    '''
+    window = Tk()
+    window.wm_withdraw()
+
+    #message at x:200,y:200
+    window.geometry("1x1+"+str(window.winfo_screenwidth()//2)+"+"+str(window.winfo_screenheight()//2))
+    tkMessageBox.showerror(title="error",message=in_string,parent=window)
+
+@atexit.register
+def cleanup():
+    '''
+    Stop BrickPi3 and print out error msg
+    if I can figure out how to differentiate between normal exit and crash
+    then I'll consider having a popup window here.
+    '''
+    try:
+        BP3.reset_all() # we want the brickpi3 to stop if BrickPi3Scratch.py crashes
+    except:
+        pass
+    print ("Scratch Interpreted closed")
+
+
 ##################################################################
 # GLOBAL VARIABLES
 ##################################################################
@@ -47,9 +78,19 @@ try:
     'TEMP'          : [BP3.SENSOR_TYPE.CUSTOM, "Temp"],
     'FLEX'          : [BP3.SENSOR_TYPE.CUSTOM, "Flex"]
     }
+
+## Handle Firmware Version Error with a popup instead of quietly dying
+## and leaving the user wondering why their program isn't working
+except brickpi3.FirmwareVersionError as error:
+    error_box("BrickPi Robot needs to be updated (see DI Update Software)")
+    print ("Scratch Interpreted closed: {}".format(error.args[0]))
+    sys.exit()
 except IOError as error:
+    error_box("Connection Error: {}".format(error.args[0]))
     print(error.args[0], ". Exiting...")
     sys.exit()
+except:
+    error_box("Unknown Error, closing Scratch Interpreter")
 
 SensorType = ["NONE", "NONE", "NONE", "NONE"]
 
@@ -109,13 +150,17 @@ def set_regex_string():
     # group 4 -> motor port
     # group 5 -> motor speed
 
-    regex_set_update_all = "(UPDATE)"
+    regex_set_update_all = "\s*(UPDATE)\s*"
     # group 6 -> "UPDATE"
+
+    # Add a reset
+    regex_reset = "\s*(RESET)\s*"
 
     return ("^" + regex_set_sensor + "|" +
                 regex_read_single_sensor + "|" +
                 regex_set_motor + "|" +
-                regex_set_update_all)
+                regex_set_update_all + "|" +
+                regex_reset)
 
 
 def is_BrickPi_msg(msg):
@@ -196,6 +241,17 @@ def read_sensor(port):
     return return_dict
 
 
+def BP_reset():
+    '''
+    Resets the BrickPi3
+    '''
+
+    global SensorType
+    SensorType = ["NONE", "NONE", "NONE", "NONE"]
+    for port in range(4):
+        BP3.set_sensor_type(port, sensor_types["NONE"][0])
+
+
 def handle_BrickPi_msg(msg):
     '''
     parses the message
@@ -211,7 +267,7 @@ def handle_BrickPi_msg(msg):
     regObj = compiled_regexBP.match(msg.strip().lower())
     if regObj is None:
         if en_debug:
-            print ("BrickPi command is not recognized")
+            print ("BrickPi3 command is not recognized")
         return None
 
     # the following are set to None when they are not required
@@ -222,6 +278,7 @@ def handle_BrickPi_msg(msg):
     incoming_motor_poscmd = regObj.group(5)
     incoming_motor_target = regObj.group(6)
     incoming_update_all = regObj.group(7)
+    incoming_reset = regObj.group(8)
 
     motor_name_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
     motor_number_to_name = ['A', 'B', 'C', 'D']
@@ -317,6 +374,10 @@ def handle_BrickPi_msg(msg):
         if en_debug:
             print("Update all sensor values")
 
+    # ADD A RESET - NP 19 Jan 2017
+    elif incoming_reset is not None:
+        BP_reset()
+
     else:
         if en_debug:
             print("Unexpected error: {}".format(msg))
@@ -342,7 +403,7 @@ if __name__ == '__main__':
             s = scratch.Scratch()
             if s.connected:
                 if en_debug:
-                    print("BrickPi Scratch: Connected to Scratch successfully")
+                    print("BrickPi3 Scratch: Connected to Scratch successfully")
             connected = 1   # We are succesfully connected!  Exit Away!
             # time.sleep(1)
 
@@ -362,6 +423,16 @@ if __name__ == '__main__':
             m = s.receive()
 
             while m is None or m[0] == 'sensor-update' :
+
+                # keep this for reference.
+                # may work to detect File/new, File/Open but needs a change in scratchpi
+                # to detect "send_vars" msg as being valid          
+                # if m[0] == "send_vars":  # File/New
+                #     print("Resetting everything")
+                #     SensorType = ["None","None","None","None"]
+                #     for port in range(4):
+                #         BP3.set_sensor_type(port, sensor_types["NONE"][0])
+
                 m = s.receive()
 
             msg = m[1]
