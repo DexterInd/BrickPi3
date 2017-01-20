@@ -513,6 +513,34 @@ if __name__ == '__main__':
                 # print "Back from PivotPi",pivotsensors
                 s.sensorupdate(pivotsensors)
 
+            # Get the value from the Dexter Industries line sensor
+            elif msg.lower()=="LINE".lower():
+                try:
+                    import sys
+
+                    # NOTE: for now te line follower is still kept in the GoPiGo folder
+                    sys.path.insert(0, '/home/pi/Dexter/GoPiGo/Software/Python/line_follower')
+                    # import line_sensor
+                    import scratch_line
+
+                except ImportError:
+                    print ("Line sensor libraries not found")
+                    s.sensorupdate({'line':-3})
+
+                if en_debug:
+                    print ("LINE!")
+
+                try:
+                    line=scratch_line.line_sensor_val_scratch()
+                    if en_debug:
+                        print ("Line Sensor Readings: ".format(str(line)))
+                    s.sensorupdate({'line':line})
+
+                except:
+                    if en_debug:
+                        e = sys.exc_info()[1]
+                        print ("Error reading Line sensor: ",format(str(e)))
+
             else:
                 if en_debug:
                     print ("Ignoring Command: {}".format(msg))
