@@ -371,8 +371,9 @@ def handle_BrickPi_msg(msg):
 
         return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
 
-        if en_debug:
-            print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_target))
+        # this is error inducing when setting motor to a specific position
+        # if en_debug:
+        #     print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_target))
 
     # UPDATE ALL SENSOR VALUES
     elif incoming_update_all is not None:
