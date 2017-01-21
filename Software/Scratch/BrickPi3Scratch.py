@@ -9,6 +9,13 @@ import math
 import time
 import sys
 import brickpi3
+import os # needed to create folders
+try:
+    sys.path.insert(0, '/home/pi/Dexter/PivotPi/Software/Scratch/')
+    import PivotPiScratch
+    pivotpi_available=True
+except:
+    pivotpi_available=False
 
 ## Add what's required to have modal popup windows
 ## and handle crashes if any
@@ -93,6 +100,8 @@ except:
     error_box("Unknown Error, closing Scratch Interpreter")
 
 SensorType = ["NONE", "NONE", "NONE", "NONE"]
+defaultCameraFolder="/home/pi/Desktop/"
+cameraFolder = defaultCameraFolder
 
 # temperature conversion lists for the dTemp sensor
 _a = [0.003357042,         0.003354017,        0.0033530481,       0.0033536166]
@@ -362,8 +371,9 @@ def handle_BrickPi_msg(msg):
 
         return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
 
-        if en_debug:
-            print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_target))
+        # this is error inducing when setting motor to a specific position
+        # if en_debug:
+        #     print("setting motor {} to speed {}".format(incoming_motor_port, incoming_motor_target))
 
     # UPDATE ALL SENSOR VALUES
     elif incoming_update_all is not None:
@@ -439,9 +449,102 @@ if __name__ == '__main__':
 
             if en_debug:
                 print("Rx:{}".format(msg))
-            sensors = handle_BrickPi_msg(msg)
-            if sensors is not None:
-                s.sensorupdate(sensors)
+
+            if is_BrickPi_msg(msg):
+                sensors = handle_BrickPi_msg(msg)
+                if sensors is not None:
+                    s.sensorupdate(sensors)
+
+            # CREATE FOLDER TO SAVE PHOTOS IN
+
+            elif msg[:6].lower()=="FOLDER".lower():
+                print ("Camera folder")
+                try:
+                    cameraFolder=defaultCameraFolder+str(msg[6:]).strip()
+                    print(cameraFolder)
+                    if not os.path.exists(cameraFolder):
+                        pi=1000  # uid and gid of user pi
+                        os.makedirs(cameraFolder)
+                        os.chown(cameraFolder,pi,pi)
+                        s.sensorupdate({"folder":"created"})
+                    else:
+                        s.sensorupdate({"folder":"set"})
+                except:
+                    print ("error with folder name")
+
+            # TAKE A PICTURE
+
+            elif msg.lower()=="TAKE_PICTURE".lower():
+                print ("TAKE_PICTURE" )
+                pi=1000  # uid and gid of user pi
+                try:
+                    from subprocess import call
+                    import datetime
+                    newimage = "{}/img_{}.jpg".format(cameraFolder,str(datetime.datetime.now()).replace(" ","_",10))
+                    photo_cmd="raspistill -o {} -w 640 -h 480 -t 1".format(newimage)
+                    call ([photo_cmd], shell=True)
+                    os.chown(newimage,pi,pi)
+                    if en_debug:
+                        print ("Picture Taken")
+                    s.sensorupdate({'camera':"Picture Taken"})  
+                except:
+                    if en_debug:
+                        e = sys.exc_info()[1]
+                        print ("Error taking picture")
+                    s.sensorupdate({'camera':"Error"})  
+
+     
+            elif (msg[:5].lower()=="SPEAK".lower()):
+                try:
+                    from subprocess import call
+                    cmd_beg = "espeak -ven+f1 "
+                    in_text = msg[len("SPEAK"):]
+                    cmd_end = " 2>/dev/null"
+                    out_str = cmd_beg+"\""+in_text+"\""+cmd_end
+                    if en_debug:
+                        print(out_str)
+                    call([out_str], shell=True)
+
+                except:
+                    print("Issue with espeak")
+
+            # PIVOTPI
+            elif pivotpi_available==True and PivotPiScratch.isPivotPiMsg(msg):
+                pivotsensors = PivotPiScratch.handlePivotPi(msg)
+                # print "Back from PivotPi",pivotsensors
+                s.sensorupdate(pivotsensors)
+
+            # Get the value from the Dexter Industries line sensor
+            elif msg.lower()=="LINE".lower():
+                try:
+                    import sys
+
+                    # NOTE: for now te line follower is still kept in the GoPiGo folder
+                    sys.path.insert(0, '/home/pi/Dexter/GoPiGo/Software/Python/line_follower')
+                    # import line_sensor
+                    import scratch_line
+
+                except ImportError:
+                    print ("Line sensor libraries not found")
+                    s.sensorupdate({'line':-3})
+
+                if en_debug:
+                    print ("LINE!")
+
+                try:
+                    line=scratch_line.line_sensor_val_scratch()
+                    if en_debug:
+                        print ("Line Sensor Readings: ".format(str(line)))
+                    s.sensorupdate({'line':line})
+
+                except:
+                    if en_debug:
+                        e = sys.exc_info()[1]
+                        print ("Error reading Line sensor: ",format(str(e)))
+
+            else:
+                if en_debug:
+                    print ("Ignoring Command: {}".format(msg))
 
         except KeyboardInterrupt:
             running = False
