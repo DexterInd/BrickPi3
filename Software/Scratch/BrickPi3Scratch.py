@@ -253,6 +253,14 @@ def read_sensor(port):
 
     return return_dict
 
+def read_encoder_values(port, name):
+    # unpack the tuple here as Scratch can't do it
+    value, error = BP3.get_motor_encoder(port)
+    return_encoder = {}
+    return_encoder["Encoder {}".format(name)] = value
+    return_encoder["Encoder {} Status".format(name)] = error
+    return return_encoder
+
 
 def BP_reset():
     '''
@@ -378,7 +386,7 @@ def handle_BrickPi_msg(msg):
 
         # returning Motor Target is meaningless as it's exactly what Scratch passed to us
         # return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
-        return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[0]
+        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
 
         # this is error inducing when setting motor to a specific position
         # if en_debug:
@@ -388,10 +396,7 @@ def handle_BrickPi_msg(msg):
     elif incoming_update_all is not None:
         for port in range(0, 4):
             return_dict.update(read_sensor(port))
-            # unpack the tuple here as Scratch can't do it
-            value, error = BP3.get_motor_encoder(port)
-            return_dict["Encoder {}".format(motor_number_to_name[port])] = value
-            return_dict["Encoder {} Status".format(motor_number_to_name[port])] = error
+            return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
 
         if en_debug:
             print("Update all sensor values")
@@ -404,10 +409,8 @@ def handle_BrickPi_msg(msg):
     elif incoming_motor_read is not None:
         port = motor_name_to_number[incoming_motor_read.upper()]
         print("incoming motor read: {}".format(incoming_motor_read))
-        # unpack the tuple here as Scratch can't handle that
-        value, error = BP3.get_motor_encoder(port)
-        return_dict["Encoder {}".format(motor_number_to_name[port])] = value
-        return_dict["Encoder {} Status".format(motor_number_to_name[port])] = error
+        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
+
     else:
         if en_debug:
             print("Unexpected error: {}".format(msg))
