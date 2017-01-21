@@ -390,7 +390,7 @@ def handle_BrickPi_msg(msg):
             return_dict.update(read_sensor(port))
             # unpack the tuple here as Scratch can't do it
             return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[0]
-            return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[1]
+            return_dict["Encoder {} Status".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[1]
 
         if en_debug:
             print("Update all sensor values")
