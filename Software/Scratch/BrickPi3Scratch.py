@@ -389,8 +389,9 @@ def handle_BrickPi_msg(msg):
         for port in range(0, 4):
             return_dict.update(read_sensor(port))
             # unpack the tuple here as Scratch can't do it
-            return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[0]
-            return_dict["Encoder {} Status".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[1]
+            value, error = BP3.get_motor_encoder(port)
+            return_dict["Encoder {}".format(motor_number_to_name[port])] = value
+            return_dict["Encoder {} Status".format(motor_number_to_name[port])] = error
 
         if en_debug:
             print("Update all sensor values")
@@ -404,8 +405,9 @@ def handle_BrickPi_msg(msg):
         port = motor_name_to_number[incoming_motor_read.upper()]
         print("incoming motor read: {}".format(incoming_motor_read))
         # unpack the tuple here as Scratch can't handle that
-        return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[0]
-        return_dict["Encoder {} Status".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)[1]
+        value, error = BP3.get_motor_encoder(port)
+        return_dict["Encoder {}".format(motor_number_to_name[port])] = value
+        return_dict["Encoder {} Status".format(motor_number_to_name[port])] = error
     else:
         if en_debug:
             print("Unexpected error: {}".format(msg))
