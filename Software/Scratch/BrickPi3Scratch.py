@@ -165,11 +165,15 @@ def set_regex_string():
     # Add a reset
     regex_reset = "\s*(RESET)\s*"
 
+    # Read a motor speed
+    reget_read_motor = "(?:M)(?:OTOR)?\s*([A-D])\s*"
+
     return ("^" + regex_set_sensor + "|" +
                 regex_read_single_sensor + "|" +
                 regex_set_motor + "|" +
                 regex_set_update_all + "|" +
-                regex_reset)
+                regex_reset + "|" +
+                reget_read_motor)
 
 
 def is_BrickPi_msg(msg):
@@ -249,6 +253,14 @@ def read_sensor(port):
 
     return return_dict
 
+def read_encoder_values(port, name):
+    # unpack the tuple here as Scratch can't do it
+    value, error = BP3.get_motor_encoder(port)
+    return_encoder = {}
+    return_encoder["Encoder {}".format(name)] = value
+    return_encoder["Encoder {} Status".format(name)] = error
+    return return_encoder
+
 
 def BP_reset():
     '''
@@ -288,6 +300,7 @@ def handle_BrickPi_msg(msg):
     incoming_motor_target = regObj.group(6)
     incoming_update_all = regObj.group(7)
     incoming_reset = regObj.group(8)
+    incoming_motor_read = regObj.group(9)
 
     motor_name_to_number = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
     motor_number_to_name = ['A', 'B', 'C', 'D']
@@ -319,10 +332,12 @@ def handle_BrickPi_msg(msg):
              or sensor_type_string == "FLEX"):
                 BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
             else:
-
                 BP3.set_sensor_type(port, sensor_types[sensor_type_string][0])
+
             SensorType[port] = sensor_type_string
-            return_dict["S{} Type".format(incoming_sensor_port)] = sensor_type_string
+
+            # don't return sensor Type as it seems useless and just makes a busier sensor value list
+            # return_dict["S{} Type".format(incoming_sensor_port)] = sensor_type_string
             if en_debug:
                 print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
             time.sleep(0.010)
@@ -369,7 +384,9 @@ def handle_BrickPi_msg(msg):
             else:
                 BP3.set_motor_speed(port, 0)
 
-        return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
+        # returning Motor Target is meaningless as it's exactly what Scratch passed to us
+        # return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
+        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
 
         # this is error inducing when setting motor to a specific position
         # if en_debug:
@@ -379,7 +396,7 @@ def handle_BrickPi_msg(msg):
     elif incoming_update_all is not None:
         for port in range(0, 4):
             return_dict.update(read_sensor(port))
-            return_dict["Encoder {}".format(motor_number_to_name[port])] = BP3.get_motor_encoder(port)
+            return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
 
         if en_debug:
             print("Update all sensor values")
@@ -387,6 +404,12 @@ def handle_BrickPi_msg(msg):
     # ADD A RESET - NP 19 Jan 2017
     elif incoming_reset is not None:
         BP_reset()
+
+    # Rrad a motor position
+    elif incoming_motor_read is not None:
+        port = motor_name_to_number[incoming_motor_read.upper()]
+        print("incoming motor read: {}".format(incoming_motor_read))
+        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
 
     else:
         if en_debug:
