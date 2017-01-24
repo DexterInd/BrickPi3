@@ -14,7 +14,7 @@ from __future__ import division
 import subprocess # for executing system calls
 import spidev
 
-FIRMWARE_VERSION_REQUIRED = "1.1.x" # Make sure the top 2 of 3 numbers match
+FIRMWARE_VERSION_REQUIRED = "1.2.x" # Make sure the top 2 of 3 numbers match
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
@@ -120,20 +120,32 @@ class BrickPi3(object):
         WRITE_MOTOR_C_DPS,
         WRITE_MOTOR_D_DPS,
         
-        OFFSET_MOTOR_ENCODER = 48,
-        OFFSET_MOTOR_A_ENCODER = 48,
+        WRITE_MOTOR_DPS_KP = 48,
+        WRITE_MOTOR_A_DPS_KP = 48,
+        WRITE_MOTOR_B_DPS_KP,
+        WRITE_MOTOR_C_DPS_KP,
+        WRITE_MOTOR_D_DPS_KP,
+        
+        WRITE_MOTOR_DPS_KD = 52,
+        WRITE_MOTOR_A_DPS_KD = 52,
+        WRITE_MOTOR_B_DPS_KD,
+        WRITE_MOTOR_C_DPS_KD,
+        WRITE_MOTOR_D_DPS_KD,
+        
+        OFFSET_MOTOR_ENCODER = 56,
+        OFFSET_MOTOR_A_ENCODER = 56,
         OFFSET_MOTOR_B_ENCODER,
         OFFSET_MOTOR_C_ENCODER,
         OFFSET_MOTOR_D_ENCODER,
         
-        READ_MOTOR_ENCODER = 52,
-        READ_MOTOR_A_ENCODER = 52,
+        READ_MOTOR_ENCODER = 60,
+        READ_MOTOR_A_ENCODER = 60,
         READ_MOTOR_B_ENCODER,
         READ_MOTOR_C_ENCODER,
         READ_MOTOR_D_ENCODER,
         
-        I2C_TRANSACT = 56,
-        I2C_TRANSACT_1 = 56,
+        I2C_TRANSACT = 64,
+        I2C_TRANSACT_1 = 64,
         I2C_TRANSACT_2,
         I2C_TRANSACT_3,
         I2C_TRANSACT_4,
