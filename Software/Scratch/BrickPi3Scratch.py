@@ -183,7 +183,7 @@ def is_BrickPi_msg(msg):
         True if valid for BrickPi3
         False otherwise
     '''
-    retval = compiled_regexBP.match(msg)
+    retval = compiled_regexBP.match(msg.strip())
 
     if retval is None:
         return False
@@ -283,9 +283,9 @@ def handle_BrickPi_msg(msg):
     return_dict = {}
 
     if en_debug:
-        print("received {}".format(msg.lower()))
+        print("received {}".format(msg.strip().lower()))
 
-    regObj = compiled_regexBP.match(msg.lower())
+    regObj = compiled_regexBP.match(msg.strip().lower())
     if regObj is None:
         if en_debug:
             print ("BrickPi3 command is not recognized")
