@@ -470,11 +470,20 @@ if __name__ == '__main__':
 
             msg = m[1]
 
+# remove all spaces in the input msg to create ms_nospace
+# brickpi3 handles the one without spaces but we keep the one with spaces
+# for others (like pivotpi, camera, line_sensor) as a precautionary measure.
+            try: 
+                msg_nospace = msg.replace(" ","")
+            except: 
+                pass
+
+	
             if en_debug:
                 print("Rx:{}".format(msg))
 
-            if is_BrickPi_msg(msg):
-                sensors = handle_BrickPi_msg(msg)
+            if is_BrickPi_msg(msg_nospace):
+                sensors = handle_BrickPi_msg(msg_nospace)
                 if sensors is not None:
                     s.sensorupdate(sensors)
 
