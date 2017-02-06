@@ -6,6 +6,7 @@
 # http://www.dexterindustries.com/                                                                
 # History
 # ------------------------------------------------
+# This file has been modified but not originally created by graykevinb
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
@@ -35,7 +36,8 @@
 #		"kill -9 pid"
 #	If the error does not go away, try changin the port number '9093' both in the client and server code
 
-from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+import brickpi3 #import BrickPi3.py file to use BrickPi3 operations
+BP = brickpi3.BrickPi3()
 import threading
 import tornado.ioloop
 import tornado.web
@@ -71,26 +73,24 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		print c
 		if c == '8' :
 		  print "Running Forward"
-		  BrickPi.MotorSpeed[PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
-		  BrickPi.MotorSpeed[PORT_D] = 200  #Set the speed of MotorD (-255 to 255)
+		  BP.set_motor_speed[BP.PORT_A] = 200  #Set the speed of MotorA (-255 to 255)
+		  BP.set_motor_speed[BP.PORT_D] = 200  #Set the speed of MotorD (-255 to 255)
 		elif c == '2' :
 		  print "Running Reverse"
-		  BrickPi.MotorSpeed[PORT_A] = -200  
-		  BrickPi.MotorSpeed[PORT_D] = -200  
+		  BP.set_motor_speed[BP.PORT_A] = -200  
+		  BP.set_motor_speed[BP.PORT_D] = -200  
 		elif c == '4' :
 		  print "Turning Right"
-		  BrickPi.MotorSpeed[PORT_A] = 200  
-		  BrickPi.MotorSpeed[PORT_D] = 0  
+		  BP.set_motor_speed[BP.PORT_A] = 200  
+		  BP.set_motor_speed[BP.PORT_D] = 0  
 		elif c == '6' :
 		  print "Turning Left"
-		  BrickPi.MotorSpeed[PORT_A] = 0  
-		  BrickPi.MotorSpeed[PORT_D] = 200  
+		  BP.set_motor_speed[BP.PORT_A] = 0  
+		  BP.set_motor_speed[BP.PORT_D] = 200  
 		elif c == '5' :
 		  print "Stopped"
-		  BrickPi.MotorSpeed[PORT_A] = 0
-		  BrickPi.MotorSpeed[PORT_D] = 0
-		BrickPiUpdateValues();                # BrickPi updates the values for the motors
-		print "Values Updated"
+		  BP.set_motor_speed[BP.PORT_A] = 0
+		  BP.set_motor_speed[BP.PORT_D] = 0
 	def on_close(self):
 		print 'connection closed...'
 
@@ -109,14 +109,9 @@ class myThread (threading.Thread):
     def run(self):
         print "Ready"
         while running:
-            BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
             time.sleep(.2)              # sleep for 200 ms
 
 if __name__ == "__main__":
-	BrickPiSetup()  						# setup the serial port for communication
-	BrickPi.MotorEnable[PORT_A] = 1 		#Enable the Motor A
-	BrickPi.MotorEnable[PORT_D] = 1 		#Enable the Motor D
-	BrickPiSetupSensors()   				#Send the properties of sensors to BrickPi
 	running = True
 	thread1 = myThread(1, "Thread-1", 1)
 	thread1.setDaemon(True)
