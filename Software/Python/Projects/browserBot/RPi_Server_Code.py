@@ -74,24 +74,24 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		print c
 		if c == '8' :
 		  print "Running Forward"
-		  BP.set_motor_speed(BP.PORT_A) = 200  #Set the speed of MotorA (-255 to 255)
-		  BP.set_motor_speed(BP.PORT_D) = 200  #Set the speed of MotorD (-255 to 255)
+		  BP.set_motor_speed(BP.PORT_A, 200)  #Set the speed of MotorA (-255 to 255)
+		  BP.set_motor_speed(BP.PORT_D, 200)  #Set the speed of MotorD (-255 to 255)
 		elif c == '2' :
 		  print "Running Reverse"
-		  BP.set_motor_speed(BP.PORT_A) = -200  
-		  BP.set_motor_speed(BP.PORT_D) = -200  
+		  BP.set_motor_speed(BP.PORT_A, -200)  
+		  BP.set_motor_speed(BP.PORT_D, -200)  
 		elif c == '4' :
 		  print "Turning Right"
-		  BP.set_motor_speed(BP.PORT_A) = 200  
-		  BP.set_motor_speed(BP.PORT_D) = 0  
+		  BP.set_motor_speed(BP.PORT_A, 200) 
+		  BP.set_motor_speed(BP.PORT_D, 0)  
 		elif c == '6' :
 		  print "Turning Left"
-		  BP.set_motor_speed(BP.PORT_A) = 0  
-		  BP.set_motor_speed(BP.PORT_D) = 200  
+		  BP.set_motor_speed(BP.PORT_A, 0)  
+		  BP.set_motor_speed(BP.PORT_D, 200)  
 		elif c == '5' :
 		  print "Stopped"
-		  BP.set_motor_speed(BP.PORT_A) = 0
-		  BP.set_motor_speed(BP.PORT_D) = 0
+		  BP.set_motor_speed(BP.PORT_A, 0)
+		  BP.set_motor_speed(BP.PORT_D, 0)
 	def on_close(self):
 		print 'connection closed...'
 
