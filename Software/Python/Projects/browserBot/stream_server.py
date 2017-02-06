@@ -6,6 +6,7 @@
 # http://www.dexterindustries.com/                                                                
 # History
 # ------------------------------------------------
+# This file has been modified to support the BrickPi3
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
