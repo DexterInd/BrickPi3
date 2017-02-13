@@ -782,7 +782,7 @@ class BrickPi3(object):
     
     def set_motor_position(self, port, position):
         """
-        Set the motor position in degrees
+        Set the motor target position in degrees
         
         Keyword arguments:
         port -- The motor port
@@ -792,11 +792,11 @@ class BrickPi3(object):
     
     def set_motor_dps(self, port, dps):
         """
-        Set the motor position in degrees
+        Set the motor target speed in degrees per second
         
         Keyword arguments:
         port -- The motor port
-        position -- The target position
+        dps -- The target speed in degrees per second
         """
         self.spi_write_16((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_DPS + port), int(dps))
     
