@@ -14,7 +14,7 @@ from __future__ import division
 import subprocess # for executing system calls
 import spidev
 
-FIRMWARE_VERSION_REQUIRED = "1.2.x" # Make sure the top 2 of 3 numbers match
+FIRMWARE_VERSION_REQUIRED = "1.3.x" # Make sure the top 2 of 3 numbers match
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
@@ -149,6 +149,18 @@ class BrickPi3(object):
         I2C_TRANSACT_2,
         I2C_TRANSACT_3,
         I2C_TRANSACT_4,
+        
+        WRITE_MOTOR_LIMITS = 68,
+        WRITE_MOTOR_A_LIMITS = 68,
+        WRITE_MOTOR_B_LIMITS,
+        WRITE_MOTOR_C_LIMITS,
+        WRITE_MOTOR_D_LIMITS,
+        
+        READ_MOTOR_STATUS = 72,
+        READ_MOTOR_A_STATUS = 72,
+        READ_MOTOR_B_STATUS,
+        READ_MOTOR_C_STATUS,
+        READ_MOTOR_D_STATUS,
     """)
     
     SENSOR_TYPE = Enumeration("""
@@ -226,6 +238,12 @@ class BrickPi3(object):
     SENSOR_I2C_SETTINGS.MID_CLOCK         = 0x01 # Send the clock pulse between reading and writing. Required by the NXT US sensor.
     SENSOR_I2C_SETTINGS.PIN1_9V           = 0x02 # 9v pullup on pin 1
     SENSOR_I2C_SETTINGS.SAME              = 0x04 # Keep performing the same transaction e.g. keep polling a sensor
+    
+    MOTOR_STATUS_FLAG = Enumeration("""
+        LOW_VOLTAGE_FLOAT,
+    """)
+    
+    MOTOR_STATUS_FLAG.LOW_VOLTAGE_FLOAT = 0x01 # If the motors are floating due to low battery voltage
     
     SUCCESS = 0
     SPI_ERROR = 1
@@ -782,7 +800,7 @@ class BrickPi3(object):
     
     def set_motor_position(self, port, position):
         """
-        Set the motor position in degrees
+        Set the motor target position in degrees
         
         Keyword arguments:
         port -- The motor port
@@ -792,13 +810,61 @@ class BrickPi3(object):
     
     def set_motor_dps(self, port, dps):
         """
-        Set the motor position in degrees
+        Set the motor target speed in degrees per second
         
         Keyword arguments:
         port -- The motor port
-        position -- The target position
+        dps -- The target speed in degrees per second
         """
         self.spi_write_16((self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_DPS + port), int(dps))
+    
+    def set_motor_limits(self, port, speed = 0, dps = 0):
+        """
+        Set the motor speed limit
+        
+        Keyword arguments:
+        port -- The motor port
+        speed -- The speed limit in percent (0 to 100) with 0 being no limit (100)
+        dps -- The speed limit in degrees per second - Not yet supported in firmware!
+        """
+        dps = int(dps)
+        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_LIMITS + port), int(speed), ((dps >> 8) & 0xFF), (dps & 0xFF)]
+        print(outArray)
+        self.spi_transfer_array(outArray)
+    
+    def get_motor_status(self, port):
+        """
+        Read a motor status
+        
+        Keyword arguments:
+        port -- The motor port
+        
+        Returns a touple:
+            list:
+                flags -- 8-bits of bit-flags that indicate motor status:
+                    bit 0 -- LOW_VOLTAGE_FLOAT - The motors are automatically disabled because the battery voltage is too low
+                power -- the raw PWM power in percent (-100 to 100)
+                encoder -- The encoder position
+                dps -- The current speed in Degrees Per Second
+            error
+        """
+        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.READ_MOTOR_STATUS + port), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        reply = self.spi_transfer_array(outArray)
+        if(reply[3] == 0xA5):
+            speed = int(reply[5])
+            if speed & 0x80:
+                speed = speed - 0x100
+            
+            encoder = int((reply[6] << 24) | (reply[7] << 16) | (reply[8] << 8) | reply[9])
+            if encoder & 0x80000000: # MT was 0x10000000, but I think it should be 0x80000000
+                encoder = int(encoder - 0x100000000)
+            
+            dps = int((reply[10] << 8) | reply[11])
+            if dps & 0x8000:
+                dps = dps - 0x10000
+            
+            return [reply[4], speed, encoder, dps], self.SUCCESS
+        return [0, 0, 0], self.SPI_ERROR
     
     def offset_motor_encoder(self, port, position):
         """
@@ -822,8 +888,8 @@ class BrickPi3(object):
         Returns the encoder position in degrees
         """
         encoder, error = self.spi_read_32(self.BPSPI_MESSAGE_TYPE.READ_MOTOR_ENCODER + port)
-        if encoder & 0x10000000:
-            encoder = encoder - 0x100000000
+        if encoder & 0x80000000: # MT was 0x10000000, but I think it should be 0x80000000
+            encoder = int(encoder - 0x100000000)
         #if encoder > 2147483647:
         #    encoder -= 4294967295
         return int(encoder), error
