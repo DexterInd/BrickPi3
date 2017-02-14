@@ -25,6 +25,7 @@ try:
     BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)[0]) # reset encoder A
     BP.offset_motor_encoder(BP.PORT_D, BP.get_motor_encoder(BP.PORT_D)[0]) # reset encoder D
     BP.set_motor_speed(BP.PORT_D, -128)                                    # float motor D
+    #BP.set_motor_limits(BP.PORT_A, 50)                                     # optionally set a power limit
     while True:
         # BP.get_motor_encoder function return a list of 2 values
         #     The first item in the list is the value (what we want to use).

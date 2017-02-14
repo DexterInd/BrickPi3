@@ -24,7 +24,8 @@ BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be 
 try:
     BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)[0]) # reset encoder A
     BP.offset_motor_encoder(BP.PORT_D, BP.get_motor_encoder(BP.PORT_D)[0]) # reset encoder D
-    BP.set_motor_speed(BP.PORT_D, -128) # float motor D
+    BP.set_motor_speed(BP.PORT_D, -128)                                    # float motor D
+    #BP.set_motor_limits(BP.PORT_A, 25)                                     # optionally set a power limit
     while True:
         # Each of the following BP.get_motor_encoder functions return a list of 2 values
         #     The first item in the list is the value (what we want to display).
