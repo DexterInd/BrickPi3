@@ -19,4 +19,4 @@ try:
     BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
     print("BrickPi3 connected and running")
 except:
-    print("Communication with BrickPi3 unsuccessful"
+    print("Communication with BrickPi3 unsuccessful")
