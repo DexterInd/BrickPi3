@@ -6,6 +6,7 @@
 # http://www.dexterindustries.com/                                                                
 # History
 # ------------------------------------------------
+# This file has been modified to support the BrickPi3
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
@@ -35,7 +36,8 @@
 #		"kill -9 pid"
 #	If the error does not go away, try changin the port number '9093' both in the client and server code
 
-from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+import brickpi3 #import BrickPi3.py file to use BrickPi3 operations
+BP = brickpi3.BrickPi3()
 import threading
 import tornado.ioloop
 import tornado.web
@@ -99,8 +101,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power > 255:
                 right_power = 255
             left_power = right_power
-            BrickPi.MotorSpeed[PORT_B] = left_power  #Set the speed of MotorB (-255 to 255)
-            BrickPi.MotorSpeed[PORT_D] = right_power  #Set the speed of MotorD (-255 to 255)
+            BP.set_motor_speed[BP.PORT_B] = left_power  #Set the speed of MotorB (-255 to 255)
+            BP.set_motor_speed[BP.PORT_D] = right_power  #Set the speed of MotorD (-255 to 255)
         elif c == '2' :
             print "Running Reverse"
             # first check which side has lower power and set it to the lowest setting before increasing it
@@ -112,16 +114,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power < -255:
                 right_power = -255
             left_power = right_power
-            BrickPi.MotorSpeed[PORT_B] = left_power  
-            BrickPi.MotorSpeed[PORT_D] = right_power  
+            BP.set_motor_speed(BP.PORT_B) = left_power  
+            BP.set_motor_speed(BP.PORT_D) = right_power  
         elif c == '4' :
             print "Turning Left"
             left_power = left_power + 100
             right_power = 0
             if left_power > 255:
                 left_power = 255
-            BrickPi.MotorSpeed[PORT_B] = left_power
-            BrickPi.MotorSpeed[PORT_D] = right_power
+            BP.set_motor_speed(BP.PORT_B) = left_power
+            BP.set_motor_speed(BP.PORT_D) = right_power
         elif c == '7' :
             print "Turning diagonal Left"
             if right_power > 200:
@@ -130,16 +132,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             left_power = right_power / 2
             if right_power > 255:
                 right_power = 255
-            BrickPi.MotorSpeed[PORT_B] = left_power
-            BrickPi.MotorSpeed[PORT_D] = right_power
+            BP.set_motor_speed(BP.PORT_B) = left_power
+            BP.set_motor_speed(BP.PORT_D) = right_power
         elif c == '6' :
             print "Turning Right"
             right_power = right_power + 100
             left_power = 0
             if right_power > 255:
                 right_power = 255
-            BrickPi.MotorSpeed[PORT_B] = left_power  
-            BrickPi.MotorSpeed[PORT_D] = right_power  
+            BP.set_motor_speed(BP.PORT_B) = left_power  
+            BP.set_motor_speed(BP.PORT_D) = right_power  
         elif c == '9' :
             print "Turning diagonal Right"
             if left_power > 200:
@@ -148,15 +150,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             right_power = left_power / 2
             if left_power > 255:
                 left_power = 255
-            BrickPi.MotorSpeed[PORT_B] = left_power
-            BrickPi.MotorSpeed[PORT_D] = right_power
+            BP.set_motor_speed(BP.PORT_B) = left_power
+            BP.set_motor_speed(BP.PORT_D) = right_power
         elif c == '5' :
             print "Stopped"
             right_power = 0
             left_power = 0
-            BrickPi.MotorSpeed[PORT_B] = left_power
-            BrickPi.MotorSpeed[PORT_D] = right_power
-        BrickPiUpdateValues();                # BrickPi updates the values for the motors
+            BP.set_motor_speed(BP.PORT_B) = left_power
+            BP.set_motor_speed(BP.PORT_D) = right_power
         print "Values Updated"
     def on_close(self):
         cameraStreamer.stopStreaming()
@@ -177,15 +178,10 @@ class myThread (threading.Thread):
     def run(self):
         print "Ready"
         while running:
-            BrickPiUpdateValues()       # Ask BrickPi to update values for sensors/motors
             time.sleep(.2)              # sleep for 200 ms
         cameraStreamer.stopStreaming()
 
 if __name__ == "__main__":
-    BrickPiSetup()  						# setup the serial port for communication
-    BrickPi.MotorEnable[PORT_B] = 1 		#Enable the Motor B
-    BrickPi.MotorEnable[PORT_D] = 1 		#Enable the Motor D
-    BrickPiSetupSensors()   				#Send the properties of sensors to BrickPi
     running = True
     thread1 = myThread(1, "Thread-1", 1)
     thread1.setDaemon(True)
