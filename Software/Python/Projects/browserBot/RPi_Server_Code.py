@@ -6,7 +6,7 @@
 # http://www.dexterindustries.com/                                                                
 # History
 # ------------------------------------------------
-# This file has been modified but not originally created by graykevinb
+#
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
