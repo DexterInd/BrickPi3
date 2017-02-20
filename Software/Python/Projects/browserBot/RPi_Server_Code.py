@@ -5,8 +5,7 @@
 # This code is for controlling a robot by a web browser using web sockets                            
 # http://www.dexterindustries.com/                                                                
 # History
-# ------------------------------------------------
-#
+# ------------------------------------------------#
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
