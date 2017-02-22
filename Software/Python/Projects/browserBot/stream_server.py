@@ -6,7 +6,6 @@
 # http://www.dexterindustries.com/                                                                
 # History
 # ------------------------------------------------
-#
 # Author     Comments
 # Joshwa     Initial Authoring
 #                                                                  
