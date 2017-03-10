@@ -7,7 +7,7 @@ fi
 
 SCRIPTDIR="$(readlink -f $(dirname $0))"
 echo $SCRIPTDIR
-REPO_PATH=$(sudo find / -name "BrickPi3" | head -1)
+REPO_PATH=$(sudo find / -path "*BrickPi3/Software/Python" | grep -E -o "^(.*?\\BrickPi3)" | head -1)
 
 #check if there's an argument on the command line
 if [[ -f /home/pi/quiet_mode ]]
