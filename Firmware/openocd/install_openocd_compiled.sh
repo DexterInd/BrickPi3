@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO_PATH=$(sudo find / -path "*BrickPi3/Software/Python" | grep -E -o "^(.*?\\BrickPi3)"| head -1)
+REPO_PATH=$(readlink -f $(dirname $0) | grep -E -o "^(.*?\\BrickPi3)")
 # unzip the compiled OpenOCD
 unzip $REPO_PATH/Firmware/openocd/openocd_compiled.zip -d $REPO_PATH/Firmware/openocd
 
