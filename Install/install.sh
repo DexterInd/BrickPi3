@@ -7,6 +7,7 @@ fi
 
 SCRIPTDIR="$(readlink -f $(dirname $0))"
 echo $SCRIPTDIR
+REPO_PATH=$(readlink -f $(dirname $0) | grep -E -o "^(.*?\\BrickPi3)")
 
 #check if there's an argument on the command line
 if [[ -f /home/pi/quiet_mode ]]
@@ -43,7 +44,7 @@ echo "                                       "
 echo ""
 echo "Welcome to BrickPi3 Installer."
 
-sudo bash /home/pi/Dexter/BrickPi3/Firmware/openocd/install_openocd_compiled.sh
+sudo bash $REPO_PATH/Firmware/openocd/install_openocd_compiled.sh
 
 # Adding in /etc/modules
 echo ""
@@ -67,7 +68,7 @@ else
 fi
 
 echo ""
-cd /home/pi/Dexter/BrickPi3/Software/Python/
+cd $REPO_PATH/Software/Python/
 sudo python setup.py install
 sudo python3 setup.py install
 
