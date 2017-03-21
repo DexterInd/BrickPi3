@@ -100,8 +100,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power > 255:
                 right_power = 255
             left_power = right_power
-            BP.set_motor_speed[BP.PORT_B] = left_power  #Set the speed of MotorB (-255 to 255)
-            BP.set_motor_speed[BP.PORT_D] = right_power  #Set the speed of MotorD (-255 to 255)
+            BP.set_motor_power[BP.PORT_B] = left_power  #Set the speed of MotorB (-255 to 255)
+            BP.set_motor_power[BP.PORT_D] = right_power  #Set the speed of MotorD (-255 to 255)
         elif c == '2' :
             print "Running Reverse"
             # first check which side has lower power and set it to the lowest setting before increasing it
@@ -113,16 +113,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power < -255:
                 right_power = -255
             left_power = right_power
-            BP.set_motor_speed(BP.PORT_B) = left_power  
-            BP.set_motor_speed(BP.PORT_D) = right_power  
+            BP.set_motor_power(BP.PORT_B) = left_power  
+            BP.set_motor_power(BP.PORT_D) = right_power  
         elif c == '4' :
             print "Turning Left"
             left_power = left_power + 100
             right_power = 0
             if left_power > 255:
                 left_power = 255
-            BP.set_motor_speed(BP.PORT_B) = left_power
-            BP.set_motor_speed(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B) = left_power
+            BP.set_motor_power(BP.PORT_D) = right_power
         elif c == '7' :
             print "Turning diagonal Left"
             if right_power > 200:
@@ -131,16 +131,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             left_power = right_power / 2
             if right_power > 255:
                 right_power = 255
-            BP.set_motor_speed(BP.PORT_B) = left_power
-            BP.set_motor_speed(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B) = left_power
+            BP.set_motor_power(BP.PORT_D) = right_power
         elif c == '6' :
             print "Turning Right"
             right_power = right_power + 100
             left_power = 0
             if right_power > 255:
                 right_power = 255
-            BP.set_motor_speed(BP.PORT_B) = left_power  
-            BP.set_motor_speed(BP.PORT_D) = right_power  
+            BP.set_motor_power(BP.PORT_B) = left_power  
+            BP.set_motor_power(BP.PORT_D) = right_power  
         elif c == '9' :
             print "Turning diagonal Right"
             if left_power > 200:
@@ -149,14 +149,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             right_power = left_power / 2
             if left_power > 255:
                 left_power = 255
-            BP.set_motor_speed(BP.PORT_B) = left_power
-            BP.set_motor_speed(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B) = left_power
+            BP.set_motor_power(BP.PORT_D) = right_power
         elif c == '5' :
             print "Stopped"
             right_power = 0
             left_power = 0
-            BP.set_motor_speed(BP.PORT_B) = left_power
-            BP.set_motor_speed(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B) = left_power
+            BP.set_motor_power(BP.PORT_D) = right_power
         print "Values Updated"
     def on_close(self):
         cameraStreamer.stopStreaming()
