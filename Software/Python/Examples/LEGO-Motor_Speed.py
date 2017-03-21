@@ -27,7 +27,7 @@ try:
         #     The first item in the list is the value (what we want to use to control motor C's speed).
         #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
         speed = BP.get_motor_encoder(BP.PORT_B)[0]
-        BP.set_motor_speed(BP.PORT_C, speed)
+        BP.set_motor_power(BP.PORT_C, speed)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

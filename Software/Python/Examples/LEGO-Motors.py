@@ -45,10 +45,10 @@ try:
             adder = 1
         
         # Set the motor speed for all four motors
-        BP.set_motor_speed(BP.PORT_A, speed)
-        BP.set_motor_speed(BP.PORT_B, speed)
-        BP.set_motor_speed(BP.PORT_C, speed)
-        BP.set_motor_speed(BP.PORT_D, speed)
+        BP.set_motor_power(BP.PORT_A, speed)
+        BP.set_motor_power(BP.PORT_B, speed)
+        BP.set_motor_power(BP.PORT_C, speed)
+        BP.set_motor_power(BP.PORT_D, speed)
         
         # Each of the following BP.get_motor_encoder functions return a list of 2 values
         #     The first item in the list is the value (what we want to display).

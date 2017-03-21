@@ -286,9 +286,9 @@ def handle_BrickPi_msg(msg):
                 #    incoming_motor_target = "target error"
             
             if incoming_motor_target != "target error":
-                BP3.set_motor_speed(port, incoming_motor_target)
+                BP3.set_motor_power(port, incoming_motor_target)
             else:
-                BP3.set_motor_speed(port, 0)  
+                BP3.set_motor_power(port, 0)  
         else:
             if en_debug:
                 print("Motor position {}".format(incoming_motor_target))
@@ -301,7 +301,7 @@ def handle_BrickPi_msg(msg):
             if incoming_motor_target != "target error":
                 BP3.set_motor_position(port, incoming_motor_target)
             else:
-                BP3.set_motor_speed(port, 0)
+                BP3.set_motor_power(port, 0)
 
         return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
 

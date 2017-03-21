@@ -61,6 +61,8 @@ class BrickPi3(object):
     PORT_C = 2
     PORT_D = 3
     
+    MOTOR_FLOAT = -128
+    
     SensorType = [0, 0, 0, 0]
     I2CInBytes = [0, 0, 0, 0]
     
@@ -90,11 +92,11 @@ class BrickPi3(object):
         READ_SENSOR_3,
         READ_SENSOR_4,
         
-        WRITE_MOTOR_SPEED = 28,
-        WRITE_MOTOR_A_SPEED = 28,
-        WRITE_MOTOR_B_SPEED,
-        WRITE_MOTOR_C_SPEED,
-        WRITE_MOTOR_D_SPEED,
+        WRITE_MOTOR_POWER = 28,
+        WRITE_MOTOR_A_POWER = 28,
+        WRITE_MOTOR_B_POWER,
+        WRITE_MOTOR_C_POWER,
+        WRITE_MOTOR_D_POWER,
         
         WRITE_MOTOR_POSITION = 32,
         WRITE_MOTOR_A_POSITION = 32,
@@ -250,11 +252,12 @@ class BrickPi3(object):
     SENSOR_ERROR = 2
     SENSOR_TYPE_ERROR = 3
     
-    def __init__(self, addr = 1, detect = True): # Configure for the BrickPi. Optionally set the address (default to 1).
+    def __init__(self, addr = 1, detect = True): # Configure for the BrickPi. Optionally set the address (default to 1). Optionally disable detection (default to detect).
         """
         Do any necessary configuration, and optionally detect the BrickPi3
         
         Optionally set the SPI address to something other than 1
+        Optionally disable the detection of the BrickPi3 hardware. This can be used for debugging and testing when the BrickPi3 would otherwise not pass the detection tests.
         """
         
         # note these two lines were a temporary work-around for older Raspbian For Robots.
@@ -783,20 +786,16 @@ class BrickPi3(object):
         
         return 0, self.SENSOR_TYPE_ERROR #"Error, sensor not configured or not supported."#int(0) # not configured
     
-    def set_motor_speed(self, port, speed):
+    def set_motor_power(self, port, power):
         """
-        Set the motor speed in percent
+        Set the motor power in percent
         
         Keyword arguments:
         port -- The Motor port
-        speed -- The Speed from -100 to 100
+        power -- The Power from -100 to 100
         """
-        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_SPEED + port), int(speed)]
+        outArray = [self.SPI_Address, (self.BPSPI_MESSAGE_TYPE.WRITE_MOTOR_POWER + port), int(power)]
         self.spi_transfer_array(outArray)
-    
-    #def set_tank_drive(self, ):
-    #    self.set_motor_speed(port, speed)
-    #    self.set_motor_speed(port, speed)
     
     def set_motor_position(self, port, position):
         """
@@ -905,10 +904,10 @@ class BrickPi3(object):
         self.set_sensor_type(self.PORT_4, self.SENSOR_TYPE.NONE)
         
         # turn off all motors
-        self.set_motor_speed(self.PORT_A, -128)
-        self.set_motor_speed(self.PORT_B, -128)
-        self.set_motor_speed(self.PORT_C, -128)
-        self.set_motor_speed(self.PORT_D, -128)
+        self.set_motor_power(self.PORT_A, self.MOTOR_FLOAT)
+        self.set_motor_power(self.PORT_B, self.MOTOR_FLOAT)
+        self.set_motor_power(self.PORT_C, self.MOTOR_FLOAT)
+        self.set_motor_power(self.PORT_D, self.MOTOR_FLOAT)
         
         # return the LED to the control of the FW
         self.set_led(-1)
