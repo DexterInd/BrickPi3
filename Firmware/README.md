@@ -2,8 +2,8 @@ To update the BrickPi3 Firmware
 -------------------------------
 
 Connect the BrickPi3 to a Raspberry Pi. Assuming you've set up the BrickPi3
-software by running the install.sh script, everything should be ready for you
-to update the firmware.
+software by running DI Update on Raspbian for Robots (or the install.sh script
+on Raspbian), everything should be ready for you to update the firmware.
 
 Run the firmware update script:
 
