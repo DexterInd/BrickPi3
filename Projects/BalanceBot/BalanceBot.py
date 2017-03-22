@@ -230,8 +230,8 @@ try:
         if powerRight < -100:
             powerRight = -100
         
-        BP.set_motor_speed(PORT_MOTOR_LEFT , powerLeft)
-        BP.set_motor_speed(PORT_MOTOR_RIGHT, powerRight)
+        BP.set_motor_power(PORT_MOTOR_LEFT , powerLeft)
+        BP.set_motor_power(PORT_MOTOR_RIGHT, powerRight)
         
         if (CurrentTime - tMotorPosOK) > TIME_FALL_LIMIT:
             print("Oh no! Robot fell. Exiting.")
