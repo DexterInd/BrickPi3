@@ -9,7 +9,7 @@
 #
 # This code is an example for reading a Dexter Industries GPS connected to the BrickPi3
 # 
-# Hardware: Connect a Dexter Industries dGPS to sensor port 3 of the BrickPi3.
+# Hardware: Connect a Dexter Industries dGPS to sensor port 1 of the BrickPi3.
 # 
 # Results:  When you run this program, the GPS is read, and the values are printed.
 
@@ -21,7 +21,7 @@ import brickpi3 # import the BrickPi3 drivers
 
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
-GPS_PORT = BP.PORT_3 # GPS will be on sensor port 3
+GPS_PORT = BP.PORT_1 # GPS will be on sensor port 1
 
 BP.set_sensor_type(GPS_PORT, BP.SENSOR_TYPE.I2C, [BP.SENSOR_I2C_SETTINGS.MID_CLOCK, 0]) # Configure for a Dexter Industries GPS (I2C device with clock pulse between the write and read bytes).
 
@@ -44,70 +44,75 @@ DGPS_CMD_VWSAT  = 0x10	    # Satellites in View
 
 try:
     while True:
-        BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_UTC], 4)
-        time.sleep(0.02)          # delay 20ms
-        value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-        if not error:      # successfully read the values
+        try:
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_UTC], 4)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
             UTC = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
             
             BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_LONG], 4)
             time.sleep(0.02)          # delay 20ms
-            value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-            if not error:      # successfully read the values
-                lon = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
-                if value[0]>10:	#if the 0th byte >10, then the longitude was negative and use the 2's compliment of the longitude
-                    lon=(4294967295L^lon)+1
-                    lon=(-float(lon)/1000000)
-                else:
-                    lon=(float(lon)/1000000)
-                
-                BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_LAT], 4)
-                time.sleep(0.02)          # delay 20ms
-                value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                if not error:      # successfully read the values
-                    lat = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
-                    if value[0]>10:	#if the 0th byte >10, then the longitude was negative and use the 2's compliment of the longitude
-                        lat=(4294967295L^lat)+1
-                        lat=(-float(lat)/1000000)
-                    else:
-                        lat=(float(lat)/1000000)
-                    
-                    BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_HEAD], 2)
-                    time.sleep(0.02)          # delay 20ms
-                    value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                    if not error:      # successfully read the values
-                        head = ((long)(value[0]<<8)) + ((long)(value[1]))
-                        
-                        BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_STATUS], 1)
-                        time.sleep(0.02)          # delay 20ms
-                        value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                        if not error:      # successfully read the values
-                            status = (long)(value[0])
-                            
-                            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_VELO], 3)
-                            time.sleep(0.02)          # delay 20ms
-                            value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                            if not error:      # successfully read the values
-                                velo = ((long)(value[0]<<16)) + ((long)(value[1]<<8)) + (long)(value[2])
-                                
-                                BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_ALTTD], 4)
-                                time.sleep(0.02)          # delay 20ms
-                                value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                                if not error:     # successfully read the values
-                                    altitude = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
-                                    
-                                    BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_HDOP], 4)
-                                    time.sleep(0.02)          # delay 20ms
-                                    value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                                    if not error:     # successfully read the values
-                                        hdop = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
-                                        
-                                        BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_VWSAT], 4)
-                                        time.sleep(0.02)          # delay 20ms
-                                        value, error = BP.get_sensor(GPS_PORT) # read the sensor port values
-                                        if not error:      # successfully read the values
-                                            satv = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
-                                            
-                                            print('Status',status,'UTC',UTC,'Latitude %.6f'% lat,'Longitude %.6f'%lon,'Heading',head,'Velocity',velo,'Altitude',altitude,'HDOP',hdop,'Satellites in view',satv)
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            lon = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
+            if value[0]>10:	#if the 0th byte >10, then the longitude was negative and use the 2's compliment of the longitude
+                lon=(4294967295L^lon)+1
+                lon=(-float(lon)/1000000)
+            else:
+                lon=(float(lon)/1000000)
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_LAT], 4)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            lat = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
+            if value[0]>10:	#if the 0th byte >10, then the longitude was negative and use the 2's compliment of the longitude
+                lat=(4294967295L^lat)+1
+                lat=(-float(lat)/1000000)
+            else:
+                lat=(float(lat)/1000000)
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_HEAD], 2)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            head = ((long)(value[0]<<8)) + ((long)(value[1]))
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_STATUS], 1)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            status = (long)(value[0])
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_VELO], 3)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            velo = ((long)(value[0]<<16)) + ((long)(value[1]<<8)) + (long)(value[2])
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_ALTTD], 4)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            altitude = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_HDOP], 4)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            hdop = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
+            
+            BP.transact_i2c(GPS_PORT, DGPS_I2C_ADDR, [DGPS_CMD_VWSAT], 4)
+            time.sleep(0.02)          # delay 20ms
+            value = BP.get_sensor(GPS_PORT) # read the sensor values
+            
+            satv = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
+            
+            print('Status',status,'UTC',UTC,'Latitude %.6f'% lat,'Longitude %.6f'%lon,'Heading',head,'Velocity',velo,'Altitude',altitude,'HDOP',hdop,'Satellites in view',satv)
+        
+        except brickpi3.SensorError as error:
+            print(error)
+        
 except KeyboardInterrupt:
     BP.reset_all()

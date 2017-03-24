@@ -34,14 +34,15 @@ try:
         # read and display the sensor value
         # BP.get_sensor retrieves a sensor value.
         # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is a list of sensor values (what we want to display).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        value = BP.get_sensor(BP.PORT_1)[0]                      # read the sensor values
-        if(value[0] >= 1 and value[0] <= 6 and len(value) == 5): # successfully read the values
-            print(color[value[0] - 1], value)                    # print the values
-        else:
-            print("error reading color sensor values from BrickPi3")
+        # BP.get_sensor returns the sensor value (what we want to display).
+        try:
+            value = BP.get_sensor(BP.PORT_1)
+            if(value[0] >= 1 and value[0] <= 6 and len(value) == 5): # successfully read the values
+                print(color[value[0] - 1], value)                    # print the values
+            else:
+                print("error reading color sensor values from BrickPi3")
+        except brickpi3.SensorError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

@@ -23,10 +23,11 @@ BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be 
 
 try:
     while True:
-        # Each of the following BP.get_motor_encoder functions return a list of 2 values
-        #     The first item in the list is the value (what we want to display).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        print("Encoder A: %6d  B: %6d  C: %6d  D: %6d" % (BP.get_motor_encoder(BP.PORT_A)[0], BP.get_motor_encoder(BP.PORT_B)[0], BP.get_motor_encoder(BP.PORT_C)[0], BP.get_motor_encoder(BP.PORT_D)[0]))
+        # The following BP.get_motor_encoder function returns the encoder value
+        try:
+            print("Encoder A: %6d  B: %6d  C: %6d  D: %6d" % (BP.get_motor_encoder(BP.PORT_A), BP.get_motor_encoder(BP.PORT_B), BP.get_motor_encoder(BP.PORT_C), BP.get_motor_encoder(BP.PORT_D)))
+        except IOError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

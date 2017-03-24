@@ -22,28 +22,28 @@ import brickpi3 # import the BrickPi3 drivers
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
 # configure all four sensor ports as an analog sensor, polling the pin 1 analog line
-BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
-BP.set_sensor_type(BP.PORT_2, BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
-BP.set_sensor_type(BP.PORT_3, BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
-BP.set_sensor_type(BP.PORT_4, BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
+BP.set_sensor_type(BP.PORT_1 + BP.PORT_2 + BP.PORT_3 + BP.PORT_4, BP.SENSOR_TYPE.CUSTOM, [(BP.SENSOR_CUSTOM.PIN1_ADC)])
 
 try:
     while True:
         # read the sensor value for each port
         # BP.get_sensor retrieves a sensor value.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is a list of 4 values.
-        #         The first is the pin 1 analog line value (what we want to display).
-        #         The second is the pin 6 analog line value.
-        #         The third is the pin 5 digital value.
-        #         The third is the pin 6 digital value.
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        value1 = BP.get_sensor(BP.PORT_1)[0][0]
-        value2 = BP.get_sensor(BP.PORT_2)[0][0]
-        value3 = BP.get_sensor(BP.PORT_3)[0][0]
-        value4 = BP.get_sensor(BP.PORT_4)[0][0]
-        ref5v = (4095.0 / BP.get_voltage_5v()[0]) # read the reference to determine the analog sensor voltage
-        print("1R: %4d  1V: %5.3fV  2R: %4d  2V: %5.3fV  3R: %4d  3V: %5.3fV  4R: %4d  4V: %5.3fV" % (value1, (value1 / ref5v), value2, (value2 / ref5v), value3, (value3 / ref5v), value4, (value4 / ref5v))) # print the values
+        # BP.get_sensor returns a list of 4 values.
+        #     The first is the pin 1 analog line value (what we want to display).
+        #     The second is the pin 6 analog line value.
+        #     The third is the pin 5 digital value.
+        #     The third is the pin 6 digital value.
+        try:
+            value1 = BP.get_sensor(BP.PORT_1)[0]
+            value2 = BP.get_sensor(BP.PORT_2)[0]
+            value3 = BP.get_sensor(BP.PORT_3)[0]
+            value4 = BP.get_sensor(BP.PORT_4)[0]
+            
+            ref5v = (4095.0 / BP.get_voltage_5v()) # read the reference to determine the analog sensor voltage
+            print("1R: %4d  1V: %5.3fV  2R: %4d  2V: %5.3fV  3R: %4d  3V: %5.3fV  4R: %4d  4V: %5.3fV" % (value1, (value1 / ref5v), value2, (value2 / ref5v), value3, (value3 / ref5v), value4, (value4 / ref5v))) # print the values
+        
+        except brickpi3.SensorError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

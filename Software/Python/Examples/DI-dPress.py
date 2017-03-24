@@ -27,19 +27,20 @@ try:
     while True:
         # read the sensor value
         # BP.get_sensor retrieves a sensor value.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is a list of 4 values.
-        #         The first is the pin 1 analog line value (what we want to display).
-        #         The second is the pin 6 analog line value.
-        #         The third is the pin 5 digital value.
-        #         The third is the pin 6 digital value.
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        value = BP.get_sensor(BP.PORT_1)[0][0]
-        if(value < 4095): # if the value is < 4095, the sensor is connected
-            print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.0018)) # print the value for the dPressure 500
-            #print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.00369)) # print the value for the dPressure 250
-        else:             # else the value is 4095, so the sensor is disconnected
-            print("Pressure: (disconnected)")
+        # BP.get_sensor returns a list of 4 values.
+        #     The first is the pin 1 analog line value (what we want to display).
+        #     The second is the pin 6 analog line value.
+        #     The third is the pin 5 digital value.
+        #     The third is the pin 6 digital value.
+        try:
+            value = BP.get_sensor(BP.PORT_1)[0]
+            if(value < 4095): # if the value is < 4095, the sensor is connected
+                print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.0018)) # print the value for the dPressure 500
+                #print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.00369)) # print the value for the dPressure 250
+            else:             # else the value is 4095, so the sensor is disconnected
+                print("Pressure: (disconnected)")
+        except brickpi3.SensorError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

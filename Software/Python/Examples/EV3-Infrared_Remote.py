@@ -31,10 +31,11 @@ try:
     while True:
         # BP.get_sensor retrieves a sensor value.
         # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is a list of the sensor values (what we want to display).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the sensor is configured and the value was read successfully)
-        print(BP.get_sensor(BP.PORT_1)[0]) # print the infrared remote values
+        # BP.get_sensor returns the sensor value (what we want to display).
+        try:
+            print(BP.get_sensor(BP.PORT_1))   # print the infrared values
+        except brickpi3.SensorError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 
