@@ -252,7 +252,7 @@ class BrickPi3(object):
         """
         
         if addr < 1 or addr > 255:
-            raise IOError("set_address error: SPI address must be in the range of 1 to 255")
+            raise IOError("error: SPI address must be in the range of 1 to 255")
             return
         
         self.SPI_Address = addr
@@ -297,7 +297,7 @@ class BrickPi3(object):
         Keyword arguments:
         MessageType -- the SPI message type
         
-        Returns touple:
+        Returns:
         value
         """
         outArray = [self.SPI_Address, MessageType, 0, 0, 0, 0]
@@ -336,7 +336,7 @@ class BrickPi3(object):
         Keyword arguments:
         MessageType -- the SPI message type
         
-        Returns touple:
+        Returns :
         value
         """
         outArray = [self.SPI_Address, MessageType, 0, 0, 0, 0, 0, 0]
@@ -361,7 +361,7 @@ class BrickPi3(object):
         """
         Read the 20 charactor BrickPi3 manufacturer name
         
-        Returns touple:
+        Returns:
         BrickPi3 manufacturer name string
         """
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.GET_MANUFACTURER, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -381,7 +381,7 @@ class BrickPi3(object):
         """
         Read the 20 charactor BrickPi3 board name
         
-        Returns touple:
+        Returns:
         BrickPi3 board name string
         """
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.GET_NAME, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -401,7 +401,7 @@ class BrickPi3(object):
         """
         Read the hardware version
         
-        Returns touple:
+        Returns:
         hardware version
         """
         version = self.spi_read_32(self.BPSPI_MESSAGE_TYPE.GET_HARDWARE_VERSION)
@@ -411,7 +411,7 @@ class BrickPi3(object):
         """
         Read the firmware version
         
-        Returns touple:
+        Returns:
         firmware version
         """
         version = self.spi_read_32(self.BPSPI_MESSAGE_TYPE.GET_FIRMWARE_VERSION)
@@ -421,7 +421,7 @@ class BrickPi3(object):
         """
         Read the 128-bit BrickPi hardware serial number
         
-        Returns touple:
+        Returns:
         serial number as 32 char HEX formatted string
         """
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.GET_ID, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -444,7 +444,7 @@ class BrickPi3(object):
         """
         Get the 3.3v circuit voltage
         
-        Returns touple:
+        Returns:
         3.3v circuit voltage
         """
         value = self.spi_read_16(self.BPSPI_MESSAGE_TYPE.GET_VOLTAGE_3V3)
@@ -454,7 +454,7 @@ class BrickPi3(object):
         """
         Get the 5v circuit voltage
         
-        Returns touple:
+        Returns:
         5v circuit voltage
         """
         value = self.spi_read_16(self.BPSPI_MESSAGE_TYPE.GET_VOLTAGE_5V)
@@ -464,7 +464,7 @@ class BrickPi3(object):
         """
         Get the 9v circuit voltage
         
-        Returns touple:
+        Returns:
         9v circuit voltage
         """
         value = self.spi_read_16(self.BPSPI_MESSAGE_TYPE.GET_VOLTAGE_9V)
@@ -474,7 +474,7 @@ class BrickPi3(object):
         """
         Get the battery voltage
         
-        Returns touple:
+        Returns:
         battery voltage
         """
         value = self.spi_read_16(self.BPSPI_MESSAGE_TYPE.GET_VOLTAGE_VCC)
@@ -574,7 +574,7 @@ class BrickPi3(object):
         Keyword arguments:
         port -- The sensor port (one at a time). PORT_1, PORT_2, PORT_3, or PORT_4.
         
-        Returns a touple with the value(s) for the specified sensor.
+        Returns the value(s) for the specified sensor.
             The following sensor types each return a single value:
                 NONE ----------------------- 0
                 TOUCH ---------------------- 0 or 1 (released or pressed)
@@ -868,14 +868,12 @@ class BrickPi3(object):
         Keyword arguments:
         port -- The motor port (one at a time). PORT_A, PORT_B, PORT_C, or PORT_D.
         
-        Returns a touple:
-            list:
-                flags -- 8-bits of bit-flags that indicate motor status:
-                    bit 0 -- LOW_VOLTAGE_FLOAT - The motors are automatically disabled because the battery voltage is too low
-                power -- the raw PWM power in percent (-100 to 100)
-                encoder -- The encoder position
-                dps -- The current speed in Degrees Per Second
-            error
+        Returns a list:
+            flags -- 8-bits of bit-flags that indicate motor status:
+                bit 0 -- LOW_VOLTAGE_FLOAT - The motors are automatically disabled because the battery voltage is too low
+            power -- the raw PWM power in percent (-100 to 100)
+            encoder -- The encoder position
+            dps -- The current speed in Degrees Per Second
         """
         if port == self.PORT_A:
             message_type = self.BPSPI_MESSAGE_TYPE.GET_MOTOR_A_STATUS
