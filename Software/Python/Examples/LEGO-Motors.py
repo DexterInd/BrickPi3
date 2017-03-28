@@ -25,35 +25,41 @@ BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.TOUCH) # Configure for a touch sens
 
 try:
     print("Press touch sensor on port 1 to run motors")
-    while not BP.get_sensor(BP.PORT_1)[0]: # Wait until the touch sensor is pressed
-        time.sleep(0.02)
+    value = 0
+    while not value:
+        try:
+            value = BP.get_sensor(BP.PORT_1)
+        except brickpi3.SensorError:
+            pass
     
     speed = 0
     adder = 1
     while True:
         # BP.get_sensor retrieves a sensor value.
         # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is the sensor value (what we want to check).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        if BP.get_sensor(BP.PORT_1)[0]:       # if the touch sensor is pressed
+        # BP.get_sensor returns the sensor value.
+        try:
+            value = BP.get_sensor(BP.PORT_1)
+        except brickpi3.SensorError as error:
+            print(error)
+            value = 0
+        
+        if value:                             # if the touch sensor is pressed
             if speed <= -100 or speed >= 100: # if speed reached 100, start ramping down. If speed reached -100, start ramping up.
                 adder = -adder
             speed += adder
-        else:                                 # else the touch sensor is not pressed, so set the speed to 0
+        else:                                 # else the touch sensor is not pressed or not configured, so set the speed to 0
             speed = 0
             adder = 1
         
         # Set the motor speed for all four motors
-        BP.set_motor_power(BP.PORT_A, speed)
-        BP.set_motor_power(BP.PORT_B, speed)
-        BP.set_motor_power(BP.PORT_C, speed)
-        BP.set_motor_power(BP.PORT_D, speed)
+        BP.set_motor_power(BP.PORT_A + BP.PORT_B + BP.PORT_C + BP.PORT_D, speed)
         
-        # Each of the following BP.get_motor_encoder functions return a list of 2 values
-        #     The first item in the list is the value (what we want to display).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        print("Encoder A: %6d  B: %6d  C: %6d  D: %6d" % (BP.get_motor_encoder(BP.PORT_A)[0], BP.get_motor_encoder(BP.PORT_B)[0], BP.get_motor_encoder(BP.PORT_C)[0], BP.get_motor_encoder(BP.PORT_D)[0]))
+        try:
+            # Each of the following BP.get_motor_encoder functions returns the encoder value (what we want to display).
+            print("Encoder A: %6d  B: %6d  C: %6d  D: %6d" % (BP.get_motor_encoder(BP.PORT_A), BP.get_motor_encoder(BP.PORT_B), BP.get_motor_encoder(BP.PORT_C), BP.get_motor_encoder(BP.PORT_D)))
+        except IOError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

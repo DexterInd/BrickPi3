@@ -22,15 +22,20 @@ import brickpi3 # import the BrickPi3 drivers
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
 try:
-    BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)[0]) # reset encoder A
-    BP.offset_motor_encoder(BP.PORT_D, BP.get_motor_encoder(BP.PORT_D)[0]) # reset encoder D
+    try:
+        BP.offset_motor_encoder(BP.PORT_A, BP.get_motor_encoder(BP.PORT_A)) # reset encoder A
+        BP.offset_motor_encoder(BP.PORT_D, BP.get_motor_encoder(BP.PORT_D)) # reset encoder D
+    except IOError as error:
+        print(error)
+    
     BP.set_motor_power(BP.PORT_D, BP.MOTOR_FLOAT)                          # float motor D
     #BP.set_motor_limits(BP.PORT_A, 50)                                     # optionally set a power limit
     while True:
-        # BP.get_motor_encoder function return a list of 2 values
-        #     The first item in the list is the value (what we want to use).
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        target = BP.get_motor_encoder(BP.PORT_D)[0]     # read motor D's position
+        # The following BP.get_motor_encoder function returns the encoder value
+        try:
+            target = BP.get_motor_encoder(BP.PORT_D)     # read motor D's position
+        except IOError as error:
+            print(error)
         
         BP.set_motor_dps(BP.PORT_A, target)             # set the target speed for motor A in Degrees Per Second
         

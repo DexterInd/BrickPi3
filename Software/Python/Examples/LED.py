@@ -27,7 +27,7 @@ try:
         
         for i in range(101):    # count from 0-100
             BP.set_led(100 - i) # set the LED brightness (100 to 0)
-            time.sleep(0.1)     # delay for 0.1 seconds (100ms) to reduce the Raspberry Pi CPU load and give time to see the LED pulsing.
+            time.sleep(0.01)     # delay for 0.1 seconds (100ms) to reduce the Raspberry Pi CPU load and give time to see the LED pulsing.
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
     BP.reset_all()        # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.

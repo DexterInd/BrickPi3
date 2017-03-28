@@ -23,8 +23,11 @@ BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be 
 
 try:
     while True:
-        status = BP.get_motor_status(BP.PORT_A)[0]
-        print(status)
+        try:
+            status = BP.get_motor_status(BP.PORT_A)
+            print(status)
+        except IOError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

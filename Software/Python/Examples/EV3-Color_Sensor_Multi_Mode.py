@@ -30,31 +30,38 @@ BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_REFLECTED)
 try:
     # BP.get_sensor retrieves a sensor value.
     # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-    # BP.get_sensor returns a list of two values.
-    #     The first item in the list is the sensor value (what we want to display).
-    #     The second item in the list is the error value (should be equal to BP.SUCCESS if the sensor is configured and the value was read successfully)
-    print("Configuring...")
-    error = -1
-    while error != BP.SUCCESS:
-        error = BP.get_sensor(BP.PORT_1)[1] # while the sensor is being configured
-        print(error)
-        time.sleep(0.1)                     # wait
+    # BP.get_sensor returns the sensor value (what we want to display).
+    try:
+        BP.get_sensor(BP.PORT_1)
+    except brickpi3.SensorError:
+        print("Configuring...")
+        error = True
+        while error:
+            time.sleep(0.1)
+            try:
+                BP.get_sensor(BP.PORT_1)
+                error = False
+            except brickpi3.SensorError:
+                error = True
     print("Configured.")
     
     while True:
-        BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_REFLECTED)        # Configure for an EV3 color sensor in reflected mode.
-        time.sleep(0.02)
-        value1 = BP.get_sensor(BP.PORT_1)[0]                                     # get the sensor value
-        BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_AMBIENT)          # Configure for an EV3 color sensor in ambient mode.
-        time.sleep(0.02)
-        value2 = BP.get_sensor(BP.PORT_1)[0]                                     # get the sensor value
-        BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_COLOR)            # Configure for an EV3 color sensor in color mode.
-        time.sleep(0.02)
-        value3 = BP.get_sensor(BP.PORT_1)[0]                                     # get the sensor value
-        BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_COLOR_COMPONENTS) # Configure for an EV3 color sensor in color components mode.
-        time.sleep(0.02)
-        value4 = BP.get_sensor(BP.PORT_1)[0]                                     # get the sensor value
-        print(value1, "   ", value2, "   ", value3, "   ", value4)               # print the color sensor values
+        try:
+            BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_REFLECTED)        # Configure for an EV3 color sensor in reflected mode.
+            time.sleep(0.02)
+            value1 = BP.get_sensor(BP.PORT_1)                                        # get the sensor value
+            BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_AMBIENT)          # Configure for an EV3 color sensor in ambient mode.
+            time.sleep(0.02)
+            value2 = BP.get_sensor(BP.PORT_1)                                        # get the sensor value
+            BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_COLOR)            # Configure for an EV3 color sensor in color mode.
+            time.sleep(0.02)
+            value3 = BP.get_sensor(BP.PORT_1)                                        # get the sensor value
+            BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_COLOR_COLOR_COMPONENTS) # Configure for an EV3 color sensor in color components mode.
+            time.sleep(0.02)
+            value4 = BP.get_sensor(BP.PORT_1)                                        # get the sensor value
+            print(value1, "   ", value2, "   ", value3, "   ", value4)               # print the color sensor values
+        except brickpi3.SensorError as error:
+            print(error)
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
     BP.reset_all()        # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.

@@ -28,15 +28,16 @@ try:
         # read the sensor value
         # BP.get_sensor retrieves a sensor value.
         # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
-        # BP.get_sensor returns a list of two values.
-        #     The first item in the list is a list of 4 values.
-        #         The first is the pin 1 analog line value (what we want to display).
-        #         The second is the pin 6 analog line value.
-        #         The third is the pin 5 digital value.
-        #         The third is the pin 6 digital value.
-        #     The second item in the list is the error value (should be equal to BP.SUCCESS if the value was read successfully)
-        value = BP.get_sensor(BP.PORT_1)[0][0] # read the sensor port value
-        print("Raw value: %4d   Voltage: %5.3fv" % (value, (value / (4095.0 / BP.get_voltage_5v()[0])))) # print the raw value, and calculate and print the voltage as well
+        # BP.get_sensor returns a list of 4 values.
+        #     The first is the pin 1 analog line value (what we want to display).
+        #     The second is the pin 6 analog line value.
+        #     The third is the pin 5 digital value.
+        #     The fourth is the pin 6 digital value.
+        try:
+            value = BP.get_sensor(BP.PORT_1)[0] # read the sensor port value
+            print("Raw value: %4d   Voltage: %5.3fv" % (value, (value / (4095.0 / BP.get_voltage_5v())))) # print the raw value, and calculate and print the voltage as well
+        except brickpi3.SensorError as error:
+            print(error)
         
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 
