@@ -350,7 +350,7 @@ def handle_BrickPi_msg(msg):
 #       with either "none"
 #       or else something like "red up, blu dw"
 
-    # SET SENSOR TYPE
+    # SET and READ SENSOR TYPE
     elif incoming_sensor_port is not None and incoming_sensor_type is not None:
         # set that port to that sensor
         port_index = int(incoming_sensor_port) - 1  # convert the 1-4 to 0-3
@@ -416,7 +416,7 @@ def handle_BrickPi_msg(msg):
                 incoming_motor_target = int(float(incoming_motor_target))
                 BP3.set_motor_position(bp3motors[motor_index],
                                        incoming_motor_target)
-                print("Motor {} moved to {}".format(motor_index,incoming_motor_target))
+                # print("Motor {} moved to {}".format(motor_index,incoming_motor_target))
             except TypeError:
                 incoming_motor_target = "target error"
                 BP3.set_motor_power(bp3motors[motor_index], 0)
