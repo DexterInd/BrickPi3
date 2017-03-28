@@ -191,7 +191,7 @@ def is_BrickPi_msg(msg):
     if retval is None:
         return False
     else:
-        print ("Recognized {}".format(msg))
+        # print ("Recognized {}".format(msg))
         return True
 
 
@@ -211,7 +211,7 @@ def read_sensor(port_index):
 
     try:
         if valid_reading:
-            print ("got {} from {}".format(value,port_index))
+            # print ("got {} from {}".format(value,port_index))
 
             # if type != 'NONE':
             #     if error == BP3.SUCCESS:
@@ -285,7 +285,7 @@ def read_encoder_values(port_index, name):
         return_encoder["Encoder {} Status".format(name)] = success_code
     except Exception as e:
         return_encoder["Encoder {} Status".format(name)] = e
-        print ("read_encoder_value: {}".format(e))
+        # print ("read_encoder_value: {}".format(e))
 
     return return_encoder
 
@@ -311,8 +311,8 @@ def handle_BrickPi_msg(msg):
     return_string = "0"
     return_dict = {}
 
-    if en_debug:
-        print("received {}".format(msg.strip().lower()))
+    # if en_debug:
+        # print("received {}".format(msg.strip().lower()))
 
     regObj = compiled_regexBP.match(msg.strip().lower())
     if regObj is None:
@@ -341,8 +341,8 @@ def handle_BrickPi_msg(msg):
         port_index = int(incoming_sensor_port_read) - 1  # convert the 1-4 to 0-3
         return_dict = read_sensor(port_index)
 
-        if en_debug:
-            print("Reading sensor port {}".format(incoming_sensor_port_read))
+        # if en_debug:
+        #     print("Reading sensor port {}".format(incoming_sensor_port_read))
 
 # hold off on this for now.
 # for the EV3 IR sensor in remote mode:
@@ -358,7 +358,7 @@ def handle_BrickPi_msg(msg):
         sensor_type_string = incoming_sensor_type.upper()
 
         if SensorType[port_index] != sensor_type_string:
-            print("Setting sensor type")
+            # print("Setting sensor type")
             if (sensor_type_string == "RAW"
              or sensor_type_string == "TEMP"
              or sensor_type_string == "FLEX"):
@@ -388,8 +388,8 @@ def handle_BrickPi_msg(msg):
 
 
         if incoming_motor_poscmd is None: # speed control
-            if en_debug:
-                print("Motor speed {}".format(incoming_motor_target))
+            # if en_debug:
+            #     print("Motor speed {}".format(incoming_motor_target))
 
             if incoming_motor_target == "on" or \
                incoming_motor_target == "full":
@@ -409,8 +409,8 @@ def handle_BrickPi_msg(msg):
                 BP3.set_motor_power(bp3motors[motor_index], 0)
 
         else:  # position control
-            if en_debug:
-                print("Motor position {}".format(incoming_motor_target))
+            # if en_debug:
+            #     print("Motor position {}".format(incoming_motor_target))
 
             try:
                 incoming_motor_target = int(float(incoming_motor_target))
@@ -447,7 +447,7 @@ def handle_BrickPi_msg(msg):
     # Read a motor position
     elif incoming_motor_read is not None:
         motor_index = motor_name_to_number[incoming_motor_read.upper()]
-        print("incoming motor read: {}".format(incoming_motor_read))
+        # print("incoming motor read: {}".format(incoming_motor_read))
         return_dict.update(read_encoder_values(motor_index,
                                       motor_number_to_name[motor_index]))
 
@@ -455,8 +455,8 @@ def handle_BrickPi_msg(msg):
         if en_debug:
             print("Unexpected error: {}".format(msg))
 
-    if en_debug:
-        print("Returning ", return_dict)
+    # if en_debug:
+    #     print("Returning ", return_dict)
 
     return(return_dict)
 
