@@ -55,9 +55,12 @@ def cleanup():
 # Set to 1 to have debugging information printed out
 # Set to 0 to go into quiet mode
 en_debug = 1
+success_code = "SUCCESS"
 
 try:
     BP3 = brickpi3.BrickPi3()
+    bp3ports = [BP3.PORT_1, BP3.PORT_2, BP3.PORT_3, BP3.PORT_4]
+    bp3motors = [BP3.PORT_A, BP3.PORT_B, BP3.PORT_C, BP3.PORT_D]
 
     sensor_types = {
     'NONE'          : [BP3.SENSOR_TYPE.NONE, "None"],
@@ -188,77 +191,102 @@ def is_BrickPi_msg(msg):
     if retval is None:
         return False
     else:
+        print ("Recognized {}".format(msg))
         return True
 
 
-def read_sensor(port):
+def read_sensor(port_index):
+
     return_dict = {}
-    type = SensorType[port]
-    value, error = BP3.get_sensor(port)
+    bp3_port = bp3ports[port_index]
 
-    if type != 'NONE':
-        if error == BP3.SUCCESS:
-            return_dict["S{} Status".format((port + 1))] = "SUCCESS"
-        if error == BP3.SPI_ERROR:
-            return_dict["S{} Status".format((port + 1))] = "SPI_ERROR"
-        if error == BP3.SENSOR_ERROR:
-            return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
-        if error == BP3.SENSOR_TYPE_ERROR:
-            return_dict["S{} Status".format((port + 1))] = "SENSOR_TYPE_ERROR"
+    type = SensorType[port_index]
+    try:
+        value = BP3.get_sensor(bp3_port)
+        valid_reading = True
+    except Exception as e:
+        print ("failing to read_sensor: {}".format(e))
+        valid_reading = False
+        return_dict["S{} Status".format(port_index+1)] = e
 
-    if type != 'TEMP':  # the temp sensor is a peculiar case
-        try:
-            # this is for a sensor returning more than one value
-            # (ie value is a list object)
-            # some sensors return more than one value
-            # but we are only interested in the first one
-            # Raw and Flex are examples of this situation
-            # using zip will iterate over both lists
-            # allowing iteration over the shortest of the
-            # two lists
-            for out_str, out_value in zip(sensor_types[type][1:], value):
-                return_dict["S{} {}".format((port + 1), out_str)] = out_value
+    try:
+        if valid_reading:
+            print ("got {} from {}".format(value,port_index))
 
-        # TypeError is generated if we attempt to iterate over 
-        # a non-iterable object
-        # in other words, value was a number, not a list
-        except TypeError:
-            # for a sensor returning just one value:
-            return_dict["S{} {}".format((port + 1),sensor_types[type][1])] = value
+            # if type != 'NONE':
+            #     if error == BP3.SUCCESS:
+            #         return_dict["S{} Status".format((port + 1))] = "SUCCESS"
+            #     if error == BP3.SPI_ERROR:
+            #         return_dict["S{} Status".format((port + 1))] = "SPI_ERROR"
+            #     if error == BP3.SENSOR_ERROR:
+            #         return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
+            #     if error == BP3.SENSOR_TYPE_ERROR:
+            #         return_dict["S{} Status".format((port + 1))] = "SENSOR_TYPE_ERROR"
 
-    elif type == 'TEMP':
-        temp = 0
-        if value[0] == 4095:
-            return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
-        elif error == BP3.SUCCESS:
-            RtRt25 = (float)(value[0]) / (4095 - value[0])
-            lnRtRt25 = math.log(RtRt25)
-            if (RtRt25 > 3.277):
-                i = 0
-            elif (RtRt25 > 0.3599):
-                i = 1
-            elif (RtRt25 > 0.06816):
-                i = 2
+            if type != 'TEMP':  # the temp sensor is a peculiar case
+                try:
+                    # this is for a sensor returning more than one value
+                    # (ie value is a list object)
+                    # some sensors return more than one value
+                    # but we are only interested in the first one
+                    # Raw and Flex are examples of this situation
+                    # using zip will iterate over both lists
+                    # allowing iteration over the shortest of the
+                    # two lists
+                    for out_str, out_value in zip(sensor_types[type][1:], value):
+                        return_dict["S{} {}".format((port_index+1), out_str)] = out_value
+                        return_dict["S{} Status".format(port_index+1)] = success_code
+
+                # TypeError is generated if we attempt to iterate over
+                # a non-iterable object
+                # in other words, value was a number, not a list
+                except TypeError:
+                    # for a sensor returning just one value:
+                    return_dict["S{} {}".format((port_index+1),sensor_types[type][1])] = value
+                    return_dict["S{} Status".format(port_index+1)] = success_code
+
+            elif type == 'TEMP':
+                temp = 0
+                if value[0] == 4095:
+                    return_dict["S{} Status".format((port_index+1))] = "SENSOR_ERROR"
+                elif error == BP3.SUCCESS:
+                    RtRt25 = (float)(value[0]) / (4095 - value[0])
+                    lnRtRt25 = math.log(RtRt25)
+                    if (RtRt25 > 3.277):
+                        i = 0
+                    elif (RtRt25 > 0.3599):
+                        i = 1
+                    elif (RtRt25 > 0.06816):
+                        i = 2
+                    else:
+                        i = 3
+                    temp = 1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
+                    temp = temp - 273.15
+
+                return_dict["S{} {}".format((port_index + 1), sensor_types[type][1])] = temp
+                return_dict["S{} Status".format(port_index+1)] = success_code
             else:
-                i = 3
-            temp = 1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
-            temp = temp - 273.15
-
-        return_dict["S{} {}".format((port + 1), sensor_types[type][1])] = temp
-    else:
-        # we really should never get here. Should we handle this case
-        # or just let it pass?
-        pass
+                # we really should never get here. Should we handle this case
+                # or just let it pass?
+                pass
+    except Exception as e:
+        print (e)
 
 
     return return_dict
 
-def read_encoder_values(port, name):
+def read_encoder_values(port_index, name):
     # unpack the tuple here as Scratch can't do it
-    value, error = BP3.get_motor_encoder(port)
     return_encoder = {}
-    return_encoder["Encoder {}".format(name)] = value
-    return_encoder["Encoder {} Status".format(name)] = error
+
+    try:
+        value = BP3.get_motor_encoder(bp3motors[port_index])
+        return_encoder["Encoder {}".format(name)] = value
+        return_encoder["Encoder {} Status".format(name)] = success_code
+    except Exception as e:
+        return_encoder["Encoder {} Status".format(name)] = e
+        print ("read_encoder_value: {}".format(e))
+
     return return_encoder
 
 
@@ -269,8 +297,9 @@ def BP_reset():
 
     global SensorType
     SensorType = ["NONE", "NONE", "NONE", "NONE"]
+
     for port in range(4):
-        BP3.set_sensor_type(port, sensor_types["NONE"][0])
+        BP3.set_sensor_type(bp3ports[port], sensor_types["NONE"][0])
 
 
 def handle_BrickPi_msg(msg):
@@ -306,10 +335,11 @@ def handle_BrickPi_msg(msg):
     motor_number_to_name = ['A', 'B', 'C', 'D']
 
     # READ A SPECIFIC SENSOR
+    # valid when the broadcast msg is simply S1 to S4
     if incoming_sensor_port_read is not None:
         # read that sensor value
-        port = int(incoming_sensor_port_read) - 1  # convert the 1-4 to 0-3
-        return_dict = read_sensor(port)
+        port_index = int(incoming_sensor_port_read) - 1  # convert the 1-4 to 0-3
+        return_dict = read_sensor(port_index)
 
         if en_debug:
             print("Reading sensor port {}".format(incoming_sensor_port_read))
@@ -323,18 +353,21 @@ def handle_BrickPi_msg(msg):
     # SET SENSOR TYPE
     elif incoming_sensor_port is not None and incoming_sensor_type is not None:
         # set that port to that sensor
-        port = int(incoming_sensor_port) - 1  # convert the 1-4 to 0-3
+        port_index = int(incoming_sensor_port) - 1  # convert the 1-4 to 0-3
+        bp3_portaddress = bp3ports[port_index]
         sensor_type_string = incoming_sensor_type.upper()
 
-        if SensorType[port] != sensor_type_string:
+        if SensorType[port_index] != sensor_type_string:
+            print("Setting sensor type")
             if (sensor_type_string == "RAW"
              or sensor_type_string == "TEMP"
              or sensor_type_string == "FLEX"):
-                BP3.set_sensor_type(port, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
+                BP3.set_sensor_type(bp3_portaddress, BP3.SENSOR_TYPE.CUSTOM, [(BP3.SENSOR_CUSTOM.PIN1_ADC)])
             else:
-                BP3.set_sensor_type(port, sensor_types[sensor_type_string][0])
+                BP3.set_sensor_type(bp3_portaddress,
+                                    sensor_types[sensor_type_string][0])
 
-            SensorType[port] = sensor_type_string
+            SensorType[port_index] = sensor_type_string
 
             # don't return sensor Type as it seems useless and just makes a busier sensor value list
             # return_dict["S{} Type".format(incoming_sensor_port)] = sensor_type_string
@@ -342,20 +375,24 @@ def handle_BrickPi_msg(msg):
                 print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
             time.sleep(0.010)
 
-        return_dict.update(read_sensor(port))
+        return_dict.update(read_sensor(port_index))
 
         if en_debug:
             print("Reading sensor port {}".format(incoming_sensor_port))
 
     # SET MOTOR SPEED
     elif incoming_motor_port is not None :
-        port = motor_name_to_number[incoming_motor_port.upper()]  # convert A-D to 0-3
+
+        # convert A-D to 0-3
+        motor_index = motor_name_to_number[incoming_motor_port.upper()]
+
 
         if incoming_motor_poscmd is None: # speed control
             if en_debug:
                 print("Motor speed {}".format(incoming_motor_target))
 
-            if incoming_motor_target == "on" or incoming_motor_target == "full":
+            if incoming_motor_target == "on" or \
+               incoming_motor_target == "full":
                 incoming_motor_target = 100
             elif incoming_motor_target == "off" or incoming_motor_target == "stop":
                 incoming_motor_target = 0
@@ -365,28 +402,29 @@ def handle_BrickPi_msg(msg):
                 incoming_motor_target = int(float(incoming_motor_target))
                 # except TypeError:
                 #    incoming_motor_target = "target error"
-            
+
             if incoming_motor_target != "target error":
-                BP3.set_motor_power(port, incoming_motor_target)
+                BP3.set_motor_power(bp3motors[motor_index], incoming_motor_target)
             else:
-                BP3.set_motor_power(port, 0)  
-        else:
+                BP3.set_motor_power(bp3motors[motor_index], 0)
+
+        else:  # position control
             if en_debug:
                 print("Motor position {}".format(incoming_motor_target))
 
             try:
                 incoming_motor_target = int(float(incoming_motor_target))
+                BP3.set_motor_position(bp3motors[motor_index],
+                                       incoming_motor_target)
+                print("Motor {} moved to {}".format(motor_index,incoming_motor_target))
             except TypeError:
                 incoming_motor_target = "target error"
-
-            if incoming_motor_target != "target error":
-                BP3.set_motor_position(port, incoming_motor_target)
-            else:
-                BP3.set_motor_power(port, 0)
+                BP3.set_motor_power(bp3motors[motor_index], 0)
 
         # returning Motor Target is meaningless as it's exactly what Scratch passed to us
         # return_dict["Motor Target {}".format(incoming_motor_port.upper())] = incoming_motor_target
-        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
+
+        return_dict.update(read_encoder_values(motor_index,motor_number_to_name[motor_index]))
 
         # this is error inducing when setting motor to a specific position
         # if en_debug:
@@ -394,6 +432,7 @@ def handle_BrickPi_msg(msg):
 
     # UPDATE ALL SENSOR VALUES
     elif incoming_update_all is not None:
+
         for port in range(0, 4):
             return_dict.update(read_sensor(port))
             return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
@@ -405,11 +444,12 @@ def handle_BrickPi_msg(msg):
     elif incoming_reset is not None:
         BP_reset()
 
-    # Rrad a motor position
+    # Read a motor position
     elif incoming_motor_read is not None:
-        port = motor_name_to_number[incoming_motor_read.upper()]
+        motor_index = motor_name_to_number[incoming_motor_read.upper()]
         print("incoming motor read: {}".format(incoming_motor_read))
-        return_dict.update(read_encoder_values(port,motor_number_to_name[port]))
+        return_dict.update(read_encoder_values(motor_index,
+                                      motor_number_to_name[motor_index]))
 
     else:
         if en_debug:
@@ -459,12 +499,12 @@ if __name__ == '__main__':
 
                 # keep this for reference.
                 # may work to detect File/new, File/Open but needs a change in scratchpi
-                # to detect "send_vars" msg as being valid          
+                # to detect "send_vars" msg as being valid
                 # if m[0] == "send_vars":  # File/New
                 #     print("Resetting everything")
                 #     SensorType = ["None","None","None","None"]
                 #     for port in range(4):
-                #         BP3.set_sensor_type(port, sensor_types["NONE"][0])
+                #         BP3.set_sensor_type(bp3ports[port], sensor_types["NONE"][0])
 
                 m = s.receive()
 
@@ -473,12 +513,12 @@ if __name__ == '__main__':
 # remove all spaces in the input msg to create ms_nospace
 # brickpi3 handles the one without spaces but we keep the one with spaces
 # for others (like pivotpi, camera, line_sensor) as a precautionary measure.
-            try: 
+            try:
                 msg_nospace = msg.replace(" ","")
-            except: 
+            except:
                 pass
 
-	
+
             if en_debug:
                 print("Rx:{}".format(msg))
 
@@ -518,14 +558,14 @@ if __name__ == '__main__':
                     os.chown(newimage,pi,pi)
                     if en_debug:
                         print ("Picture Taken")
-                    s.sensorupdate({'camera':"Picture Taken"})  
+                    s.sensorupdate({'camera':"Picture Taken"})
                 except:
                     if en_debug:
                         e = sys.exc_info()[1]
                         print ("Error taking picture")
-                    s.sensorupdate({'camera':"Error"})  
+                    s.sensorupdate({'camera':"Error"})
 
-     
+
             elif (msg[:5].lower()=="SPEAK".lower()):
                 try:
                     from subprocess import call
