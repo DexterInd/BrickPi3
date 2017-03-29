@@ -490,7 +490,7 @@ class BrickPi3(object):
         params = 0 -- the parameters needed for some sensor types.
         
         params is used for the following sensor types:
-            CUSTOM -- a 24-bit integer used to configure the hardware.
+            CUSTOM -- a 16-bit integer used to configure the hardware.
             I2C -- a list of settings:
                 params[0] -- Settings/flags
                 params[1] -- target Speed in microseconds (0-255). Realistically the speed will vary.
@@ -847,17 +847,17 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_DPS, int(port), ((dps >> 8) & 0xFF), (dps & 0xFF)]
         self.spi_transfer_array(outArray)
     
-    def set_motor_limits(self, port, speed = 0, dps = 0):
+    def set_motor_limits(self, port, power = 0, dps = 0):
         """
         Set the motor speed limit
         
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
-        speed -- The speed limit in percent (0 to 100) with 0 being no limit (100)
+        power -- The power limit in percent (0 to 100) with 0 being no limit (100)
         dps -- The speed limit in degrees per second - Not yet supported in firmware!
         """
         dps = int(dps)
-        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_LIMITS, int(port), int(speed), ((dps >> 8) & 0xFF), (dps & 0xFF)]
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_LIMITS, int(port), int(power), ((dps >> 8) & 0xFF), (dps & 0xFF)]
         print(outArray)
         self.spi_transfer_array(outArray)
     
