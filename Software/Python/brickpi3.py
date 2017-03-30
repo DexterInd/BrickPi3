@@ -706,7 +706,7 @@ class BrickPi3(object):
                     value = int((reply[6] << 8) | reply[7])
                     if((self.SensorType[port_index] == self.SENSOR_TYPE.EV3_GYRO_ABS
                     or self.SensorType[port_index] == self.SENSOR_TYPE.EV3_GYRO_DPS)
-                    and (value & 0x1000)):
+                    and (value & 0x8000)):
                         value = value - 0x10000
                     elif(self.SensorType[port_index] == self.SENSOR_TYPE.EV3_ULTRASONIC_CM
                       or self.SensorType[port_index] == self.SENSOR_TYPE.EV3_ULTRASONIC_INCHES):
