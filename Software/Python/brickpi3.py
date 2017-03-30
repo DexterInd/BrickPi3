@@ -759,7 +759,7 @@ class BrickPi3(object):
                     results = [[int(reply[6]), int(reply[7])], [int(reply[8]), int(reply[9])], [int(reply[10]), int(reply[11])], [int(reply[12]), int(reply[13])]]
                     for c in range(len(results)):
                         for v in range(len(results[c])):
-                            if results[c][v] > 0x80:
+                            if results[c][v] >= 0x80:
                                 results[c][v] = results[c][v] - 0x100
                     return results
                 else:
