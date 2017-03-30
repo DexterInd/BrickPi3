@@ -262,9 +262,9 @@ class BrickPi3(object):
                 board = self.get_board()
                 vfw = self.get_version_firmware()
             except IOError():
-                raise IOError("BrickPi3 not connected")
+                raise IOError("No SPI response")
             if manufacturer != "Dexter Industries" or board != "BrickPi3":
-                raise IOError("BrickPi3 not connected")
+                raise IOError("No SPI response")
             if vfw.split('.')[0] != FIRMWARE_VERSION_REQUIRED.split('.')[0] or vfw.split('.')[1] != FIRMWARE_VERSION_REQUIRED.split('.')[1]:
                 raise FirmwareVersionError("BrickPi3 firmware needs to be version %s but is currently version %s" % (FIRMWARE_VERSION_REQUIRED, vfw))
     
