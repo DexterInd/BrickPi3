@@ -262,9 +262,9 @@ class BrickPi3(object):
                 board = self.get_board()
                 vfw = self.get_version_firmware()
             except IOError():
-                raise IOError("BrickPi3 not connected")
+                raise IOError("No SPI response")
             if manufacturer != "Dexter Industries" or board != "BrickPi3":
-                raise IOError("BrickPi3 not connected")
+                raise IOError("No SPI response")
             if vfw.split('.')[0] != FIRMWARE_VERSION_REQUIRED.split('.')[0] or vfw.split('.')[1] != FIRMWARE_VERSION_REQUIRED.split('.')[1]:
                 raise FirmwareVersionError("BrickPi3 firmware needs to be version %s but is currently version %s" % (FIRMWARE_VERSION_REQUIRED, vfw))
     
@@ -706,7 +706,7 @@ class BrickPi3(object):
                     value = int((reply[6] << 8) | reply[7])
                     if((self.SensorType[port_index] == self.SENSOR_TYPE.EV3_GYRO_ABS
                     or self.SensorType[port_index] == self.SENSOR_TYPE.EV3_GYRO_DPS)
-                    and (value & 0x1000)):
+                    and (value & 0x8000)):
                         value = value - 0x10000
                     elif(self.SensorType[port_index] == self.SENSOR_TYPE.EV3_ULTRASONIC_CM
                       or self.SensorType[port_index] == self.SENSOR_TYPE.EV3_ULTRASONIC_INCHES):
@@ -759,7 +759,7 @@ class BrickPi3(object):
                     results = [[int(reply[6]), int(reply[7])], [int(reply[8]), int(reply[9])], [int(reply[10]), int(reply[11])], [int(reply[12]), int(reply[13])]]
                     for c in range(len(results)):
                         for v in range(len(results[c])):
-                            if results[c][v] > 0x80:
+                            if results[c][v] >= 0x80:
                                 results[c][v] = results[c][v] - 0x100
                     return results
                 else:
