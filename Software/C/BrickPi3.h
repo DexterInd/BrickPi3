@@ -33,6 +33,7 @@
 //#include <getopt.h>
 //#include <unistd.h>
 
+// Error values
 #define ERROR_NONE                  0
 #define ERROR_SPI_FILE             -1
 #define ERROR_SPI_RESPONSE         -2
@@ -59,7 +60,7 @@ int spi_setup(){
   spi_xfer_struct.speed_hz = SPI_TARGET_SPEED; // speed
   spi_xfer_struct.bits_per_word = 8;           // bites per word 8
   
-  return 0;
+  return ERROR_NONE;
 }
 
 // Transfer length number of bytes. Write from outArray, read to inArray.
@@ -72,7 +73,7 @@ int spi_transfer_array(uint8_t length, uint8_t *outArray, uint8_t *inArray){
     return ERROR_SPI_FILE;
   }
   
-  return 0;
+  return ERROR_NONE;
 }
 
 // Function to call if an error occured that can not be resolved, such as failure to set up SPI
@@ -89,6 +90,7 @@ void fatal_error(const char *error){
   exit(-1);
 }
 
+// SPI message type
 enum BPSPI_MESSAGE_TYPE{
   BPSPI_MESSAGE_NONE,
   
@@ -145,6 +147,7 @@ enum BPSPI_MESSAGE_TYPE{
   BPSPI_MESSAGE_GET_MOTOR_D_STATUS
 };
 
+// Sensor type
 enum SENSOR_TYPE{
   SENSOR_TYPE_NONE = 1, // Not configured for any sensor type
   SENSOR_TYPE_I2C,
@@ -184,6 +187,7 @@ enum SENSOR_TYPE{
   SENSOR_TYPE_EV3_INFRARED_REMOTE
 };
 
+// Sensor states/error values
 enum SENSOR_STATE{
   SENSOR_STATE_VALID_DATA,
   SENSOR_STATE_NOT_CONFIGURED,
@@ -192,16 +196,17 @@ enum SENSOR_STATE{
   SENSOR_STATE_I2C_ERROR        // Such as no ACK, SCL stretched too long, etc.
 };
 
+// Flags for configuring custom and I2C sensors
 enum SENSOR_CONFIG_FLAGS{
-  SENSOR_CONFIG_I2C_MID_CLOCK = 0x0001, // Send the clock pulse between reading and writing. Required by the NXT US sensor.
-  SENSOR_CONFIG_PIN_1_PULL    = 0x0002, // 9v pullup on pin 1
-  SENSOR_CONFIG_I2C_REPEAT    = 0x0004, // Keep performing the same transaction e.g. keep polling a sensor
-  SENSOR_CONFIG_PIN_5_DIR     = 0x0010,
-  SENSOR_CONFIG_PIN_5_STATE   = 0x0020,
-  SENSOR_CONFIG_PIN_6_DIR     = 0x0100,
-  SENSOR_CONFIG_PIN_6_STATE   = 0x0200,
-  SENSOR_CONFIG_REPORT_1_ADC  = 0x1000,
-  SENSOR_CONFIG_REPORT_6_ADC  = 0x4000
+  SENSOR_CONFIG_I2C_MID_CLOCK = 0x0001, // I2C. Send a clock pulse between reading and writing. Required by the NXT US sensor.
+  SENSOR_CONFIG_PIN_1_PULL    = 0x0002, // I2C or custom. Enable 9v pullup on pin 1
+  SENSOR_CONFIG_I2C_REPEAT    = 0x0004, // I2C. Keep performing the same transaction e.g. keep polling a sensor
+  SENSOR_CONFIG_PIN_5_DIR     = 0x0010, // Custom. Set pin 5 output
+  SENSOR_CONFIG_PIN_5_STATE   = 0x0020, // Custom. Set pin 5 high
+  SENSOR_CONFIG_PIN_6_DIR     = 0x0100, // Custom. Set pin 6 output
+  SENSOR_CONFIG_PIN_6_STATE   = 0x0200, // Custom. Set pin 6 high
+  SENSOR_CONFIG_REPORT_1_ADC  = 0x1000, // Custom. Read pin 1 ADC
+  SENSOR_CONFIG_REPORT_6_ADC  = 0x4000  // Custom. Read pin 6 ADC
 };
 
 // Sensor ports
@@ -219,12 +224,14 @@ enum SENSOR_CONFIG_FLAGS{
 // Motor Float. Value to pass to set_motor_power to make a motor float.
 #define MOTOR_FLOAT -128
 
+// EV3 infrared remote button bit masks
 #define REMOTE_BIT_BROADCAST 0b00001
 #define REMOTE_BIT_BLUE_DOWN 0b00010
 #define REMOTE_BIT_BLUE_UP   0b00100
 #define REMOTE_BIT_RED_DOWN  0b01000
 #define REMOTE_BIT_RED_UP    0b10000
 
+// structure for I2C
 struct i2c_struct_t{
   uint8_t speed;
   uint8_t delay;
@@ -235,13 +242,63 @@ struct i2c_struct_t{
   uint8_t buffer_read[LONGEST_I2C_TRANSFER];
 };
 
+// structure for custom sensors
+struct sensor_custom_t{
+  uint16_t adc1;
+  uint16_t adc6;
+  bool     pin5;
+  bool     pin6;
+};
+
+// structure for touch sensors
+struct sensor_touch_t{
+  bool     pressed;
+};
+
+// structure for light sensor
+struct sensor_light_t{
+  int16_t  ambient;
+  int16_t  reflected;
+};
+
+// structure for color sensors
+struct sensor_color_t{
+  int8_t   color;
+  int16_t  reflected_red;
+  int16_t  reflected_green;
+  int16_t  reflected_blue;
+  int16_t  ambient;
+};
+
+// structure for ultrasonic sensors
+struct sensor_ultrasonic_t{
+  float    cm;
+  float    inch;
+  bool     presence;
+};
+
+// structure for gyro sensor
+struct sensor_gyro_t{
+  int16_t  abs;
+  int16_t  dps;
+};
+
+// structure for infrared sensor
+struct sensor_infrared_t{
+  uint8_t  proximity;
+  int8_t   distance[4];
+  int8_t   heading[4];
+  uint8_t  remote[4];
+};
+
+// Set a BrickPi3's address to allow stacking
 int BrickPi3_set_address(int addr, const char *id){
   if(addr < 1 || addr > 255){
     fatal_error("BrickPi3_set_address error: invalid address. Must be in the range of 1 to 255");
     return -1;
   }
   
-  spi_array_out[0] = 0;
+  spi_array_out[0] = 0;                         // use address 0 so all BrickPi3s will listen, regardless of current address
   spi_array_out[1] = BPSPI_MESSAGE_SET_ADDRESS;
   spi_array_out[2] = addr;
   for(uint8_t i = 0; i < 16; i++){
@@ -263,32 +320,64 @@ int BrickPi3_set_address(int addr, const char *id){
 
 class BrickPi3{
   public:
+    // Default to address 1, but the BrickPi3 address could have been changed.
     BrickPi3(uint8_t addr = 1);
     
+    // Confirm that the BrickPi3 is connected and up-to-date
     int     detect(bool critical = true);
+    
+    // Get the manufacturer (should be "Dexter Industries")
     int     get_manufacturer(char *str);
+    // Get the board name (should be "BrickPi3")
     int     get_board(char *str);
+    // Get the hardware version number
     int     get_version_hardware(char *str);
+    // Get the firmware version number
     int     get_version_firmware(char *str);
+    // Get the serial number ID that is unique to each BrickPi3
     int     get_id(char *str);
-    void    set_led(uint8_t value);
-    float   get_voltage_3v3();
-    float   get_voltage_5v();
-    float   get_voltage_9v();
+    
+    // Control the LED
+    int     set_led(uint8_t value);
+    
+    // Get the voltages of the four power rails
+    int     get_voltage_3v3    (float &voltage);
+    float   get_voltage_3v3    ();
+    int     get_voltage_5v     (float &voltage);
+    float   get_voltage_5v     ();
+    int     get_voltage_9v     (float &voltage);
+    float   get_voltage_9v     ();
+    int     get_voltage_battery(float &voltage);
     float   get_voltage_battery();
+    
+    // Configure a sensor
     int     set_sensor_type(uint8_t port, uint8_t type, uint16_t flags = 0, i2c_struct_t *i2c_struct = NULL);
+    // Configure and trigger an I2C transaction
     int     transact_i2c(uint8_t port, i2c_struct_t *i2c_struct);
-    int     get_sensor(uint8_t port, int32_t *value);
+    // Get sensor value(s)
+    int     get_sensor(uint8_t port, void *value);
+    
+    // Set the motor PWM power
     int     set_motor_power(uint8_t port, int8_t power);
+    // Set the motor target position to run to
     int     set_motor_position(uint8_t port, int32_t position);
+    // Set the motor speed in degrees per second. As of FW version 1.4.0, the algorithm regulates the speed, but it is not accurate.
     int     set_motor_dps(uint8_t port, int16_t dps);
+    // Set the motor limits. Only the power limit is implemented. Use the power limit to limit the motor speed/torque.
     int     set_motor_limits(uint8_t port, uint8_t power, uint16_t dps);
+    // Get the motor status. State, PWM power, encoder position, and speed (in degrees per second)
     int     get_motor_status(uint8_t port, uint8_t &state, int8_t &power, int32_t &position, int16_t &dps);
+    // Offset the encoder position. By setting the offset to the current position, it effectively resets the encoder value.
     int     offset_motor_encoder(uint8_t port, int32_t position);
+    // Get the encoder position
+    int     get_motor_encoder(uint8_t port, int32_t &value);
     int32_t get_motor_encoder(uint8_t port);
-    void    reset_all();
+    
+    // Reset the sensors (unconfigure), motors (float), and LED (return control to the firmware).
+    int     reset_all();
     
   private:
+    // BrickPi3 SPI address
     uint8_t Address;
     uint8_t SensorType[4];
     uint8_t I2CInBytes[4];
