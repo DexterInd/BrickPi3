@@ -130,17 +130,14 @@ int BrickPi3::detect(bool critical){
 }
 
 int BrickPi3::get_manufacturer(char *str){
-  str[0] = 0;
   return spi_read_string(BPSPI_MESSAGE_GET_MANUFACTURER, str);
 }
 
 int BrickPi3::get_board(char *str){
-  str[0] = 0;
   return spi_read_string(BPSPI_MESSAGE_GET_NAME, str);
 }
 
 int BrickPi3::get_version_hardware(char *str){
-  str[0] = 0;
   uint32_t value;
   if(int error = spi_read_32(BPSPI_MESSAGE_GET_HARDWARE_VERSION, value)){ // assign error to the value returned by spi_read_32, and if not 0:
     return error;
@@ -149,7 +146,6 @@ int BrickPi3::get_version_hardware(char *str){
 }
 
 int BrickPi3::get_version_firmware(char *str){
-  str[0] = 0;
   uint32_t value;
   if(int error = spi_read_32(BPSPI_MESSAGE_GET_FIRMWARE_VERSION, value)){ // assign error to the value returned by spi_read_32, and if not 0:
     return error;
@@ -159,7 +155,6 @@ int BrickPi3::get_version_firmware(char *str){
 }
 
 int BrickPi3::get_id(char *str){
-  str[0] = 0;
   spi_array_out[0] = Address;
   spi_array_out[1] = BPSPI_MESSAGE_GET_ID;
   if(int error = spi_transfer_array(20, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_read_32, and if not 0:
