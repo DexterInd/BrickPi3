@@ -29,7 +29,7 @@ int main(){
   
   BP.detect(); // Make sure that the BrickPi3 is communicating and that the firmware is compatible with the drivers.
   
-  char string[32];
+  char string[33]; // Room for the 32-character serial number string plus the NULL terminator.
   
   BP.get_manufacturer(string);
   printf("Manufacturer    : %s\n", string);
