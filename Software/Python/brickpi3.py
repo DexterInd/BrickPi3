@@ -853,8 +853,8 @@ class BrickPi3(object):
         
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
-        power -- The power limit in percent (0 to 100) with 0 being no limit (100)
-        dps -- The speed limit in degrees per second - Not yet supported in firmware!
+        power -- The power limit in percent (0 to 100), with 0 being no limit (100)
+        dps -- The speed limit in degrees per second, with 0 being no limit
         """
         dps = int(dps)
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_LIMITS, int(port), int(power), ((dps >> 8) & 0xFF), (dps & 0xFF)]
