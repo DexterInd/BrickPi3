@@ -225,11 +225,11 @@ enum SENSOR_CONFIG_FLAGS{
 #define MOTOR_FLOAT -128
 
 // EV3 infrared remote button bit masks
-#define REMOTE_BIT_BROADCAST 0b00001
-#define REMOTE_BIT_BLUE_DOWN 0b00010
-#define REMOTE_BIT_BLUE_UP   0b00100
-#define REMOTE_BIT_RED_DOWN  0b01000
-#define REMOTE_BIT_RED_UP    0b10000
+#define REMOTE_BIT_RED_UP    0x01
+#define REMOTE_BIT_RED_DOWN  0x02
+#define REMOTE_BIT_BLUE_UP   0x04
+#define REMOTE_BIT_BLUE_DOWN 0x08
+#define REMOTE_BIT_BROADCAST 0x10
 
 // structure for I2C
 struct i2c_struct_t{
