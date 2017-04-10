@@ -1,7 +1,7 @@
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2017 Dexter Industries
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
@@ -19,10 +19,10 @@ FIRMWARE_VERSION_REQUIRED = "1.4.x" # Make sure the top 2 of 3 numbers match
 
 BP_SPI = spidev.SpiDev()
 BP_SPI.open(0, 1)
-BP_SPI.max_speed_hz = 500000 #1000000 #1300000
+BP_SPI.max_speed_hz = 500000
 BP_SPI.mode = 0b00
 BP_SPI.bits_per_word = 8
-#BP_SPI.delay_usec = 10
+
 
 class Enumeration(object):
     def __init__(self, names):  # or *names, with no .split()
@@ -48,11 +48,14 @@ class Enumeration(object):
                 setattr(self, name, number)
                 number = number + 1
 
+
 class FirmwareVersionError(Exception):
     """Exception raised if the BrickPi3 firmware needs to be updated"""
 
+
 class SensorError(Exception):
     """Exception raised if a sensor is not yet configured when trying to read it with get_sensor"""
+
 
 def set_address(address, id):
     """
@@ -82,6 +85,7 @@ def set_address(address, id):
     outArray = [0, BrickPi3.BPSPI_MESSAGE_TYPE.SET_ADDRESS, address]
     outArray.extend(id_arr)
     BP_SPI.xfer2(outArray)
+
 
 class BrickPi3(object):
     PORT_1 = 0x01
