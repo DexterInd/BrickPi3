@@ -211,6 +211,32 @@ class BrickPi3(object):
         PIN1_ADC,
         PIN6_ADC,
     """)
+    """
+    Flags for use with SENSOR_TYPE.CUSTOM
+
+    PIN1_9V
+        Enable 9V out on pin 1 (for LEGO NXT Ultrasonic sensor).
+
+    PIN5_OUT
+        Set pin 5 state to output. Pin 5 will be set to input if this flag is not set.
+
+    PIN5_STATE
+        If PIN5_OUT is set, this will set the state to output high, otherwise the state will
+        be output low. If PIN5_OUT is not set, this flag has no effect.
+
+    PIN6_OUT
+        Set pin 6 state to output. Pin 6 will be set to input if this flag is not set.
+
+    PIN6_STATE
+        If PIN6_OUT is set, this will set the state to output high, otherwise the state will
+        be output low. If PIN6_OUT is not set, this flag has no effect.
+
+    PIN1_ADC
+        Enable the analog/digital converter on pin 1 (e.g. for NXT analog sensors).
+
+    PIN6_ADC
+        Enable the analog/digital converter on pin 6.
+    """
     
     SENSOR_CUSTOM.PIN1_9V    = 0x0002
     SENSOR_CUSTOM.PIN5_OUT   = 0x0010
