@@ -29,22 +29,22 @@ int main(){
   
   BP.detect(); // Make sure that the BrickPi3 is communicating and that the firmware is compatible with the drivers.
   
-  char string[33]; // Room for the 32-character serial number string plus the NULL terminator.
+  char str[33]; // Room for the 32-character serial number string plus the NULL terminator.
   
-  BP.get_manufacturer(string);
-  printf("Manufacturer    : %s\n", string);
+  BP.get_manufacturer(str);
+  printf("Manufacturer    : %s\n", str);
   
-  BP.get_board(string);
-  printf("Board           : %s\n", string);
+  BP.get_board(str);
+  printf("Board           : %s\n", str);
   
-  BP.get_id(string);
-  printf("Serial Number   : %s\n", string);
+  BP.get_id(str);
+  printf("Serial Number   : %s\n", str);
   
-  BP.get_version_hardware(string);
-  printf("Hardware version: %s\n", string);
+  BP.get_version_hardware(str);
+  printf("Hardware version: %s\n", str);
   
-  BP.get_version_firmware(string);
-  printf("Firmware version: %s\n", string);
+  BP.get_version_firmware(str);
+  printf("Firmware version: %s\n", str);
   
   printf("Battery voltage : %.3f\n", BP.get_voltage_battery());
   printf("9v voltage      : %.3f\n", BP.get_voltage_9v());

@@ -78,17 +78,17 @@ int BrickPi3::spi_read_string(uint8_t msg_type, char *str, uint8_t chars){
 }
 
 int BrickPi3::detect(bool critical){
-  char ErrorString[100];
-  char string[21];
+  char ErrorStr[100];
+  char str[21];
   int error;
-  if(error = get_manufacturer(string)){     // assign error to the value returned by get_manufacturer, and if not 0:
+  if(error = get_manufacturer(str)){     // assign error to the value returned by get_manufacturer, and if not 0:
     if(critical){
       fatal_error("detect error: get_manufacturer failed. Perhaps the BrickPi3 is not connected, or the address is incorrect.");
     }else{
       return error;
     }
   }
-  if(strstr(string, "Dexter Industries") != string){
+  if(strstr(str, "Dexter Industries") != str){
     if(critical){
       fatal_error("detect error: get_manufacturer string is not 'Dexter Industries'");
     }else{
@@ -96,14 +96,14 @@ int BrickPi3::detect(bool critical){
     }
   }
   
-  if(error = get_board(string)){            // assign error to the value returned by get_board, and if not 0:
+  if(error = get_board(str)){            // assign error to the value returned by get_board, and if not 0:
     if(critical){
       fatal_error("detect error: get_board failed");
     }else{
       return error;
     }
   }
-  if(strstr(string, "BrickPi3") != string){
+  if(strstr(str, "BrickPi3") != str){
     if(critical){
       fatal_error("detect error: get_board string is not 'BrickPi3'");
     }else{
@@ -111,17 +111,17 @@ int BrickPi3::detect(bool critical){
     }
   }
   
-  if(error = get_version_firmware(string)){ // assign error to the value returned by get_version_firmware, and if not 0:
+  if(error = get_version_firmware(str)){ // assign error to the value returned by get_version_firmware, and if not 0:
     if(critical){
       fatal_error("detect error: get_version_firmware failed");
     }else{
       return error;
     }
   }
-  if(strstr(string, FIRMWARE_VERSION_REQUIRED) != string){
+  if(strstr(str, FIRMWARE_VERSION_REQUIRED) != str){
     if(critical){
-      sprintf(ErrorString, "detect error: BrickPi3 firmware needs to be version %sx but is currently version %s", FIRMWARE_VERSION_REQUIRED, string);
-      fatal_error(ErrorString);
+      sprintf(ErrorStr, "detect error: BrickPi3 firmware needs to be version %sx but is currently version %s", FIRMWARE_VERSION_REQUIRED, str);
+      fatal_error(ErrorStr);
     }else{
       return ERROR_FIRMWARE_MISMATCH;
     }
@@ -682,13 +682,16 @@ int BrickPi3::get_motor_encoder(uint8_t port, int32_t &value){
 int BrickPi3::reset_all(){
   int res1 = set_sensor_type(PORT_1 + PORT_2 + PORT_3 + PORT_4, SENSOR_TYPE_NONE);
   int res2 = set_motor_power(PORT_A + PORT_B + PORT_C + PORT_D, MOTOR_FLOAT);
-  int res3 = set_led(-1);
+  int res3 = set_motor_limits(PORT_A + PORT_B + PORT_C + PORT_D, 0, 0);
+  int res4 = set_led(-1);
   if(res1){
     return res1;
   }else if(res2){
     return res2;
   }else if(res3){
     return res3;
+  }else if(res4){
+    return res4;
   }
   return ERROR_NONE;
 }
