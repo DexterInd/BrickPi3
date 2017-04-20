@@ -682,13 +682,16 @@ int BrickPi3::get_motor_encoder(uint8_t port, int32_t &value){
 int BrickPi3::reset_all(){
   int res1 = set_sensor_type(PORT_1 + PORT_2 + PORT_3 + PORT_4, SENSOR_TYPE_NONE);
   int res2 = set_motor_power(PORT_A + PORT_B + PORT_C + PORT_D, MOTOR_FLOAT);
-  int res3 = set_led(-1);
+  int res3 = set_motor_limits(PORT_A + PORT_B + PORT_C + PORT_D, 0, 0);
+  int res4 = set_led(-1);
   if(res1){
     return res1;
   }else if(res2){
     return res2;
   }else if(res3){
     return res3;
+  }else if(res4){
+    return res4;
   }
   return ERROR_NONE;
 }

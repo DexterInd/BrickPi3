@@ -961,5 +961,8 @@ class BrickPi3(object):
         # turn off all motors
         self.set_motor_power(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D, self.MOTOR_FLOAT)
         
+        # reset motor limits
+        self.set_motor_limits(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D, 0, 0)
+        
         # return the LED to the control of the FW
         self.set_led(-1)
