@@ -875,6 +875,7 @@ class BrickPi3(object):
         Returns a list:
             flags -- 8-bits of bit-flags that indicate motor status:
                 bit 0 -- LOW_VOLTAGE_FLOAT - The motors are automatically disabled because the battery voltage is too low
+                bit 1 -- OVERLOADED - The motors aren't close to the target (applies to position control and dps speed control).
             power -- the raw PWM power in percent (-100 to 100)
             encoder -- The encoder position
             dps -- The current speed in Degrees Per Second
