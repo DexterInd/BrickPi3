@@ -373,7 +373,7 @@ class BrickPi3{
     int     get_motor_encoder(uint8_t port, int32_t &value);
     int32_t get_motor_encoder(uint8_t port);
     
-    // Reset the sensors (unconfigure), motors (float), and LED (return control to the firmware).
+    // Reset the sensors (unconfigure), motors (float with no limits), and LED (return control to the firmware).
     int     reset_all();
     
   private:
