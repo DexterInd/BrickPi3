@@ -67,10 +67,23 @@ else
     echo "SPI enabled"
 fi
 
+# Install python and python3 modules
 echo ""
 cd $REPO_PATH/Software/Python/
+echo "Installing python modules"
+echo ""
 sudo python setup.py install
+echo ""
+echo "Installing python3 modules"
+echo ""
 sudo python3 setup.py install
+
+# Install C++ drivers
+echo ""
+echo "Installing C++ drivers"
+echo "Copying BrickPi3.h and BrickPi3.cpp to /usr/local/include"
+cp $REPO_PATH/Software/C/BrickPi3.h /usr/local/include/BrickPi3.h
+cp $REPO_PATH/Software/C/BrickPi3.cpp /usr/local/include/BrickPi3.cpp
 
 # not the job of this script. It's being done in fetch_brickpi3
 # and only for users who have the whole raspbian for robots

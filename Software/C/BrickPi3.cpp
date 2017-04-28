@@ -35,7 +35,8 @@ int BrickPi3::spi_read_16(uint8_t msg_type, uint16_t &value){
   value = 0;
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
-  if(int error = spi_transfer_array(6, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_transfer_array, and if not 0:
+  // assign error to the value returned by spi_transfer_array, and if not 0:
+  if(int error = spi_transfer_array(6, spi_array_out, spi_array_in)){
     return error;
   }
   if(spi_array_in[3] != 0xA5){
@@ -49,7 +50,8 @@ int BrickPi3::spi_read_32(uint8_t msg_type, uint32_t &value){
   value = 0;
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
-  if(int error = spi_transfer_array(8, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_transfer_array, and if not 0:
+  // assign error to the value returned by spi_transfer_array, and if not 0:
+  if(int error = spi_transfer_array(8, spi_array_out, spi_array_in)){
     return error;
   }
   if(spi_array_in[3] != 0xA5){
@@ -65,7 +67,8 @@ int BrickPi3::spi_read_string(uint8_t msg_type, char *str, uint8_t chars){
   }
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
-  if(int error = spi_transfer_array(chars + 4, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_transfer_array, and if not 0:
+  // assign error to the value returned by spi_transfer_array, and if not 0:
+  if(int error = spi_transfer_array(chars + 4, spi_array_out, spi_array_in)){
     return error;
   }
   if(spi_array_in[3] != 0xA5){
@@ -81,7 +84,8 @@ int BrickPi3::detect(bool critical){
   char ErrorStr[100];
   char str[21];
   int error;
-  if(error = get_manufacturer(str)){     // assign error to the value returned by get_manufacturer, and if not 0:
+  // assign error to the value returned by get_manufacturer, and if not 0:
+  if(error = get_manufacturer(str)){
     if(critical){
       fatal_error("detect error: get_manufacturer failed. Perhaps the BrickPi3 is not connected, or the address is incorrect.");
     }else{
@@ -96,7 +100,8 @@ int BrickPi3::detect(bool critical){
     }
   }
   
-  if(error = get_board(str)){            // assign error to the value returned by get_board, and if not 0:
+  // assign error to the value returned by get_board, and if not 0:
+  if(error = get_board(str)){
     if(critical){
       fatal_error("detect error: get_board failed");
     }else{
@@ -111,7 +116,8 @@ int BrickPi3::detect(bool critical){
     }
   }
   
-  if(error = get_version_firmware(str)){ // assign error to the value returned by get_version_firmware, and if not 0:
+  // assign error to the value returned by get_version_firmware, and if not 0:
+  if(error = get_version_firmware(str)){
     if(critical){
       fatal_error("detect error: get_version_firmware failed");
     }else{
@@ -139,7 +145,8 @@ int BrickPi3::get_board(char *str){
 
 int BrickPi3::get_version_hardware(char *str){
   uint32_t value;
-  if(int error = spi_read_32(BPSPI_MESSAGE_GET_HARDWARE_VERSION, value)){ // assign error to the value returned by spi_read_32, and if not 0:
+  // assign error to the value returned by spi_read_32, and if not 0:
+  if(int error = spi_read_32(BPSPI_MESSAGE_GET_HARDWARE_VERSION, value)){
     return error;
   }
   sprintf(str, "%d.%d.%d", (value / 1000000), ((value / 1000) % 1000), (value % 1000));
@@ -147,7 +154,8 @@ int BrickPi3::get_version_hardware(char *str){
 
 int BrickPi3::get_version_firmware(char *str){
   uint32_t value;
-  if(int error = spi_read_32(BPSPI_MESSAGE_GET_FIRMWARE_VERSION, value)){ // assign error to the value returned by spi_read_32, and if not 0:
+  // assign error to the value returned by spi_read_32, and if not 0:
+  if(int error = spi_read_32(BPSPI_MESSAGE_GET_FIRMWARE_VERSION, value)){
     return error;
   }
   sprintf(str, "%d.%d.%d", (value / 1000000), ((value / 1000) % 1000), (value % 1000));
@@ -157,7 +165,8 @@ int BrickPi3::get_version_firmware(char *str){
 int BrickPi3::get_id(char *str){
   spi_array_out[0] = Address;
   spi_array_out[1] = BPSPI_MESSAGE_GET_ID;
-  if(int error = spi_transfer_array(20, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_read_32, and if not 0:
+  // assign error to the value returned by spi_read_32, and if not 0:
+  if(int error = spi_transfer_array(20, spi_array_out, spi_array_in)){
     return error;
   }
   if(spi_array_in[3] != 0xA5){
@@ -402,7 +411,8 @@ int BrickPi3::get_sensor(uint8_t port, void *value_ptr){
   }
   
   // Get the sensor value(s), and if error
-  if(int error = spi_transfer_array(spi_transfer_length, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_transfer_array, and if not 0:
+  // assign error to the value returned by spi_transfer_array, and if not 0:
+  if(int error = spi_transfer_array(spi_transfer_length, spi_array_out, spi_array_in)){
     return error;
   }
   // If the fourth byte received is not 0xA5
@@ -622,7 +632,8 @@ int BrickPi3::get_motor_status(uint8_t port, uint8_t &state, int8_t &power, int3
   }
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
-  if(int error = spi_transfer_array(12, spi_array_out, spi_array_in)){ // assign error to the value returned by spi_transfer_array, and if not 0:
+  // assign error to the value returned by spi_transfer_array, and if not 0:
+  if(int error = spi_transfer_array(12, spi_array_out, spi_array_in)){
     return error;
   }
   

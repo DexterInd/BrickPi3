@@ -264,9 +264,11 @@ class BrickPi3(object):
     
     MOTOR_STATUS_FLAG = Enumeration("""
         LOW_VOLTAGE_FLOAT,
+        OVERLOADED,
     """)
     
     MOTOR_STATUS_FLAG.LOW_VOLTAGE_FLOAT = 0x01 # If the motors are floating due to low battery voltage
+    MOTOR_STATUS_FLAG.OVERLOADED        = 0x02 # If the motors aren't close to the target (applies to position control and dps speed control).
     
     #SUCCESS = 0
     #SPI_ERROR = 1
