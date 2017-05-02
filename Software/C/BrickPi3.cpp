@@ -660,6 +660,29 @@ int BrickPi3::offset_motor_encoder(uint8_t port, int32_t position){
   return spi_transfer_array(7, spi_array_out, spi_array_in);
 }
 
+int BrickPi3::reset_motor_encoder(uint8_t port){
+  int32_t value;
+  return reset_motor_encoder(port, value);
+}
+
+int BrickPi3::reset_motor_encoder(uint8_t port, int32_t &value){
+  value = 0;
+  // assign error to the error value returned by get_motor_encoder, and if not 0:
+  if(int error = get_motor_encoder(port, value)){
+    return error;
+  }
+  return offset_motor_encoder(port, value);
+}
+
+int BrickPi3::set_motor_encoder(uint8_t port, int32_t value){
+  int32_t enc_value = 0;
+  // assign error to the error value returned by get_motor_encoder, and if not 0:
+  if(int error = get_motor_encoder(port, enc_value)){
+    return error;
+  }
+  return offset_motor_encoder(port, (enc_value - value));
+}
+
 int32_t BrickPi3::get_motor_encoder(uint8_t port){
   int32_t value;
   get_motor_encoder(port, value);
