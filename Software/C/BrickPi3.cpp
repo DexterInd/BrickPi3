@@ -581,7 +581,7 @@ int BrickPi3::set_motor_power(uint8_t port, int8_t power){
   spi_array_out[3] = power;
   return spi_transfer_array(4, spi_array_out, spi_array_in);
 }
-    
+
 int BrickPi3::set_motor_position(uint8_t port, int32_t position){
   spi_array_out[0] = Address;
   spi_array_out[1] = BPSPI_MESSAGE_SET_MOTOR_POSITION;
@@ -592,7 +592,24 @@ int BrickPi3::set_motor_position(uint8_t port, int32_t position){
   spi_array_out[6] = (position & 0xFF);
   return spi_transfer_array(7, spi_array_out, spi_array_in);
 }
-    
+
+int BrickPi3::set_motor_position_relative(uint8_t port, int32_t position){
+  for(uint8_t p = 1; p <= PORT_D; p <<= 1){
+    if(port & p){
+      int32_t encoder = 0;
+      // assign error to the error value returned by get_motor_encoder, and if not 0:
+      if(int error = get_motor_encoder(p, encoder)){
+        return error;
+      }
+      // assign error to the error value returned by get_motor_encoder, and if not 0:
+      if(int error = set_motor_position(p, (encoder + position))){
+        return error;
+      }
+    }
+  }
+  return ERROR_NONE;
+}
+
 int BrickPi3::set_motor_dps(uint8_t port, int16_t dps){
   spi_array_out[0] = Address;
   spi_array_out[1] = BPSPI_MESSAGE_SET_MOTOR_DPS;
@@ -601,7 +618,7 @@ int BrickPi3::set_motor_dps(uint8_t port, int16_t dps){
   spi_array_out[4] = (dps & 0xFF);
   return spi_transfer_array(5, spi_array_out, spi_array_in);
 }
-    
+
 int BrickPi3::set_motor_limits(uint8_t port, uint8_t power, uint16_t dps){
   spi_array_out[0] = Address;
   spi_array_out[1] = BPSPI_MESSAGE_SET_MOTOR_LIMITS;

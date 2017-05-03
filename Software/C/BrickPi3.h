@@ -363,7 +363,10 @@ class BrickPi3{
   // Set the motor PWM power
     int     set_motor_power(uint8_t port, int8_t power);
   // Set the motor target position to run to
+    // Set the absolute position to run to (go to the specified position)
     int     set_motor_position(uint8_t port, int32_t position);
+    // Set the relative position to run to (go to the current position plus the specified position)
+    int     set_motor_position_relative(uint8_t port, int32_t position);
   // Set the motor speed in degrees per second. As of FW version 1.4.0, the algorithm regulates the speed, but it is not accurate.
     int     set_motor_dps(uint8_t port, int16_t dps);
   // Set the motor limits. Only the power limit is implemented. Use the power limit to limit the motor speed/torque.
