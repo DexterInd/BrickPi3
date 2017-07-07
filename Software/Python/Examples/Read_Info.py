@@ -3,9 +3,9 @@
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2017 Dexter Industries
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
-# For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
+# For more information see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for reading BrickPi3 information
 #

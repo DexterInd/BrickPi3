@@ -21,7 +21,7 @@ import brickpi3 # import the BrickPi3 drivers
 
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
-BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.I2C, [0, 20]) # Configure for a Dexter Industries Thermal Infrared sensor (I2C device). No special settings, 20 microseconds minimum between I2C transistions.
+BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.I2C, [0, 20]) # Configure for a Dexter Industries Thermal Infrared sensor (I2C device). No special settings, 20 microseconds minimum between I2C transitions.
 
 TIR_I2C_ADDR        = 0x0E      # TIR I2C device address 
 TIR_AMBIENT         = 0x00      # Ambient Temp
