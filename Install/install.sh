@@ -1,5 +1,11 @@
 #! /bin/bash
 
+# install script_tools
+curl --silent https://raw.githubusercontent.com/DexterInd/script_tools/master/install_script_tools.sh | bash
+
+# install openocd
+curl --silent https://raw.githubusercontent.com/DexterInd/openocd/master/openocd_install.sh | bash
+
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root" 
     exit 1
@@ -43,8 +49,6 @@ echo "                                       "
 
 echo ""
 echo "Welcome to BrickPi3 Installer."
-
-sudo bash $REPO_PATH/Firmware/openocd/install_openocd_compiled.sh
 
 # Adding in /etc/modules
 echo ""

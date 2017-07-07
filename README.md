@@ -6,7 +6,7 @@ The BrickPi3 connects LEGO Mindstorms with the Raspberry Pi.
 Installation
 ------------
 
-On Raspbian for Robots, run DI Update to install the latest version.
+On Raspbian for Robots, run DI Update to install or update to the latest version.
 
 On Raspbian:
 
