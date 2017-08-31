@@ -358,7 +358,7 @@ class BrickPi3{
   // Configure and trigger an I2C transaction
     int     transact_i2c(uint8_t port, i2c_struct_t *i2c_struct);
   // Get sensor value(s)
-    int     get_sensor(uint8_t port, void *value);
+    int     get_sensor(uint8_t port, void *value_ptr);
     
   // Set the motor PWM power
     int     set_motor_power(uint8_t port, int8_t power);
@@ -399,10 +399,10 @@ class BrickPi3{
     uint8_t SensorType[4];
     uint8_t I2CInBytes[4];
     
-    int  spi_write_8(uint8_t msg_type, uint8_t value);
-    int  spi_read_16(uint8_t msg_type, uint16_t &value);
-    int  spi_read_32(uint8_t msg_type, uint32_t &value);
-    int  spi_read_string(uint8_t msg_type, char *str, uint8_t chars = 20);
+    int spi_write_8(uint8_t msg_type, uint8_t value);
+    int spi_read_16(uint8_t msg_type, uint16_t &value);
+    int spi_read_32(uint8_t msg_type, uint32_t &value);
+    int spi_read_string(uint8_t msg_type, char *str, uint8_t chars = 20);
 };
 
 #endif
