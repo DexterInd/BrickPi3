@@ -890,7 +890,6 @@ class BrickPi3(object):
         """
         dps = int(dps)
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_LIMITS, int(port), int(power), ((dps >> 8) & 0xFF), (dps & 0xFF)]
-        print(outArray)
         self.spi_transfer_array(outArray)
     
     def get_motor_status(self, port):
