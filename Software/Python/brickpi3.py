@@ -867,6 +867,28 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
         self.spi_transfer_array(outArray)
     
+    def set_motor_position_kp(self, port, kp = 70):
+        """
+        Set the motor target position KP constant
+        
+        Keyword arguments:
+        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
+        kp -- The KP constant (default 25)
+        """
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION_KP, int(port), int(kp)]
+        self.spi_transfer_array(outArray)
+    
+    def set_motor_position_kd(self, port, kd = 70):
+        """
+        Set the motor target position KD constant
+        
+        Keyword arguments:
+        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
+        kd -- The KD constant (default 70)
+        """
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION_KD, int(port), int(kd)]
+        self.spi_transfer_array(outArray)
+    
     def set_motor_dps(self, port, dps):
         """
         Set the motor target speed in degrees per second
@@ -890,7 +912,6 @@ class BrickPi3(object):
         """
         dps = int(dps)
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_LIMITS, int(port), int(power), ((dps >> 8) & 0xFF), (dps & 0xFF)]
-        print(outArray)
         self.spi_transfer_array(outArray)
     
     def get_motor_status(self, port):
@@ -981,7 +1002,7 @@ class BrickPi3(object):
     
     def reset_all(self):
         """
-        Reset the BrickPi. Set all the sensors' type to NONE, set the motors' speed to 0, and return control of the LED to the firmware.
+        Reset the BrickPi. Set all the sensors' type to NONE, set the motors to float, and motors' limits and constants to default, and return control of the LED to the firmware.
         """
         # reset all sensors
         self.set_sensor_type(self.PORT_1 + self.PORT_2 + self.PORT_3 + self.PORT_4, self.SENSOR_TYPE.NONE)
@@ -990,7 +1011,11 @@ class BrickPi3(object):
         self.set_motor_power(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D, self.MOTOR_FLOAT)
         
         # reset motor limits
-        self.set_motor_limits(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D, 0, 0)
+        self.set_motor_limits(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D)
+        
+        # reset motor kP and kD constants
+        self.set_motor_position_kp(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D)
+        self.set_motor_position_kd(self.PORT_A + self.PORT_B + self.PORT_C + self.PORT_D)
         
         # return the LED to the control of the FW
         self.set_led(-1)

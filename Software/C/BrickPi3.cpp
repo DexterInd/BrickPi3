@@ -645,7 +645,7 @@ int BrickPi3::get_motor_status(uint8_t port, uint8_t &state, int8_t &power, int3
       msg_type = BPSPI_MESSAGE_GET_MOTOR_D_STATUS;
     break;
     default:
-      fatal_error("get_motor_encoder error. Must be one motor port at a time. PORT_A, PORT_B, PORT_C, or PORT_D.");
+      fatal_error("get_motor_status error. Must be one motor port at a time. PORT_A, PORT_B, PORT_C, or PORT_D.");
   }
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
