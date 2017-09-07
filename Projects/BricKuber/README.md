@@ -8,6 +8,14 @@ Install dependencies by running the install_brickuber.sh setup script:
 
     sudo bash ~/Dexter/BrickPi3/Projects/BricKuber/install_brickuber.sh
 
+Enable the Raspberry Pi Camera:
+ * Run `sudo raspi-config`
+ * select `Interfacing Options`
+ * select `Camera`
+ * select `<Yes>`
+ * hit enter and then the right arrow twice and then enter (which will select `<Finish>`)
+ * when asked if you would like to reboot now, select `<yes>`
+
 This project uses the following software packages installed by the install_brickuber.sh script:
 
 * [rubiks-cube-tracker](https://github.com/dwalton76/rubiks-cube-tracker) for converting an image of a Rubik's cube face into a set of nine RGB values.

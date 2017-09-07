@@ -1,5 +1,7 @@
 #! /bin/bash
 
+sudo apt-get update
+
 # install rubiks-cube-tracker
 sudo apt-get install python-pip python-opencv -y
 sudo pip install git+https://github.com/dwalton76/rubiks-cube-tracker.git
