@@ -867,7 +867,7 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
         self.spi_transfer_array(outArray)
     
-    def set_motor_position_kp(self, port, kp = 70):
+    def set_motor_position_kp(self, port, kp = 25):
         """
         Set the motor target position KP constant
         
