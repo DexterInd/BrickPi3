@@ -871,6 +871,10 @@ class BrickPi3(object):
         """
         Set the motor target position KP constant
         
+        If you set kp higher, the motor will be more responsive to errors in position, at the cost of perhaps overshooting and oscillating.
+        kd slows down the motor as it approaches the target, and helps to prevent overshoot.
+        In general, if you increase kp, you should also increase kd to keep the motor from overshooting and oscillating.
+        
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
         kp -- The KP constant (default 25)
@@ -881,6 +885,10 @@ class BrickPi3(object):
     def set_motor_position_kd(self, port, kd = 70):
         """
         Set the motor target position KD constant
+        
+        If you set kp higher, the motor will be more responsive to errors in position, at the cost of perhaps overshooting and oscillating.
+        kd slows down the motor as it approaches the target, and helps to prevent overshoot.
+        In general, if you increase kp, you should also increase kd to keep the motor from overshooting and oscillating.
         
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
