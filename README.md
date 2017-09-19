@@ -6,26 +6,11 @@ The BrickPi3 connects LEGO Mindstorms with the Raspberry Pi.
 Installation
 ------------
 
-On Raspbian for Robots, run DI Update to install or update to the latest version.
+On Raspbian for Robots, run DI Update to install or update.
 
-On Raspbian:
+On Raspbian, run this command to install or update:
 
-1. For install, clone this repository onto the Raspberry Pi:
-
-        sudo git clone http://www.github.com/DexterInd/BrickPi3.git /home/pi/Dexter/BrickPi3
-
-    For update, pull the repository:
-
-        sudo git --work-tree=/home/pi/Dexter/BrickPi3 --git-dir=/home/pi/Dexter/BrickPi3/.git pull
-
-2. Run the install script:
-
-        sudo bash /home/pi/Dexter/BrickPi3/Install/install.sh
-
-3. Reboot the Raspberry Pi to make the settings take effect:
-
-        sudo reboot
-
+    curl --silent https://raw.githubusercontent.com/DexterInd/Raspbian_For_Robots/master/upd_script/fetch_brickpi3.sh | bash
 
 Compatibility
 -------------

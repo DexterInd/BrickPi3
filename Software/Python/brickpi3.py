@@ -867,9 +867,13 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
         self.spi_transfer_array(outArray)
     
-    def set_motor_position_kp(self, port, kp = 70):
+    def set_motor_position_kp(self, port, kp = 25):
         """
         Set the motor target position KP constant
+        
+        If you set kp higher, the motor will be more responsive to errors in position, at the cost of perhaps overshooting and oscillating.
+        kd slows down the motor as it approaches the target, and helps to prevent overshoot.
+        In general, if you increase kp, you should also increase kd to keep the motor from overshooting and oscillating.
         
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
@@ -881,6 +885,10 @@ class BrickPi3(object):
     def set_motor_position_kd(self, port, kd = 70):
         """
         Set the motor target position KD constant
+        
+        If you set kp higher, the motor will be more responsive to errors in position, at the cost of perhaps overshooting and oscillating.
+        kd slows down the motor as it approaches the target, and helps to prevent overshoot.
+        In general, if you increase kp, you should also increase kd to keep the motor from overshooting and oscillating.
         
         Keyword arguments:
         port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
