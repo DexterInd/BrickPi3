@@ -13,7 +13,7 @@ Quick Install
 
 In order to quick install the `BrickPi3` repository, open up a terminal and type the following command:
 ```
-sudo curl -L dexterindustries.com/update_brickpi3 | bash
+sudo curl -kL dexterindustries.com/update_brickpi3 | bash
 ```
 The same command can be used for updating the `BrickPi3` to the latest version.
 
