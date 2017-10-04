@@ -13,4 +13,4 @@ Towards the bottom of the output (third line from the end), you should see
 `** Verified OK **` which means the firmware was flashed and verified successfully.
 
 You can run the example program `Read_Info.py` in `BrickPi3/Software/Python/Examples`
-to make sure that the FW version is correct (version `1.1.0` as of writing this).
+to make sure that the FW version is correct.
