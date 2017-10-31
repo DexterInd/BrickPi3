@@ -1,9 +1,8 @@
-# BrickPi3
-## Windows 10 IoT Core implementation for the BrickPi3.  These libraries can be run with the Raspberry Pi 2 or Raspberry Pi 3.
+# Windows 10 IoT Core Implementation For the BrickPi3  
 
 The BrickPi3 was ported to C# [by Laurent Ellerbach](https://github.com/Ellerbach/).  There is a separate repository on Github with the code and [instructions on getting started here](https://github.com/Ellerbach/BrickPi3).
 
-Here are some shortcut for Windows 10 IoT Core with the BrickPi3.  
+Here are some shortcuts for Windows 10 IoT Core with the BrickPi3: 
 
 - [RaspberryPi setup](https://github.com/Ellerbach/BrickPi3/blob/master/README.md#setup-the-raspberrypi-running-windows-10-iot-core)
 - [BrickPi3 requirements](https://github.com/Ellerbach/BrickPi3/blob/master/README.md#make-sure-you-have-a-brickpi3)
