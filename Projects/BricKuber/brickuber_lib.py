@@ -90,8 +90,10 @@ class BricKuberLib(object):
             EncoderLast = EncoderNow
             time.sleep(0.1)
             EncoderNow = self.BP.get_motor_encoder(self.MOTOR_PORTS[self.MOTOR_GRAB])
-        self.BP.offset_motor_encoder(self.MOTOR_PORTS[self.MOTOR_GRAB], (EncoderNow - 25))
-        # self.BP.offset_motor_encoder(self.MOTOR_PORTS[self.MOTOR_GRAB], (EncoderNow + 25))
+        if robot_style == "EV3":       # Need to revers the spin direction for the EV3 to work.    
+            self.BP.offset_motor_encoder(self.MOTOR_PORTS[self.MOTOR_GRAB], (EncoderNow - 25))
+        else:
+            self.BP.offset_motor_encoder(self.MOTOR_PORTS[self.MOTOR_GRAB], (EncoderNow + 25))
         self.BP.set_motor_position(self.MOTOR_PORTS[self.MOTOR_GRAB], self.MOTOR_GRAB_POSITION_REST)
         
         self.BP.offset_motor_encoder(self.MOTOR_PORTS[self.MOTOR_TURN], self.BP.get_motor_encoder(self.MOTOR_PORTS[self.MOTOR_TURN]))
@@ -103,7 +105,7 @@ class BricKuberLib(object):
         debug_motor_commands("Start run to position: " + str(position))
         debug_motor_commands("Current Position: " + str(self.BP.get_motor_encoder(self.MOTOR_PORTS[port])))
         debug_motor_commands("Running Motor: " + str(port))
-        # self.BP.set_motor_power(self.MOTOR_PORTS[self.MOTOR_GRAB], -30)
+
         self.BP.set_motor_position(self.MOTOR_PORTS[port], position)
         encoder = self.BP.get_motor_encoder(self.MOTOR_PORTS[port])
         while((encoder > (position + tolerance)) or (encoder < (position - tolerance))):
@@ -297,24 +299,18 @@ class BricKuberLib(object):
     # Read the entire cube, and retun the result as a string that can be fed directly into kociemba.
     def ReadCubeColors(self):
         self.release()
-        #time.sleep(2)
         self.CameraReadFaceColors("top")
         self.flip(True)
-        #time.sleep(2)
         self.CameraReadFaceColors("front")
         self.flip(True)
-        #time.sleep(2)
         self.CameraReadFaceColors("bottom")
         self.spin(90)
         self.flip(True)
-        #time.sleep(2)
         self.CameraReadFaceColors("right")
         self.spin(-90)
         self.flip(True)
-        #time.sleep(2)
         self.CameraReadFaceColors("back")
         self.flip(True)
-        #time.sleep(2)
         self.CameraReadFaceColors("left")
         self.CCO = [5, 1, 0]
         
