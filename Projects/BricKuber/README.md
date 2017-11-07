@@ -27,4 +27,17 @@ Hardware
 * Build the robot according to the [MindCuber](http://mindcuber.com/) building instructions.
 * Substitute the BrickPi3 and Raspberry Pi Camera for the Mindstorms brick, color sensor, and sensor assembly.
 * Connect the turn-table motor to BrickPi3 port MA.
-* Connect the grabber motor to BrickPi3 port MD.
+* Connect the grabber motor to BrickPi3 port MB.
+
+Tuning
+-
+Depending on any modifications you have made to the model, you may need to tune the following variables:
+* ` self.MOTOR_GRAB_POSITION_HOME      = 0 `	This is the start position of the grabber.
+* `self.MOTOR_GRAB_POSITION_REST      = -35`  This is a middle position of the grabber.
+* `self.MOTOR_GRAB_POSITION_FLIP_PUSH = -90`  This is a middle position of the grabber.
+* `self.MOTOR_GRAB_POSITION_GRAB      = -130` This is a middle position of the grabber.
+* `self.MOTOR_GRAB_POSITION_FLIP      = -240`	This is the fully extended position of the grabber.
+
+Kociemba String
+-
+More info on the [Kociemba string can be found here.](https://github.com/muodov/kociemba)
