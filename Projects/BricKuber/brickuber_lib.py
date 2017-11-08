@@ -118,7 +118,7 @@ class BricKuberLib(object):
             encoder = self.BP.get_motor_encoder(self.MOTOR_PORTS[port])
             debug_motor_commands("Current Position: " + str(self.BP.get_motor_encoder(self.MOTOR_PORTS[port])))
     
-    # spin the cube the specified number of degrees. Opionally overshoot and return (helps with the significant mechanical play while making a face turn).
+    # spin the cube the specified number of degrees. Opionally overshoot and return (helps with the significant mechanical play while making a face turn).  
     def spin(self, deg, overshoot = 0):
         debug_motor_commands("Start Spin!")
         deg = spin_direction * deg      # Need to revers the spin direction for the EV3 to work.
