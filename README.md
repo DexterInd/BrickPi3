@@ -2,6 +2,8 @@ BrickPi3
 ========
 The BrickPi3 connects LEGO Mindstorms with the Raspberry Pi.  You can learn [more about the BrickPi3 here.](https://www.dexterindustries.com/brickpi/)  
 
+![BrickPi3 Introduction Header](https://user-images.githubusercontent.com/29712567/32540756-0d9f7224-c487-11e7-9941-968fa33dd95a.png)
+
 Documentation
 -------------
 You can find more extensive documentation about setting up the BrickPi3 for the first time, other programming languages contributed by our community, and more extensive information on our projects [on the Dexter Industries website here.](https://www.dexterindustries.com/brickpi3-tutorials-documentation/)
@@ -50,6 +52,8 @@ and [this python example for reading custom I2C sensors][ex2].
 
 [ex1]: https://github.com/DexterInd/BrickPi3/blob/master/Software/Python/Examples/Analog_Sensor.py
 [ex2]: https://github.com/DexterInd/BrickPi3/blob/master/Software/Python/Examples/DI-dTIR.py
+
+![BrickPi3 Introduction Header](https://user-images.githubusercontent.com/29712567/32540754-0d719912-c487-11e7-876c-06e311d1f2a5.jpg)
 
 
 License
