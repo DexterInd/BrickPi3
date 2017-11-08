@@ -19,6 +19,8 @@ import commands # import system command support
 debug_print_commands_on = True
 debug_motor_commands_on = False
 
+spin_direction = -1 # Default is EV3
+
 def debug_print_commands(string_in):
     if debug_print_commands_on:
         print(str(string_in))
@@ -54,6 +56,9 @@ class BricKuberLib(object):
             self.MOTOR_GRAB_SPEED_GRAB = 400
             self.MOTOR_GRAB_SPEED_FLIP = 600
             self.MOTOR_GRAB_SPEED_REST = 400
+            
+            spin_direction = 1             
+            
         elif robot_style == "EV3":
             self.TurnTablePinion = 12
             self.TurnTableGear = 36
@@ -116,8 +121,8 @@ class BricKuberLib(object):
     # spin the cube the specified number of degrees. Opionally overshoot and return (helps with the significant mechanical play while making a face turn).
     def spin(self, deg, overshoot = 0):
         debug_motor_commands("Start Spin!")
-        if robot_style == "EV3":       # Need to revers the spin direction for the EV3 to work.
-            deg = -1* deg
+        deg = spin_direction * deg      # Need to revers the spin direction for the EV3 to work.
+
         if deg < 0:
             overshoot = -overshoot
         self.TurnTableTarget -= (deg + overshoot)
