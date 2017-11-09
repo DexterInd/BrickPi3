@@ -103,6 +103,8 @@ class BrickPi3(object):
     SensorType = [0, 0, 0, 0]
     I2CInBytes = [0, 0, 0, 0]
     
+    I2C_LENGTH_LIMIT = 32
+    
     BPSPI_MESSAGE_TYPE = Enumeration("""
         NONE,
         
@@ -590,9 +592,9 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, message_type, Address, InBytes]
         self.I2CInBytes[port_index] = InBytes
         OutBytes = len(OutArray)
-        if(OutBytes > 16):
-            outArray.append(16)
-            for b in range(16):
+        if(OutBytes > self.I2C_LENGTH_LIMIT):
+            outArray.append(self.I2C_LENGTH_LIMIT)
+            for b in range(self.I2C_LENGTH_LIMIT):
                 outArray.append(OutArray[b])
         else:
             outArray.append(OutBytes)
