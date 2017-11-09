@@ -25,9 +25,6 @@ import time          # import the time library for the sleep function
 import brickuber_lib # Rubik's cube move and read
 import kociemba      # Rubik's cube solver
 
-import brickpi3 # import the BrickPi3 drivers
-
-
 # Use this line if using the NXT1 mindcuber design
 # RobotStyle = "NXT1"
 
