@@ -31,7 +31,7 @@ This project uses the following software packages installed by the install_brick
 ## Tuning
 
 Depending on any modifications you have made to the model, you may need to tune the following variables:
-* ` self.MOTOR_GRAB_POSITION_HOME      = 0 `	This is the start position of the grabber.
+* `self.MOTOR_GRAB_POSITION_HOME      = 0 `	This is the start position of the grabber.
 * `self.MOTOR_GRAB_POSITION_REST      = -35`  This is a middle position of the grabber.
 * `self.MOTOR_GRAB_POSITION_FLIP_PUSH = -90`  This is a middle position of the grabber.
 * `self.MOTOR_GRAB_POSITION_GRAB      = -130` This is a middle position of the grabber.
