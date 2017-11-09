@@ -26,10 +26,10 @@ import brickuber_lib # Rubik's cube move and read
 import kociemba      # Rubik's cube solver
 
 # Use this line if using the NXT1 mindcuber design
-RobotStyle = "NXT1"
+# RobotStyle = "NXT1"
 
 # Use this line if using the EV3 mindcuber design
-#RobotStyle = "EV3"
+RobotStyle = "EV3"
 
 
 # Print debug information?
@@ -44,26 +44,27 @@ try:
     UnsolvedString = Cuber.ReadCubeColors()
     if PrintDebugInfo:
         print(UnsolvedString)
-    
+
+    # This produces a Kociemba string.  It should have 54 letters
     # Use kociemba to solve the cube based on the configuration string.
     if PrintDebugInfo:
         print("Using kociemba to compute an efficient solve solution.")
     SolutionCmds = kociemba.solve(UnsolvedString)
     if PrintDebugInfo:
         print(SolutionCmds)
-    
+
     # Execute the moves to solve the cube.
     if PrintDebugInfo:
         print("Executing the solve solution.")
     Cuber.Moves(SolutionCmds)
-    
+
     if PrintDebugInfo:
         print("Rubik's cube solved!")
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
     Cuber.BP.reset_all()        
-except:
-    print("Unknown error. Probably failed to read colors correctly. Try again.")
+except Exception, e:
+    print("Error: " + str(e))
 
 # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.
 Cuber.BP.reset_all()
