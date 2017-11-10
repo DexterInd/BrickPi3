@@ -103,7 +103,7 @@ class BrickPi3(object):
     SensorType = [0, 0, 0, 0]
     I2CInBytes = [0, 0, 0, 0]
     
-    I2C_LENGTH_LIMIT = 32
+    I2C_LENGTH_LIMIT = 16
     
     BPSPI_MESSAGE_TYPE = Enumeration("""
         NONE,
