@@ -1,0 +1,12 @@
+[package]
+name = "brickpi3"
+version = "0.1.0"
+authors = ["juhe"]
+
+[dependencies]
+nix="0.6.0"
+spidev = "0.3.0"
+
+[patch.crates-io]
+spidev = { path = "/Users/juhe/rust-spidev" }
+nix = { path = "/Users/juhe/nix" }
