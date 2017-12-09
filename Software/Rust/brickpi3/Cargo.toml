@@ -1,7 +1,7 @@
 [package]
 name = "brickpi3"
-version = "0.1.0"
-authors = ["juhe"]
+version = "0.2.0"
+authors = ["<juhe@iki.fi>"]
 
 [dependencies]
 nix="0.6.0"

@@ -1,5 +1,5 @@
 //
-// This code is an example for reading the encoders of motors connected to the BrickPi3.
+// This code is an example for reading sensors to the BrickPi3.
 //
 // Copyright (C) 2017 Juhana Helovuo <juhe@iki.fi>
 // Released under the MIT license (http://choosealicense.com/licenses/mit/).
