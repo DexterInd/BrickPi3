@@ -25,28 +25,28 @@ use std::sync::Arc;
 use brickpi3::*;
 
 fn main() {
-	match brickpi3::BrickPi3::open("/dev/spidev0.1") {
-		Err(why) =>  println!("Opening BrickPi3 SPI device failed: {:?}", why) ,
-		Ok(mut bp) => {
-			match bp.detect() {
-				Err(why) => println!("BrickPi3 detection failed: {:?}", why) ,
-				Ok(_ident) => {
-					match do_sensors(&mut bp) {
-						Err(why) => { println!("BrickPi error: {:?}", why);
-									  bp.reset_all()
-									  	.unwrap_or_else(|e| println!("{:?}",e))	
-									},
-						Ok(()) => ()
-					}
-				}
-			}
-		}
-	}
+    match brickpi3::BrickPi3::open("/dev/spidev0.1") {
+        Err(why) =>  println!("Opening BrickPi3 SPI device failed: {:?}", why) ,
+        Ok(mut bp) => {
+            match bp.detect() {
+                Err(why) => println!("BrickPi3 detection failed: {:?}", why) ,
+                Ok(_ident) => {
+                    match do_sensors(&mut bp) {
+                        Err(why) => { println!("BrickPi error: {:?}", why);
+                                      bp.reset_all()
+                                        .unwrap_or_else(|e| println!("{:?}",e)) 
+                                    },
+                        Ok(()) => ()
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn do_sensors(bp: &mut BrickPi3) -> Result<(),SPIError> {
-	// Set signal handler for Ctrl-C
-	let running = Arc::new(AtomicBool::new(true));
+    // Set signal handler for Ctrl-C
+    let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
     ctrlc::set_handler(move || {
         r.store(false, Ordering::SeqCst);
@@ -87,14 +87,14 @@ fn do_sensors(bp: &mut BrickPi3) -> Result<(),SPIError> {
         } 
 
         println!("");
-    	// wait 50ms before next iteration
-    	thread::sleep(time::Duration::from_millis(50));
+        // wait 50ms before next iteration
+        thread::sleep(time::Duration::from_millis(50));
 
     }
     // ensure no motors are left running
     bp.reset_all()
 }
 
-	
+    
     
     

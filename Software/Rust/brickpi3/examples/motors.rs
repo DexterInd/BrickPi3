@@ -26,28 +26,28 @@ use strum::IntoEnumIterator;
 use brickpi3::*;
 
 fn main() {
-	match brickpi3::BrickPi3::open("/dev/spidev0.1") {
-		Err(why) =>  println!("Opening BrickPi3 SPI device failed: {:?}", why) ,
-		Ok(mut bp) => {
-			match bp.detect() {
-				Err(why) => println!("BrickPi3 detection failed: {:?}", why) ,
-				Ok(_ident) => {
-					match run_motors(&mut bp) {
-						Err(why) => { println!("BrickPi error: {:?}", why);
-									  bp.reset_all()
-									  	.unwrap_or_else(|e| println!("{:?}",e))	
-									},
-						Ok(()) => ()
-					}
-				}
-			}
-		}
-	}
+    match brickpi3::BrickPi3::open("/dev/spidev0.1") {
+        Err(why) =>  println!("Opening BrickPi3 SPI device failed: {:?}", why) ,
+        Ok(mut bp) => {
+            match bp.detect() {
+                Err(why) => println!("BrickPi3 detection failed: {:?}", why) ,
+                Ok(_ident) => {
+                    match run_motors(&mut bp) {
+                        Err(why) => { println!("BrickPi error: {:?}", why);
+                                      bp.reset_all()
+                                        .unwrap_or_else(|e| println!("{:?}",e)) 
+                                    },
+                        Ok(()) => ()
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn run_motors(bp: &mut BrickPi3) -> Result<(),SPIError> {
-	// Set signal handler for Ctrl-C
-	let running = Arc::new(AtomicBool::new(true));
+    // Set signal handler for Ctrl-C
+    let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
     ctrlc::set_handler(move || {
         r.store(false, Ordering::SeqCst);
@@ -55,35 +55,35 @@ fn run_motors(bp: &mut BrickPi3) -> Result<(),SPIError> {
 
     // reset all motor encoders
     for mp in MotorPort::iter() {
-    	bp.reset_motor_encoder(mp)
-    		.unwrap_or_else(|e| {println!("{:?}",e); 0} );
+        bp.reset_motor_encoder(mp)
+            .unwrap_or_else(|e| {println!("{:?}",e); 0} );
     }
 
     // loop until interrupted
     while running.load(Ordering::SeqCst) {
-    	let enc_a = bp.read_motor_encoder(MotorPort::PortA) ?;
-    	let enc_b = bp.read_motor_encoder(MotorPort::PortB) ?;
-    	let enc_c = bp.read_motor_encoder(MotorPort::PortC) ?;
-    	let enc_d = bp.read_motor_encoder(MotorPort::PortD) ?;
+        let enc_a = bp.read_motor_encoder(MotorPort::PortA) ?;
+        let enc_b = bp.read_motor_encoder(MotorPort::PortB) ?;
+        let enc_c = bp.read_motor_encoder(MotorPort::PortC) ?;
+        let enc_d = bp.read_motor_encoder(MotorPort::PortD) ?;
 
-    	bp.set_motor_power(	MotorPort::PortB
-    						, if enc_a < 100 
-    							{if enc_a > -100 {enc_a as i8} else {-100}} 
-    						  else {100} 
-    						) ?;
-    	bp.set_motor_dps( MotorPort::PortC, enc_a as i16) ? ;
-    	bp.set_motor_position(MotorPort::PortD , enc_a) ? ;
+        bp.set_motor_power( MotorPort::PortB
+                            , if enc_a < 100 
+                                {if enc_a > -100 {enc_a as i8} else {-100}} 
+                              else {100} 
+                            ) ?;
+        bp.set_motor_dps( MotorPort::PortC, enc_a as i16) ? ;
+        bp.set_motor_position(MotorPort::PortD , enc_a) ? ;
 
-    	println!("Encoders A: {:.2 } B: {:.2 } C: {:.2 } D: {:.2 }", enc_a, enc_b, enc_c, enc_d);
+        println!("Encoders A: {:.2 } B: {:.2 } C: {:.2 } D: {:.2 }", enc_a, enc_b, enc_c, enc_d);
 
-    	// wait 200ms before next iteration
-    	thread::sleep(time::Duration::from_millis(200));
+        // wait 200ms before next iteration
+        thread::sleep(time::Duration::from_millis(200));
 
     }
     // ensure no motors are left running
     bp.reset_all()
 }
 
-	
+    
     
     
