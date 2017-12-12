@@ -433,10 +433,14 @@ impl BrickPi3 {
             SensorType::NxtColorFull 
                 => Ok(SensorData::Color
                         { color:   recv_buf[2] as i8
-                        , red:     (recv_buf[3] as i16).shl(2) | ((recv_buf[7] as i16).shr(6) & (0x03 as i16))
-                        , green:   (recv_buf[4] as i16).shl(2) | ((recv_buf[7] as i16).shr(4) & (0x03 as i16))
-                        , blue:    (recv_buf[5] as i16).shl(2) | ((recv_buf[7] as i16).shr(2) & (0x03 as i16))
-                        , ambient: (recv_buf[6] as i16).shl(2) | ((recv_buf[7] as i16).shr(0) & (0x03 as i16))
+                        , red:     (recv_buf[3] as i16).shl(2) 
+                                    | ((recv_buf[7] as i16).shr(6) & (0x03 as i16))
+                        , green:   (recv_buf[4] as i16).shl(2) 
+                                    | ((recv_buf[7] as i16).shr(4) & (0x03 as i16))
+                        , blue:    (recv_buf[5] as i16).shl(2) 
+                                    | ((recv_buf[7] as i16).shr(2) & (0x03 as i16))
+                        , ambient: (recv_buf[6] as i16).shl(2) 
+                                    | ((recv_buf[7] as i16).shr(0) & (0x03 as i16))
                         } ) ,
             SensorType::NxtColorOff 
                 => Ok(SensorData::Color
@@ -481,7 +485,7 @@ impl BrickPi3 {
             SensorType::Ev3UltrasonicCm 
                 => Ok(SensorData::UltrasonicDistance{ meters: raw_fst_i16() as f32 / 1000.0 }) ,
             SensorType::Ev3UltrasonicInches 
-                => Ok(SensorData::UltrasonicDistance{ meters: raw_fst_i16() as f32 * 0.00254 }) , // TODO
+                => Ok(SensorData::UltrasonicDistance{ meters: raw_fst_i16() as f32 * 0.00254 }) , 
             SensorType::Ev3UltrasonicListen
                 => Ok(SensorData::UltrasonicPresence{ presence: raw_i8 != 0 } ) ,
 
