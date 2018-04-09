@@ -31,7 +31,6 @@ import kociemba      # Rubik's cube solver
 # Use this line if using the EV3 mindcuber design
 RobotStyle = "EV3"
 
-
 # Print debug information?
 PrintDebugInfo = True
 
@@ -44,7 +43,7 @@ try:
     UnsolvedString = Cuber.ReadCubeColors()
     if PrintDebugInfo:
         print(UnsolvedString)
-
+    
     # This produces a Kociemba string.  It should have 54 letters
     # Use kociemba to solve the cube based on the configuration string.
     if PrintDebugInfo:
@@ -52,12 +51,12 @@ try:
     SolutionCmds = kociemba.solve(UnsolvedString)
     if PrintDebugInfo:
         print(SolutionCmds)
-
+    
     # Execute the moves to solve the cube.
     if PrintDebugInfo:
         print("Executing the solve solution.")
     Cuber.Moves(SolutionCmds)
-
+    
     if PrintDebugInfo:
         print("Rubik's cube solved!")
 
