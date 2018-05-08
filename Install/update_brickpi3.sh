@@ -134,6 +134,7 @@ parse_cmdline_arguments() {
 install_scriptools() {
 
   # update script_tools first
+  rm -f $PIHOME/.tmp_script_tools.sh
   #curl --silent -kL dexterindustries.com/update_tools > $PIHOME/.tmp_script_tools.sh
   # MT use Robert's repo for developing
   curl --silent -kL https://raw.githubusercontent.com/RobertLucian/script_tools/feature/arg-based-installation/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
