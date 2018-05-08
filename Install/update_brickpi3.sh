@@ -139,7 +139,7 @@ install_scriptools() {
   # MT use Robert's repo for developing
   curl --silent -kL https://raw.githubusercontent.com/RobertLucian/script_tools/feature/arg-based-installation/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
 
-  echo "Installing script_tools."
+  echo "Installing script_tools with options: \"${optionslist[@]}\""
   bash $PIHOME/.tmp_script_tools.sh ${optionslist[@]} > /dev/null
   ret_val=$?
   rm $PIHOME/.tmp_script_tools.sh
