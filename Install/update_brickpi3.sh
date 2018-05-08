@@ -240,8 +240,8 @@ install_python_pkgs_and_dependencies() {
   # Install C++ drivers
   echo "Installing BrickPi3 C++ drivers"
   echo "Copying BrickPi3.h and BrickPi3.cpp to /usr/local/include"
-  sudo rm /usr/local/include/BrickPi3.h
-  sudo rm /usr/local/include/BrickPi3.cpp
+  sudo rm -f /usr/local/include/BrickPi3.h
+  sudo rm -f /usr/local/include/BrickPi3.cpp
   sudo cp $BRICKPI3_DIR/Software/C/BrickPi3.h /usr/local/include/BrickPi3.h
   sudo cp $BRICKPI3_DIR/Software/C/BrickPi3.cpp /usr/local/include/BrickPi3.cpp
 
