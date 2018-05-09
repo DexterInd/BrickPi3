@@ -12,9 +12,7 @@ DEXTERSCRIPT=$DEXTER_PATH/lib/Dexter/script_tools
 REPO_PACKAGE=brickpi3
 
 # the following option specifies which BrickPi3 github branch to use
-#selectedbranch="master"
-# MT only for testing use this branch
-selectedbranch="feature/easy-python-installation"
+selectedbranch="master"
 
 ##############################################
 ######## Parse Command Line Arguments ########
@@ -176,7 +174,7 @@ clone_brickpi3() {
   sudo rm -rf $BRICKPI3_DIR
   # MT for testing temporarily use mattallen37 repo for cloning.
   #git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
-  git clone --quiet --depth=1 -b $selectedbranch https://github.com/mattallen37/BrickPi3.git
+  git clone --quiet --depth=1 -b feature/easy-python-installation https://github.com/mattallen37/BrickPi3.git
   cd $BRICKPI3_DIR
 }
 
