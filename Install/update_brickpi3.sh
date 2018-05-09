@@ -14,7 +14,7 @@ REPO_PACKAGE=brickpi3
 # the following option specifies which BrickPi3 github branch to use
 #selectedbranch="master"
 # MT only for testing use this branch
-selectedbranch = "feature/easy-python-installation"
+selectedbranch="feature/easy-python-installation"
 
 ##############################################
 ######## Parse Command Line Arguments ########
