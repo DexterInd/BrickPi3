@@ -12,7 +12,9 @@ DEXTERSCRIPT=$DEXTER_PATH/lib/Dexter/script_tools
 REPO_PACKAGE=brickpi3
 
 # the following option specifies which BrickPi3 github branch to use
-selectedbranch="master"
+#selectedbranch="master"
+# MT only for testing use this branch
+selectedbranch = "feature/easy-python-installation"
 
 ##############################################
 ######## Parse Command Line Arguments ########
@@ -171,9 +173,10 @@ clone_brickpi3() {
   # it's simpler and more reliable (for now) to just delete the repo and clone a new one
   # otherwise, we'd have to deal with all the intricacies of git
 
-  # MT for testing temporarily disable the following two lines for cloning.
-  #sudo rm -rf $BRICKPI3_DIR
+  sudo rm -rf $BRICKPI3_DIR
+  # MT for testing temporarily use mattallen37 repo for cloning.
   #git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
+  git clone --quiet --depth=1 -b $selectedbranch https://github.com/mattallen37/BrickPi3.git
   cd $BRICKPI3_DIR
 }
 
