@@ -27,137 +27,162 @@ check_if_run_with_pi() {
   fi
 }
 
-# called way down bellow
+# called way down below
 parse_cmdline_arguments() {
 
-    # whether to install the dependencies or not (apt-get etc.)
-    installdependencies=true
-    updaterepo=true
-    install_pkg_scriptools=true
+  # whether to install the dependencies or not (avrdude, apt-get, wiringpi, and so on)
+  installdependencies=true
+  updaterepo=true
+  install_rfrtools=true
+  install_pkg_rfrtools=true
 
-    # the following 3 options are mutually exclusive
-    systemwide=true
-    userlocal=false
-    envlocal=false
-    usepython3exec=true
+  # the following 3 options are mutually exclusive
+  systemwide=true
+  userlocal=false
+  envlocal=false
+  usepython3exec=true
 
-    declare -ga optionslist=("--system-wide")
-    # iterate through bash arguments
-    for i; do
-      case "$i" in
-        --no-dependencies)
-          installdependencies=false
-          ;;
-        --no-update-aptget)
-          updaterepo=false
-          ;;
-        --bypass-pkg-scriptools)
-          install_pkg_scriptools=false
-          ;;
-        --user-local)
-          userlocal=true
-          systemwide=false
-          declare -ga optionslist=("--user-local")
-          ;;
-        --env-local)
-          envlocal=true
-          systemwide=false
-          declare -ga optionslist=("--env-local")
-          ;;
-        --system-wide)
-          ;;
-        develop|feature/*|hotfix/*|fix/*|DexterOS*|v*)
-          selectedbranch="$i"
-          ;;
-      esac
-    done
+  # the following option tells which branch has to be used
+  selectedbranch="master"
 
-    # show some feedback on the console
-    if [ -f $DEXTERSCRIPT/functions_library.sh ]; then
-      source $DEXTERSCRIPT/functions_library.sh
-      # show some feedback for the BrickPi3
-      if [ ! quiet_mode ]; then
-        echo "  _____            _                                "
-        echo " |  __ \          | |                               "
-        echo " | |  | | _____  _| |_ ___ _ __                     "
-        echo " | |  | |/ _ \ \/ / __/ _ \ '__|                    "
-        echo " | |__| |  __/>  <| ||  __/ |                       "
-        echo " |_____/ \___/_/\_\ __\___|_| _        _            "
-        echo " |_   _|         | |         | |      (_)           "
-        echo "   | |  _ __   __| |_   _ ___| |_ _ __ _  ___  ___  "
-        echo "   | | | '_ \ / _\ | | | / __| __| '__| |/ _ \/ __| "
-        echo "  _| |_| | | | (_| | |_| \__ \ |_| |  | |  __/\__ \ "
-        echo " |_____|_| |_|\__,_|\__,_|___/\__|_|  |_|\___||___/ "
-        echo "                                                    "
-        echo "                                                    "
-        echo "  ____       _      _    ____  _ _____ "
-        echo " | __ ) _ __(_) ___| | _|  _ \(_)___ / "
-        echo " |  _ \| '__| |/ __| |/ / |_) | | |_ \ "
-        echo " | |_) | |  | | (__|   <|  __/| |___) |"
-        echo " |____/|_|  |_|\___|_|\_\_|   |_|____/ "
-        echo "                                       "
-      fi
-      feedback "Welcome to BrickPi3 Installer."
-    else
-      echo "Welcome to BrickPi3 Installer."
-    fi
-    echo "Updating BrickPi3 for $selectedbranch branch with the following options:"
-    ([[ $installdependencies = "true" ]] && echo "  --no-dependencies=false") || echo "  --no-dependencies=true"
-    ([[ $updaterepo = "true" ]] && echo "  --no-update-aptget=false") || echo "  --no-update-aptget=true"
-    ([[ $install_pkg_scriptools = "true" ]] && echo "  --bypass-pkg-scriptools=false") || echo "  --bypass-pkg-scriptools=true"
-    echo "  --user-local=$userlocal"
-    echo "  --env-local=$envlocal"
-    echo "  --system-wide=$systemwide"
+  declare -ga rfrtools_options=("--system-wide")
+  # iterate through bash arguments
+  for i; do
+    case "$i" in
+      --no-dependencies)
+        installdependencies=false
+        ;;
+      --no-update-aptget)
+        updaterepo=false
+        ;;
+      --bypass-rfrtools)
+        install_rfrtools=false
+        ;;
+      --bypass-python-rfrtools)
+        install_pkg_rfrtools=false
+        ;;
+      --user-local)
+        userlocal=true
+        systemwide=false
+        declare -ga rfrtools_options=("--user-local")
+        ;;
+      --env-local)
+        envlocal=true
+        systemwide=false
+        declare -ga rfrtools_options=("--env-local")
+        ;;
+      --system-wide)
+        ;;
+      develop|feature/*|hotfix/*|fix/*|DexterOS*|v*)
+        selectedbranch="$i"
+        ;;
+    esac
+  done
 
-    # in case the following packages are not installed and `--no-dependencies` option has been used
-    if [[ $installdependencies = "false" ]]; then
-      command -v git >/dev/null 2>&1 || { echo "This script requires \"git\" but it's not installed. Exiting." >&2; exit 1; }
-      command -v python >/dev/null 2>&1 || { echo "Executable \"python\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 2; }
-      command -v python3 >/dev/null 2>&1 || { echo "Executable \"python3\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 3; }
-      #command -v pip >/dev/null 2>&1 || { echo "Executable \"pip\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 4; }
-      #command -v pip3 >/dev/null 2>&1 || { echo "Executable \"pip3\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 5; }
+  # show some feedback on the console
+  if [ -f $DEXTERSCRIPT/functions_library.sh ]; then
+    source $DEXTERSCRIPT/functions_library.sh
+    # show some feedback for the BrickPi3
+    if [[ quiet_mode -eq 0 ]]; then
+      echo "  _____            _                                ";
+      echo " |  __ \          | |                               ";
+      echo " | |  | | _____  _| |_ ___ _ __                     ";
+      echo " | |  | |/ _ \ \/ / __/ _ \ '__|                    ";
+      echo " | |__| |  __/>  <| ||  __/ |                       ";
+      echo " |_____/ \___/_/\_\\\__\___|_|          _            ";
+      echo " |_   _|         | |         | |      (_)           ";
+      echo "   | |  _ __   __| |_   _ ___| |_ _ __ _  ___  ___  ";
+      echo "   | | | '_ \ / _\ | | | / __| __| '__| |/ _ \/ __| ";
+      echo "  _| |_| | | | (_| | |_| \__ \ |_| |  | |  __/\__ \ ";
+      echo " |_____|_| |_|\__,_|\__,_|___/\__|_|  |_|\___||___/ ";
+      echo "                                                    ";
+      echo "                                                    ";
+      echo "  ____       _      _    ____  _ _____ "
+      echo " | __ ) _ __(_) ___| | _|  _ \(_)___ / "
+      echo " |  _ \| '__| |/ __| |/ / |_) | | |_ \ "
+      echo " | |_) | |  | | (__|   <|  __/| |___) |"
+      echo " |____/|_|  |_|\___|_|\_\_|   |_|____/ "
+      echo " "
     fi
 
-    # create rest of list of arguments for script_tools call
-    optionslist+=("$selectedbranch")
-    [[ $usepython3exec = "true" ]] && optionslist+=("--use-python3-exe-too")
-    [[ $updaterepo = "true" ]] && optionslist+=("--update-aptget")
-    [[ $installdependencies = "true" ]] && optionslist+=("--install-deb-deps")
-    [[ $install_pkg_scriptools = "true" ]] && optionslist+=("--install-python-package")
+    feedback "Welcome to BrickPi3 Installer."
+  else
+    echo "Welcome to BrickPi3 Installer."
+  fi
 
-    echo "Options used for script_tools script: \"${optionslist[@]}\""
+  echo "Updating BrickPi3 for $selectedbranch branch with the following options:"
+  ([[ $installdependencies = "true" ]] && echo "  --no-dependencies=false") || echo "  --no-dependencies=true"
+  ([[ $updaterepo = "true" ]] && echo "  --no-update-aptget=false") || echo "  --no-update-aptget=true"
+  ([[ $install_rfrtools = "true" ]] && echo "  --bypass-rfrtools=false") || echo "  --bypass-rfrtools=true"
+  ([[ $install_pkg_rfrtools = "true" ]] && echo "  --bypass-python-rfrtools=false") || echo "  --bypass-python-rfrtools=true"
+  echo "  --user-local=$userlocal"
+  echo "  --env-local=$envlocal"
+  echo "  --system-wide=$systemwide"
+
+  # in case the following packages are not installed and `--no-dependencies` option has been used
+  if [[ $installdependencies = "false" ]]; then
+    command -v git >/dev/null 2>&1 || { echo "This script requires \"git\" but it's not installed. Don't use --no-dependencies option. Exiting." >&2; exit 1; }
+    command -v python >/dev/null 2>&1 || { echo "Executable \"python\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 2; }
+    command -v python3 >/dev/null 2>&1 || { echo "Executable \"python3\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 3; }
+    command -v pip >/dev/null 2>&1 || { echo "Executable \"pip\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 4; }
+    command -v pip3 >/dev/null 2>&1 || { echo "Executable \"pip3\" couldn't be found. Don't use --no-dependencies option. Exiting." >&2; exit 5; }
+  fi
+
+  # create rest of list of arguments for rfrtools call
+  rfrtools_options+=("$selectedbranch")
+  [[ $usepython3exec = "true" ]] && rfrtools_options+=("--use-python3-exe-too")
+  [[ $updaterepo = "true" ]] && rfrtools_options+=("--update-aptget")
+  [[ $installdependencies = "true" ]] && rfrtools_options+=("--install-deb-deps")
+  [[ $install_pkg_rfrtools = "true" ]] && rfrtools_options+=("--install-python-package")
+
+  # create list of arguments for script_tools call
+  declare -ga scriptools_options=("$selectedbranch")
+
+  echo "Using \"$selectedbranch\" branch"
+  echo "Options used for RFR_Tools script: \"${rfrtools_options[@]}\""
+  echo "Options used for script_tools script: \"${scriptools_options[@]}\""
 }
 
-######################################
-######## Install Script_Tools ########
-######################################
-install_scriptools() {
+################################################
+## Cloning BrickPi3, Script_Tools & RFR_Tools ##
+################################################
+
+# called way down below
+install_scriptools_and_rfrtools() {
+
+  # if rfrtools is not bypassed then install it
+  if [[ $install_rfrtools = "true" ]]; then
+    curl --silent -kL dexterindustries.com/update_rfrtools > $PIHOME/.tmp_rfrtools.sh
+    echo "Installing RFR_Tools. This might take a while.."
+    bash $PIHOME/.tmp_rfrtools.sh ${rfrtools_options[@]} # > /dev/null
+    ret_val=$?
+    rm $PIHOME/.tmp_rfrtools.sh
+    if [[ $ret_val -ne 0 ]]; then
+      echo "RFR_Tools failed installing with exit code $ret_val. Exiting."
+      exit 7
+    fi
+    echo "Done installing RFR_Tool"
+  fi
 
   # update script_tools first
-  rm -f $PIHOME/.tmp_script_tools.sh
-  #curl --silent -kL dexterindustries.com/update_tools > $PIHOME/.tmp_script_tools.sh
-  # MT use Robert's repo for developing
-  curl --silent -kL https://raw.githubusercontent.com/RobertLucian/script_tools/feature/arg-based-installation/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
-
-  echo "Installing script_tools with options: \"${optionslist[@]}\""
-  bash $PIHOME/.tmp_script_tools.sh ${optionslist[@]} > /dev/null
+  curl --silent -kL https://raw.githubusercontent.com/RobertLucian/script_tools/feature/strip-down-scriptools/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
+  echo "Installing script_tools. This might take a while.."
+  bash $PIHOME/.tmp_script_tools.sh $selectedbranch > /dev/null
   ret_val=$?
   rm $PIHOME/.tmp_script_tools.sh
   if [[ $ret_val -ne 0 ]]; then
-    echo "script_tools failed installing with exit code $ret_val. Aborting."
+    echo "script_tools failed installing with exit code $ret_val. Exiting."
     exit 6
   fi
-
   # needs to be sourced from here when we call this as a standalone
   source $DEXTERSCRIPT/functions_library.sh
+  feedback "Done installing script_tools"
 }
 
-################################################
-######## Install Python Packages & Deps ########
-################################################
+# called way down bellow
 clone_brickpi3() {
 
-  echo "Installing BrickPi3 package."
+  echo "Cloning BrickPi3 repository"
 
   # create folders recursively if they don't exist already
   # we use sudo for creating the dir(s) because on older versions of R4R
@@ -174,9 +199,14 @@ clone_brickpi3() {
   sudo rm -rf $BRICKPI3_DIR
   # MT for testing temporarily use mattallen37 repo for cloning.
   #git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
-  git clone --quiet --depth=1 -b feature/easy-python-installation https://github.com/mattallen37/BrickPi3.git
+  git clone --quiet --depth=1 -b feature/use-rfr-tools-too https://github.com/RobertLucian/BrickPi3.git
   cd $BRICKPI3_DIR
+  echo "Done cloning BrickPi3 repository"
 }
+
+################################################
+######## Install Python Packages & Deps ########
+################################################
 
 install_python_packages() {
   [[ $systemwide = "true" ]] && sudo python setup.py install \
@@ -258,7 +288,7 @@ install_python_pkgs_and_dependencies() {
 
 check_if_run_with_pi
 parse_cmdline_arguments "$@"
-install_scriptools
+install_scriptools_and_rfrtools
 clone_brickpi3
 install_python_pkgs_and_dependencies
 
