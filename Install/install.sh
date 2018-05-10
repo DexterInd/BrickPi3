@@ -1,103 +1,84 @@
 #! /bin/bash
 
-# install script_tools
-curl --silent https://raw.githubusercontent.com/DexterInd/script_tools/master/install_script_tools.sh | bash
+PIHOME=/home/pi
+DEXTER=Dexter
+DEXTER_PATH=$PIHOME/$DEXTER
+RASPBIAN=$PIHOME/di_update/Raspbian_For_Robots
+BRICKPI3_DIR=$DEXTER_PATH/BrickPi3
+DEXTERSCRIPT=$DEXTER_PATH/lib/Dexter/script_tools
 
-# install openocd
-curl --silent https://raw.githubusercontent.com/DexterInd/openocd/master/openocd_install.sh | bash
+source $DEXTERSCRIPT/functions_library.sh
 
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root" 
-    exit 1
-fi
+check_root_user() {
+    if [[ $EUID -ne 0 ]]; then
+        feedback "FAIL!  This script must be run as such: sudo ./install.sh"
+        exit 1
+    fi
+}
 
-SCRIPTDIR="$(readlink -f $(dirname $0))"
-echo $SCRIPTDIR
-REPO_PATH=$(readlink -f $(dirname $0) | grep -E -o "^(.*?\\BrickPi3)")
+install_dependencies() {
 
-#check if there's an argument on the command line
-if [[ -f /home/pi/quiet_mode ]]
-then
-    quiet_mode=1
-else
-    quiet_mode=0
-fi
+    # the sudo apt-get update is already
+    # done by the script_tools installer in
+    # update_brickpi3.sh
 
-if [[ "$quiet_mode" -eq "0" ]]
-then
-    echo "  _____            _                                "
-    echo " |  __ \          | |                               "
-    echo " | |  | | _____  _| |_ ___ _ __                     "
-    echo " | |  | |/ _ \ \/ / __/ _ \ '__|                    "
-    echo " | |__| |  __/>  <| ||  __/ |                       "
-    echo " |_____/ \___/_/\_\ __\___|_| _        _            "
-    echo " |_   _|         | |         | |      (_)           "
-    echo "   | |  _ __   __| |_   _ ___| |_ _ __ _  ___  ___  "
-    echo "   | | | '_ \ / _\ | | | / __| __| '__| |/ _ \/ __| "
-    echo "  _| |_| | | | (_| | |_| \__ \ |_| |  | |  __/\__ \ "
-    echo " |_____|_| |_|\__,_|\__,_|___/\__|_|  |_|\___||___/ "
-    echo "                                                    "
-    echo "                                                    "
-fi
+    feedback "No package dependencies for the BrickPi3"
+    #feedback "Installing Dependencies for the BrickPi3"
+    #feedback "Dependencies installed for the BrickPi3"
+}
 
-echo "  ____       _      _    ____  _ _____ "
-echo " | __ ) _ __(_) ___| | _|  _ \(_)___ / "
-echo " |  _ \| '__| |/ __| |/ / |_) | | |_ \ "
-echo " | |_) | |  | | (__|   <|  __/| |___) |"
-echo " |____/|_|  |_|\___|_|\_\_|   |_|____/ "
-echo "                                       "
+install_wiringpi() {
+    # Check if WiringPi Installed
 
-echo ""
-echo "Welcome to BrickPi3 Installer."
+    # using curl piped to bash does not leave a file behind. no need to remove it
+    # we can do either the curl - it works just fine
+    # sudo curl https://raw.githubusercontent.com/DexterInd/script_tools/master/update_wiringpi.sh | bash
+    # or call the version that's already on the SD card
+    sudo bash $DEXTERSCRIPT/update_wiringpi.sh
+    # done with WiringPi
 
-# Adding in /etc/modules
-echo ""
-if grep -q "spi-dev" /etc/modules; then
-    echo "spi-dev already present in /etc/modules"
-else
-    echo spi-dev >> /etc/modules
-    echo "spi-dev added to /etc/modules"
-fi
+    # remove wiringPi directory if present
+    if [ -d wiringPi ]
+    then
+        sudo rm -r wiringPi
+    fi
+    # End check if WiringPi installed
+}
 
-# Enable SPI
-echo ""
-if grep -q "#dtparam=spi=on" /boot/config.txt; then
-    sudo sed -i 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
-    echo "SPI enabled"
-elif grep -q "dtparam=spi=on" /boot/config.txt; then
-    echo "SPI already enabled"
-else
-    echo 'dtparam=spi=on' >> /boot/config.txt
-    echo "SPI enabled"
-fi
+enable_spi() {
+    feedback "Removing blacklist from /etc/modprobe.d/raspi-blacklist.conf"
 
-# Install python and python3 modules
-echo ""
-cd $REPO_PATH/Software/Python/
-echo "Installing python modules"
-echo ""
-sudo python setup.py install
-echo ""
-echo "Installing python3 modules"
-echo ""
-sudo python3 setup.py install
+    if grep -q "#blacklist spi-bcm2708" /etc/modprobe.d/raspi-blacklist.conf; then
+        echo "SPI already removed from blacklist"
+    else
+        sudo sed -i -e 's/blacklist spi-bcm2708/#blacklist spi-bcm2708/g' /etc/modprobe.d/raspi-blacklist.conf
+        echo "SPI removed from blacklist"
+    fi
 
-# Install C++ drivers
-echo ""
-echo "Installing C++ drivers"
-echo "Copying BrickPi3.h and BrickPi3.cpp to /usr/local/include"
-cp $REPO_PATH/Software/C/BrickPi3.h /usr/local/include/BrickPi3.h
-cp $REPO_PATH/Software/C/BrickPi3.cpp /usr/local/include/BrickPi3.cpp
+    #Adding in /etc/modules
+    feedback "Adding SPI-dev in /etc/modules"
 
-# not the job of this script. It's being done in fetch_brickpi3
-# and only for users who have the whole raspbian for robots
-# standalone users do not need the softlink
-# if [ ! -d /home/pi/Desktop/BrickPi3 ] 
-# then
-# 	echo "Putting BrickPi3 folder on the desktop"
-#     sudo ln -s  /home/pi/Dexter/BrickPi3 /home/pi/Desktop/BrickPi3
-# fi
+    if grep -q "spi-dev" /etc/modules; then
+        echo "spi-dev already there"
+    else
+        echo spi-dev >> /etc/modules
+        echo "spi-dev added"
+    fi
+    feedback "Making SPI changes in /boot/config.txt"
 
-echo ""
-echo "Installation complete"
-echo "Please reboot to make settings take effect"
+    if grep -q "#dtparam=spi=on" /boot/config.txt; then
+        sudo sed -i 's/#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
+        echo "SPI enabled"
+    elif grep -q "dtparam=spi=on" /boot/config.txt; then
+        echo "SPI already enabled"
+    else
+        sudo sh -c "echo 'dtparam=spi=on' >> /boot/config.txt"
+        echo "SPI enabled"
+    fi
+
+}
+
+check_root_user
+install_dependencies
+install_wiringpi
+enable_spi
