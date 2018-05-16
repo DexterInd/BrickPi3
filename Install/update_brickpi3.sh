@@ -165,7 +165,7 @@ install_scriptools_and_rfrtools() {
   fi
 
   # update script_tools first
-  curl --silent -kL https://raw.githubusercontent.com/RobertLucian/script_tools/feature/strip-down-scriptools/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
+  curl --silent -kL https://raw.githubusercontent.com/DexterInd/script_tools/develop/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
   echo "Installing script_tools. This might take a while.."
   bash $PIHOME/.tmp_script_tools.sh $selectedbranch > /dev/null
   ret_val=$?
@@ -199,7 +199,7 @@ clone_brickpi3() {
   sudo rm -rf $BRICKPI3_DIR
   # MT for testing temporarily use mattallen37 repo for cloning.
   #git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
-  git clone --quiet --depth=1 -b feature/use-rfr-tools-too https://github.com/RobertLucian/BrickPi3.git
+  git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
   cd $BRICKPI3_DIR
   echo "Done cloning BrickPi3 repository"
 }
