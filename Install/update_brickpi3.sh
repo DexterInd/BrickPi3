@@ -43,7 +43,8 @@ parse_cmdline_arguments() {
   usepython3exec=true
 
   # the following option tells which branch has to be used
-  selectedbranch="master"
+  # duplicated from above
+  # selectedbranch="master"
 
   declare -ga rfrtools_options=("--system-wide")
   # iterate through bash arguments
@@ -152,7 +153,7 @@ install_scriptools_and_rfrtools() {
 
   # if rfrtools is not bypassed then install it
   if [[ $install_rfrtools = "true" ]]; then
-    curl --silent -kL dexterindustries.com/update_rfrtools > $PIHOME/.tmp_rfrtools.sh
+    curl --silent -kL https://raw.githubusercontent.com/DexterInd/RFR_Tools/$selectedbranch/scripts/install_tools.sh > $PIHOME/.tmp_rfrtools.sh
     echo "Installing RFR_Tools. This might take a while.."
     bash $PIHOME/.tmp_rfrtools.sh ${rfrtools_options[@]} # > /dev/null
     ret_val=$?
@@ -165,7 +166,7 @@ install_scriptools_and_rfrtools() {
   fi
 
   # update script_tools first
-  curl --silent -kL dexterindustries.com/update_tools > $PIHOME/.tmp_script_tools.sh
+  curl --silent -kL https://raw.githubusercontent.com/DexterInd/script_tools/$selectedbranch/install_script_tools.sh > $PIHOME/.tmp_script_tools.sh
   echo "Installing script_tools. This might take a while.."
   bash $PIHOME/.tmp_script_tools.sh $selectedbranch > /dev/null
   ret_val=$?
