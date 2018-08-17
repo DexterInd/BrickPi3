@@ -138,7 +138,7 @@ parse_cmdline_arguments() {
 }
 
 ################################################
-## Cloning BrickPi3, Script_Tools & RFR_Tools ##
+######### Cloning BrickPi3 & RFR_Tools #########
 ################################################
 
 # called in <<install_rfrtools_repo>>
