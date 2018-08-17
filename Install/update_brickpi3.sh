@@ -131,6 +131,7 @@ parse_cmdline_arguments() {
   [[ $updaterepo = "true" ]] && rfrtools_options+=("--update-aptget")
   [[ $installdependencies = "true" ]] && rfrtools_options+=("--install-deb-deps")
   [[ $install_pkg_rfrtools = "true" ]] && rfrtools_options+=("--install-python-package")
+  [[ $install_rfrtools_gui = "true" ]] && rfrtools_options+=("--install-gui")
 
   echo "Using \"$selectedbranch\" branch"
   echo "Options used for RFR_Tools script: \"${rfrtools_options[@]}\""
