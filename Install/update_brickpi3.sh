@@ -162,8 +162,7 @@ install_rfrtools_repo() {
 
   # if rfrtools is not bypassed then install it
   if [[ $install_rfrtools = "true" ]]; then
-    # curl --silent -kL https://raw.githubusercontent.com/DexterInd/RFR_Tools/$selectedbranch/scripts/install_tools.sh > $PIHOME/.tmp_rfrtools.sh
-    curl --silent -kL https://raw.githubusercontent.com/RobertLucian/RFR_Tools/hotfix/add-gui-bypass/scripts/install_tools.sh > $PIHOME/.tmp_rfrtools.sh
+    curl --silent -kL https://raw.githubusercontent.com/DexterInd/RFR_Tools/$selectedbranch/scripts/install_tools.sh > $PIHOME/.tmp_rfrtools.sh
     echo "Installing RFR_Tools. This might take a while.."
     bash $PIHOME/.tmp_rfrtools.sh ${rfrtools_options[@]} # > /dev/null
     ret_val=$?
@@ -201,7 +200,7 @@ clone_brickpi3() {
   sudo rm -rf $BRICKPI3_DIR
   # MT for testing temporarily use mattallen37 repo for cloning.
   #git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
-  git clone --quiet --depth=1 -b hotfix/add-gui-installation https://github.com/RobertLucian/BrickPi3.git
+  git clone --quiet --depth=1 -b $selectedbranch https://github.com/DexterInd/BrickPi3.git
   cd $BRICKPI3_DIR
   echo "Done cloning BrickPi3 repository"
 }
