@@ -970,20 +970,6 @@ class BrickPi3(object):
         raise IOError("No SPI response")
         return
     
-    def offset_motor_encoder(self, port, position):
-        """
-        Offset a motor encoder
-        
-        Keyword arguments:
-        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
-        offset -- The encoder offset
-        
-        Zero the encoder by offsetting it by the current position
-        """
-        position = int(position)
-        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
-        self.spi_transfer_array(outArray)
-    
     def get_motor_encoder(self, port):
         """
         Read a motor encoder in degrees
@@ -1010,6 +996,20 @@ class BrickPi3(object):
             encoder = int(encoder - 0x100000000)
         return int(encoder)
     
+    def offset_motor_encoder(self, port, position):
+        """
+        Offset a motor encoder
+
+        Keyword arguments:
+        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
+        offset -- The encoder offset
+
+        You can zero the encoder by offsetting it by the current position
+        """
+        position = int(position)
+        outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
+        self.spi_transfer_array(outArray)
+
     def reset_all(self):
         """
         Reset the BrickPi. Set all the sensors' type to NONE, set the motors to float, and motors' limits and constants to default, and return control of the LED to the firmware.
