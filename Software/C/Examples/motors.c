@@ -34,10 +34,7 @@ int main(){
   BP.detect(); // Make sure that the BrickPi3 is communicating and that the firmware is compatible with the drivers.
 
   // Reset the encoders
-  BP.offset_motor_encoder(PORT_A, BP.get_motor_encoder(PORT_A));
-  BP.offset_motor_encoder(PORT_B, BP.get_motor_encoder(PORT_B));
-  BP.offset_motor_encoder(PORT_C, BP.get_motor_encoder(PORT_C));
-  BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
+  BP.reset_motor_encoder(PORT_A + PORT_B + PORT_C + PORT_D);
 
   // Veriables for reading motor state bits
   uint8_t StateA, StateB, StateC, StateD;
