@@ -869,6 +869,18 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.SET_MOTOR_POSITION, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
         self.spi_transfer_array(outArray)
 
+    def set_motor_position_relative(self, port, degrees):
+        """
+        Set the relative motor target position in degrees. Current position plus the specified degrees.
+
+        Keyword arguments:
+        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
+        degrees -- The relative target position in degrees
+        """
+        for p in range(4):
+            if port & (1 << p):
+                self.set_motor_position((1 << p), (self.get_motor_encoder(1 << p) + degrees))
+
     def set_motor_position_kp(self, port, kp = 25):
         """
         Set the motor target position KP constant
