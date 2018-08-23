@@ -17,7 +17,7 @@ BrickPi3::BrickPi3(uint8_t addr){
       fatal_error("spi_setup error");
     }
   }
-  
+
   if(addr < 1 || addr > 255){
     fatal_error("error: SPI address must be in the range of 1 to 255");
   }
@@ -99,7 +99,7 @@ int BrickPi3::detect(bool critical){
       return ERROR_WRONG_MANUFACTURER;
     }
   }
-  
+
   // assign error to the value returned by get_board, and if not 0:
   if(error = get_board(str)){
     if(critical){
@@ -115,7 +115,7 @@ int BrickPi3::detect(bool critical){
       return ERROR_WRONG_DEVICE;
     }
   }
-  
+
   // assign error to the value returned by get_version_firmware, and if not 0:
   if(error = get_version_firmware(str)){
     if(critical){
@@ -249,7 +249,7 @@ int BrickPi3::set_sensor_type(uint8_t port, uint8_t type, uint16_t flags, i2c_st
   spi_array_out[2] = port;
   spi_array_out[3] = type;
   uint8_t spi_transfer_length = 4;
-  
+
   if(type == SENSOR_TYPE_CUSTOM){
     spi_array_out[4] = ((flags >> 8) & 0xFF);
     spi_array_out[5] = (flags & 0xFF);
@@ -284,7 +284,7 @@ int BrickPi3::set_sensor_type(uint8_t port, uint8_t type, uint16_t flags, i2c_st
       spi_transfer_length = 6;
     }
   }
-  
+
   return spi_transfer_array(spi_transfer_length, spi_array_out, spi_array_in);
 }
 
@@ -306,11 +306,11 @@ int BrickPi3::transact_i2c(uint8_t port, i2c_struct_t *i2c_struct){
     default:
       fatal_error("transact_i2c error. Must be one sensor port at a time. PORT_1, PORT_2, PORT_3, or PORT_4.");
   }
-  
+
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
   spi_array_out[2] = i2c_struct->address;
-  
+
   if(i2c_struct->length_read > LONGEST_I2C_TRANSFER){
     i2c_struct->length_read = LONGEST_I2C_TRANSFER;
   }
@@ -320,16 +320,16 @@ int BrickPi3::transact_i2c(uint8_t port, i2c_struct_t *i2c_struct){
       I2CInBytes[p] = i2c_struct->length_read;
     }
   }
-  
+
   if(i2c_struct->length_write > LONGEST_I2C_TRANSFER){
     i2c_struct->length_write = LONGEST_I2C_TRANSFER;
   }
   spi_array_out[4] = i2c_struct->length_write;
-  
+
   for(uint8_t i = 0; i < i2c_struct->length_write; i++){
     spi_array_out[5 + i] = i2c_struct->buffer_write[i];
   }
-  
+
   return spi_transfer_array((5 + i2c_struct->length_write), spi_array_out, spi_array_in);
 }
 
@@ -356,12 +356,12 @@ int BrickPi3::get_sensor(uint8_t port, void *value_ptr){
     default:
       fatal_error("get_sensor error. Must be one sensor port at a time. PORT_1, PORT_2, PORT_3, or PORT_4.");
   }
-  
+
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
-  
+
   uint8_t spi_transfer_length;
-  
+
   // Determine the SPI transaction byte length based on the sensor type
   switch(SensorType[port_index]){
     case SENSOR_TYPE_TOUCH:
@@ -403,13 +403,13 @@ int BrickPi3::get_sensor(uint8_t port, void *value_ptr){
     case SENSOR_TYPE_I2C:
       spi_transfer_length = 6 + I2CInBytes[port_index];
     break;
-    
+
     // Invalid or unsupported sensor type
     default:
       return SENSOR_STATE_NOT_CONFIGURED;
     break;
   }
-  
+
   // Get the sensor value(s), and if error
   // assign error to the value returned by spi_transfer_array, and if not 0:
   if(int error = spi_transfer_array(spi_transfer_length, spi_array_out, spi_array_in)){
@@ -427,12 +427,12 @@ int BrickPi3::get_sensor(uint8_t port, void *value_ptr){
   if(spi_array_in[5] != SENSOR_STATE_VALID_DATA){
     return spi_array_in[5];
   }
-  
+
   // Get some commonly used values
   uint8_t  raw_value_8 = spi_array_in[6];
   uint16_t raw_value_16 = ((spi_array_in[6] << 8) | spi_array_in[7]);
   uint16_t raw_value_16_2 = ((spi_array_in[8] << 8) | spi_array_in[9]);
-  
+
   // For each sensor type, copy the value(s) into the corresponding structure value(s)
   if(SensorType[port_index] == SENSOR_TYPE_TOUCH ||
      SensorType[port_index] == SENSOR_TYPE_TOUCH_NXT ||
@@ -653,16 +653,16 @@ int BrickPi3::get_motor_status(uint8_t port, uint8_t &state, int8_t &power, int3
   if(int error = spi_transfer_array(12, spi_array_out, spi_array_in)){
     return error;
   }
-  
+
   if(spi_array_in[3] != 0xA5){
     return ERROR_SPI_RESPONSE;
   }
-  
+
   state    = spi_array_in[4];
   power    = spi_array_in[5];
   position = ((spi_array_in[6] << 24) | (spi_array_in[7] << 16) | (spi_array_in[8] << 8) | spi_array_in[9]);
   dps      = ((spi_array_in[10] << 8) | spi_array_in[11]);
-  
+
   return ERROR_NONE;
 }
 
