@@ -1010,6 +1010,25 @@ class BrickPi3(object):
         outArray = [self.SPI_Address, self.BPSPI_MESSAGE_TYPE.OFFSET_MOTOR_ENCODER, int(port), ((position >> 24) & 0xFF), ((position >> 16) & 0xFF), ((position >> 8) & 0xFF), (position & 0xFF)]
         self.spi_transfer_array(outArray)
 
+    def reset_motor_encoder(self, port):
+        """
+        Reset motor encoder(s) to 0
+
+        Keyword arguments:
+        port -- The motor port(s). PORT_A, PORT_B, PORT_C, and/or PORT_D.
+        """
+        if port & self.PORT_A:
+            self.offset_motor_encoder(self.PORT_A, self.get_motor_encoder(self.PORT_A))
+
+        if port & self.PORT_B:
+            self.offset_motor_encoder(self.PORT_B, self.get_motor_encoder(self.PORT_B))
+
+        if port & self.PORT_C:
+            self.offset_motor_encoder(self.PORT_C, self.get_motor_encoder(self.PORT_C))
+
+        if port & self.PORT_D:
+            self.offset_motor_encoder(self.PORT_D, self.get_motor_encoder(self.PORT_D))
+
     def reset_all(self):
         """
         Reset the BrickPi. Set all the sensors' type to NONE, set the motors to float, and motors' limits and constants to default, and return control of the LED to the firmware.
