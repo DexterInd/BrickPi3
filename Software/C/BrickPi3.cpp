@@ -679,7 +679,35 @@ int BrickPi3::offset_motor_encoder(uint8_t port, int32_t position){
 
 int BrickPi3::reset_motor_encoder(uint8_t port){
   int32_t value;
-  return reset_motor_encoder(port, value);
+  int error = 1;
+  if(port & PORT_A){
+    error = reset_motor_encoder(PORT_A, value);
+    if(error){
+      return error;
+    }
+  }
+  if(port & PORT_B){
+    error = reset_motor_encoder(PORT_B, value);
+    if(error){
+      return error;
+    }
+  }
+  if(port & PORT_C){
+    error = reset_motor_encoder(PORT_C, value);
+    if(error){
+      return error;
+    }
+  }
+  if(port & PORT_D){
+    error = reset_motor_encoder(PORT_D, value);
+    if(error){
+      return error;
+    }
+  }
+  if(error){
+    fatal_error("reset_motor_encoder error. Must be one or more motor ports. PORT_A, PORT_B, PORT_C, and/or PORT_D.");
+  }
+  return ERROR_NONE;
 }
 
 int BrickPi3::reset_motor_encoder(uint8_t port, int32_t &value){
