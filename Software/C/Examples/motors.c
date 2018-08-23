@@ -2,7 +2,7 @@
  *  https://www.dexterindustries.com/BrickPi/
  *  https://github.com/DexterInd/BrickPi3
  *
- *  Copyright (c) 2017 Dexter Industries
+ *  Copyright (c) 2018 Dexter Industries
  *  Released under the MIT license (http://choosealicense.com/licenses/mit/).
  *  For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
  *
@@ -30,30 +30,39 @@ void exit_signal_handler(int signo);
 
 int main(){
   signal(SIGINT, exit_signal_handler); // register the exit function for Ctrl+C
-  
+
   BP.detect(); // Make sure that the BrickPi3 is communicating and that the firmware is compatible with the drivers.
-  
+
   // Reset the encoders
-  BP.offset_motor_encoder(PORT_A, BP.get_motor_encoder(PORT_A));
-  BP.offset_motor_encoder(PORT_B, BP.get_motor_encoder(PORT_B));
-  BP.offset_motor_encoder(PORT_C, BP.get_motor_encoder(PORT_C));
-  BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
-  
+  BP.reset_motor_encoder(PORT_A + PORT_B + PORT_C + PORT_D);
+
+  // Veriables for reading motor state bits
+  uint8_t StateA, StateB, StateC, StateD;
+
+  // Variables for reading motor powers
+  int8_t PowerA, PowerB, PowerC, PowerD;
+
+  // Variables for reading motor encoder positions
+  int32_t PositionA, PositionB, PositionC, PositionD;
+
+  // Variables for reading motor speeds (Degrees Per Second)
+  int16_t DPSA, DPSB, DPSC, DPSD;
+
   while(true){
-    // Read the encoders
-    int32_t EncoderA = BP.get_motor_encoder(PORT_A);
-    int32_t EncoderB = BP.get_motor_encoder(PORT_B);
-    int32_t EncoderC = BP.get_motor_encoder(PORT_C);
-    int32_t EncoderD = BP.get_motor_encoder(PORT_D);
-    
+    // Read the motor status values
+    BP.get_motor_status(PORT_A, StateA, PowerA, PositionA, DPSA);
+    BP.get_motor_status(PORT_B, StateB, PowerB, PositionB, DPSB);
+    BP.get_motor_status(PORT_C, StateC, PowerC, PositionC, DPSC);
+    BP.get_motor_status(PORT_D, StateD, PowerD, PositionD, DPSD);
+
     // Use the encoder value from motor A to control motors B, C, and D
-    BP.set_motor_power(PORT_B, EncoderA < 100 ? EncoderA > -100 ? EncoderA : -100 : 100);
-    BP.set_motor_dps(PORT_C, EncoderA);
-    BP.set_motor_position(PORT_D, EncoderA);
-    
+    BP.set_motor_power(PORT_B, PositionA < 100 ? PositionA > -100 ? PositionA : -100 : 100);
+    BP.set_motor_dps(PORT_C, PositionA);
+    BP.set_motor_position(PORT_D, PositionA);
+
     // Display the encoder values
-    printf("Encoder A: %6d  B: %6d  C: %6d  D: %6d\n", EncoderA, EncoderB, EncoderC, EncoderD);
-    
+    printf("State A: %d  B: %d  C: %d  D: %d  Power A: %4d  B: %4d  C: %4d  D: %4d  Encoder A: %6d  B: %6d  C: %6d  D: %6d  DPS A: %6d  B: %6d  C: %6d  D: %6d\n", StateA, StateB, StateC, StateD, PowerA, PowerB, PowerC, PowerD, PositionA, PositionB, PositionC, PositionD, DPSA, DPSB, DPSC, DPSD);
+
     // Delay for 20ms
     usleep(20000);
   }
