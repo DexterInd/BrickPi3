@@ -17,6 +17,13 @@ try:
 except:
     pivotpi_available=False
 
+try: 
+    sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Scratch/')
+    import diSensorsScratch
+    disensors_available=True
+except:
+    disensors_available=False
+
 ## Add what's required to have modal popup windows
 ## and handle crashes if any
 from Tkinter import *
@@ -585,6 +592,11 @@ if __name__ == '__main__':
                 pivotsensors = PivotPiScratch.handlePivotPi(msg)
                 # print "Back from PivotPi",pivotsensors
                 s.sensorupdate(pivotsensors)
+
+            # Light Color Sensor
+            elif disensors_available==True and diSensorsScratch.isDiSensorsMsg(msg):
+                disensors = diSensorsScratch.handleDiSensors(msg)
+                s.sensorupdate(disensors)
 
             # Get the value from the Dexter Industries line sensor
             elif msg.lower()=="LINE".lower():
