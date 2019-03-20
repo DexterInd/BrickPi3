@@ -20,6 +20,7 @@ except:
 try: 
     sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Scratch/')
     import diSensorsScratch
+    diSensorsScratch.detect_all()
     disensors_available=True
 except:
     disensors_available=False
@@ -220,15 +221,6 @@ def read_sensor(port_index):
         if valid_reading:
             # print ("got {} from {}".format(value,port_index))
 
-            # if type != 'NONE':
-            #     if error == BP3.SUCCESS:
-            #         return_dict["S{} Status".format((port + 1))] = "SUCCESS"
-            #     if error == BP3.SPI_ERROR:
-            #         return_dict["S{} Status".format((port + 1))] = "SPI_ERROR"
-            #     if error == BP3.SENSOR_ERROR:
-            #         return_dict["S{} Status".format((port + 1))] = "SENSOR_ERROR"
-            #     if error == BP3.SENSOR_TYPE_ERROR:
-            #         return_dict["S{} Status".format((port + 1))] = "SENSOR_TYPE_ERROR"
 
             if type != 'TEMP':  # the temp sensor is a peculiar case
                 try:
@@ -593,38 +585,11 @@ if __name__ == '__main__':
                 # print "Back from PivotPi",pivotsensors
                 s.sensorupdate(pivotsensors)
 
-            # Light Color Sensor
+            # DI Sensors
             elif disensors_available==True and diSensorsScratch.isDiSensorsMsg(msg):
                 disensors = diSensorsScratch.handleDiSensors(msg)
                 s.sensorupdate(disensors)
 
-            # Get the value from the Dexter Industries line sensor
-            elif msg.lower()=="LINE".lower():
-                try:
-                    import sys
-
-                    # NOTE: for now te line follower is still kept in the GoPiGo folder
-                    sys.path.insert(0, '/home/pi/Dexter/GoPiGo/Software/Python/line_follower')
-                    # import line_sensor
-                    import scratch_line
-
-                except ImportError:
-                    print ("Line sensor libraries not found")
-                    s.sensorupdate({'line':-3})
-
-                if en_debug:
-                    print ("LINE!")
-
-                try:
-                    line=scratch_line.line_sensor_val_scratch()
-                    if en_debug:
-                        print ("Line Sensor Readings: ".format(str(line)))
-                    s.sensorupdate({'line':line})
-
-                except:
-                    if en_debug:
-                        e = sys.exc_info()[1]
-                        print ("Error reading Line sensor: ",format(str(e)))
 
             else:
                 if en_debug:
