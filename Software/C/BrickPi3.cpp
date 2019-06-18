@@ -24,12 +24,83 @@ BrickPi3::BrickPi3(uint8_t addr){
   Address = addr;
 }
 
+// Set up SPI. Open the file, and define the configuration.
+int BrickPi3::spi_setup(){
+    spi_file_handle = open(SPIDEV_FILE_NAME, O_RDWR);
+
+    if (spi_file_handle < 0){
+        return ERROR_SPI_FILE;
+    }
+
+    spi_xfer_struct.cs_change = 0;               // Keep CS activated
+    spi_xfer_struct.delay_usecs = 0;             // delay in us
+    spi_xfer_struct.speed_hz = SPI_TARGET_SPEED; // speed
+    spi_xfer_struct.bits_per_word = 8;           // bites per word 8
+
+    return ERROR_NONE;
+}
+
+// Transfer length number of bytes. Write from outArray, read to inArray.
+int BrickPi3::spi_transfer_array(uint8_t length, uint8_t *outArray, uint8_t *inArray){
+    spi_xfer_struct.len = length;
+    spi_xfer_struct.tx_buf = (unsigned long)outArray;
+    spi_xfer_struct.rx_buf = (unsigned long)inArray;
+
+    if (ioctl(spi_file_handle, SPI_IOC_MESSAGE(1), &spi_xfer_struct) < 0) {
+        return ERROR_SPI_FILE;
+    }
+
+    return ERROR_NONE;
+}
+
 int BrickPi3::spi_write_8(uint8_t msg_type, uint8_t value){
   spi_array_out[0] = Address;
   spi_array_out[1] = msg_type;
   spi_array_out[2] = (value & 0xFF);
   return spi_transfer_array(3, spi_array_out, spi_array_in);
 }
+
+// Function to call if an error occured that can not be resolved, such as failure to set up SPI
+void BrickPi3::fatal_error(char *error){
+    printf(error);
+    printf("\n");
+    exit(-1);
+}
+
+// Function to call if an error occured that can not be resolved, such as failure to set up SPI
+void BrickPi3::fatal_error(const char *error){
+    printf(error);
+    printf("\n");
+    exit(-1);
+}
+
+// Set a BrickPi3's address to allow stacking
+int BrickPi3::BrickPi3_set_address(int addr, const char *id){
+    if(addr < 1 || addr > 255){
+        fatal_error("BrickPi3_set_address error: invalid address. Must be in the range of 1 to 255");
+        return -1;
+    }
+
+    spi_array_out[0] = 0;                         // use address 0 so all BrickPi3s will listen, regardless of current address
+    spi_array_out[1] = BPSPI_MESSAGE_SET_ADDRESS;
+    spi_array_out[2] = addr;
+    for(uint8_t i = 0; i < 16; i++){
+        if(strlen(id) == 32){
+            char id_str[2];
+            id_str[0] = *(id + (i * 2));
+            id_str[1] = *(id + (i * 2) + 1);
+            spi_array_out[3 + i] = strtol(id_str, NULL, 16);
+        }else if(strlen(id) == 0){
+            spi_array_out[3 + i] = 0;
+        }else{
+            fatal_error("BrickPi3_set_address error: wrong serial number id length. Must be a 32-digit hex string.");
+        }
+    }
+    if(spi_transfer_array(19, spi_array_out, spi_array_in)){
+        return -1;
+    }
+}
+
 
 int BrickPi3::spi_read_16(uint8_t msg_type, uint16_t &value){
   value = 0;
