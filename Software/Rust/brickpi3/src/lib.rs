@@ -17,8 +17,10 @@ extern crate strum; // strum is for iterating over enums
 use std::io;
 use std::ops::{Shl,Shr};
 use std::path::Path;
+use std::os::unix::io::{RawFd,AsRawFd};
+use std::error::{Error};
 
-use spidev::{Spidev, SpidevOptions, SpidevTransfer, SPI_MODE_0};
+use spidev::{Spidev, SpidevOptions, SpidevTransfer, SpiModeFlags};
 
 use strum::IntoEnumIterator;
 
@@ -230,13 +232,19 @@ pub struct Ident {
     pub firmware : u32,
 }
 
+impl Ident {
+    pub fn as_string(self) -> String {
+        self.manufacturer + " " + &self.board + " " + &self.firmware.to_string()
+    }
+}
+
 #[allow(non_snake_case)]
 pub fn version_as_String(ver: u32) -> String {
     format!("{}.{}.{}", ver / 1000000, (ver / 1000) % 1000, ver % 1000 )
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
 pub enum SPIError {
     BadResponse,
     TooLongSPITransfer,
@@ -249,8 +257,27 @@ impl From<io::Error> for SPIError {
     }
 }
 
-// ------------------------------------------------
+impl Error for SPIError {
+    fn description(&self) -> &str {
+        "SPI communication error with BrickPi3"
+    }
 
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            SPIError::IOError(e) => Some(e),
+            _ => None
+        }
+    }
+}
+
+impl SPIError {
+    pub fn to_io_error(self) -> io::Error {
+        io::Error::new(io::ErrorKind::Other , self)
+    }
+}
+
+
+// ------------------------------------------------
 pub struct BrickPi3 {
     spidev: Spidev,
     address: u8, // BrickPi3 SPI address, default = 1
@@ -270,7 +297,7 @@ impl BrickPi3 {
         let options = SpidevOptions::new()
                 .bits_per_word(8)
                 .max_speed_hz(500_000)
-                .mode(SPI_MODE_0)
+                .mode(SpiModeFlags::SPI_MODE_0)
                 .build();
         try!(spi.configure(&options));
 
@@ -281,6 +308,10 @@ impl BrickPi3 {
                      , txbuf: [0 ; LONGEST_SPI_TRANSFER]
                      , rxbuf: [0 ; LONGEST_SPI_TRANSFER]
                      } )
+    }
+
+    pub fn get_raw_fd(&self) -> RawFd {
+        self.spidev.inner().as_raw_fd()
     }
 
     pub fn detect(&mut self) -> Result<Ident,SPIError> {

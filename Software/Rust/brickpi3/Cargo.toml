@@ -5,7 +5,7 @@ authors = ["<juhe@iki.fi>"]
 
 [dependencies]
 nix="0.6.0"
-spidev = "0.3.0"
+spidev = "0.4.0"
 strum = "*"
 strum_macros = "*"
 bitflags="1.0"
