@@ -292,14 +292,14 @@ impl BrickPi3 {
     /// Typically, the path will be something like `"/dev/spidev0.1"`
     pub fn open<P: AsRef<Path>>(path: P) -> io::Result<BrickPi3> {
         
-        let mut spi = try!(Spidev::open(path));
+        let mut spi = Spidev::open(path)?;
 
         let options = SpidevOptions::new()
                 .bits_per_word(8)
                 .max_speed_hz(500_000)
                 .mode(SpiModeFlags::SPI_MODE_0)
                 .build();
-        try!(spi.configure(&options));
+        spi.configure(&options)?;
 
         Ok( BrickPi3 { spidev: spi
                      , sensor_type: [SensorType::None ; 4]
@@ -661,7 +661,7 @@ impl BrickPi3 {
             {
                 let mut transfer = SpidevTransfer
                         ::read_write(&self.txbuf[0..xfer], &mut self.rxbuf[0..xfer]);
-                try!(self.spidev.transfer(&mut transfer));
+                self.spidev.transfer(&mut transfer)?;
             }
             if self.rxbuf[3] != 0xA5 {
                 Err(SPIError::BadResponse)
@@ -683,7 +683,7 @@ impl BrickPi3 {
             (&mut self.txbuf[2..xfer]).copy_from_slice(&data);
             let mut transfer = SpidevTransfer
                         ::read_write(&self.txbuf[0..xfer], &mut self.rxbuf[0..xfer]);
-            try!(self.spidev.transfer(&mut transfer ));
+            self.spidev.transfer(&mut transfer )?;
             Ok(())
         }
     }
@@ -701,7 +701,7 @@ impl BrickPi3 {
             {
                 let mut transfer = SpidevTransfer
                             ::read_write(&self.txbuf[0..xfer], &mut self.rxbuf[0..xfer]);
-                try!(self.spidev.transfer(&mut transfer ));
+                self.spidev.transfer(&mut transfer )?;
             }
             if self.rxbuf[3] != 0xA5 {
                 Err(SPIError::BadResponse)
@@ -719,7 +719,7 @@ impl BrickPi3 {
         {
             let mut transfer = SpidevTransfer
                     ::read_write(&self.txbuf[0..8], &mut self.rxbuf[0..8]);
-            try!(self.spidev.transfer(&mut transfer));
+            self.spidev.transfer(&mut transfer)?;
         }
         if self.rxbuf[3] != 0xA5 {
             Err(SPIError::BadResponse)
@@ -738,7 +738,7 @@ impl BrickPi3 {
         {
             let mut transfer = SpidevTransfer
                     ::read_write(&self.txbuf[0..6], &mut self.rxbuf[0..6]);
-            try!(self.spidev.transfer(&mut transfer));
+            self.spidev.transfer(&mut transfer)?;
         }
         if self.rxbuf[3] != 0xA5 {
             Err(SPIError::BadResponse)
@@ -756,7 +756,7 @@ impl BrickPi3 {
         {
             let mut transfer = SpidevTransfer
                     ::read_write(&self.txbuf[0..3], &mut self.rxbuf[0..3]);
-            try!(self.spidev.transfer(&mut transfer));
+            self.spidev.transfer(&mut transfer)?;
         }
         Ok(())
     }
