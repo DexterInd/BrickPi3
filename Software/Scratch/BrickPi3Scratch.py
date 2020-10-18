@@ -1,6 +1,5 @@
 from __future__ import print_function
 from __future__ import division
-from builtins import input
 
 import scratch
 import re
@@ -565,11 +564,14 @@ if __name__ == '__main__':
                     s.sensorupdate({'camera':"Error"})
 
 
-            elif (msg[:5].lower()=="SPEAK".lower()):
+            elif (msg[:5].lower()=="SPEAK".lower() or msg[:3].lower()=="SAY".lower() ):
                 try:
                     from subprocess import call
                     cmd_beg = "espeak -ven+f1 "
-                    in_text = msg[len("SPEAK"):]
+                    if (msg[:5].lower() == "speak"):
+                        in_text = msg[5:]
+                    else:
+                        in_text = msg[3:]
                     cmd_end = " 2>/dev/null"
                     out_str = cmd_beg+"\""+in_text+"\""+cmd_end
                     if en_debug:
