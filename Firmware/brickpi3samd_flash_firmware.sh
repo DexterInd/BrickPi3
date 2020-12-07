@@ -13,7 +13,8 @@ elif [ "$RPI_VERSION" == "RPI2" ] || [ "$RPI_VERSION" == "RPI3" ] || [ "$RPI_VER
     # use rpi2 interface config file
     INTERFACE_FILE="rpi2.cfg"
 elif [ "$RPI_VERSION" == "RPI4" ] ; then
-    # use rpi2 interface config file
+    echo "Flashing the firmware using a Pi4 is not currently supported"
+    exit
     INTERFACE_FILE="rpi4.cfg"
 fi
 
