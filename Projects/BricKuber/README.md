@@ -2,6 +2,10 @@
 
 This project is for a robot that solves a Rubik's cube, using LEGO Mindstorms and the [Dexter Industries BrickPi3.](https://www.dexterindustries.com/brickpi/)  
 
+The project has been updated in March 2021 to bring it to Python3 as some of the dependencies are no longer available in Python2. It has not been fully tested unfortunately.
+
+
+
 ## Software
 Install dependencies by running the install_brickuber.sh setup script:
 
