@@ -62,7 +62,7 @@ try:
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
     Cuber.BP.reset_all()        
-except Exception, e:
+except Exception as e:
     print("Error: " + str(e))
 
 # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.
