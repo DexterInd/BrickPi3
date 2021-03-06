@@ -14,7 +14,8 @@ from __future__ import division       #                           ''
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
-import commands # import system command support
+# import commands # import system command support
+import subprocess
 
 debug_print_commands_on = False
 debug_motor_commands_on = False
@@ -274,12 +275,20 @@ class BricKuberLib(object):
         debug_print_commands("START: Read Face Colors: " + str(face))
         # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 -o /tmp/BricKuber_%s_face.jpg' % face))
         # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 --sharpness -100 --awb auto --imxfx cartoon -o /tmp/BricKuber_%s_face.jpg' % face))
-        commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 --imxfx cartoon -o /tmp/BricKuber_%s_face.jpg' % face))
+        # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 --imxfx cartoon -o /tmp/BricKuber_%s_face.jpg' % face))
+        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
+        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--sharpness', '-100', '--awb', 'auto', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
+        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
+
         debug_print_commands("Picture taken")
-        raw_result = commands.getstatusoutput(('rubiks-cube-tracker.py --filename /tmp/BricKuber_%s_face.jpg' % face))[1]
-        raw_result = raw_result.split("\n{")[1]
-        raw_result = raw_result.split("}")[0]
-        raw_results = raw_result.split("[")[1:]
+        raw_result = subprocess.run(['rubiks-cube-tracker.py', '--filename', '/tmp/BricKuber_{}_face.jpg'.format(face)],capture_output=True, text=True)
+        if raw_result.stderr == '':
+            raw_result = raw_result.stdout
+            raw_result = raw_result.split("\n{")[1]
+            raw_result = raw_result.split("}")[0]
+            raw_results = raw_result.split("[")[1:]
+        else:
+            print("Failed in processing image: {}".format(raw_result.stderr))
 
         for c in range(9):
             raw_results[c] = raw_results[c].split("]")[0]
@@ -331,10 +340,14 @@ class BricKuberLib(object):
             else:
                 str += ', '
 
-        str = 'rubiks-color-resolver.py --rgb %s' % str
+        cmd_str = ['rubiks-color-resolver.py', '--rgb', '{}'.format(str)]
         if self.debug:
-            print(str)
-        raw_result = commands.getstatusoutput(str)[1]
-        raw_result = raw_result.split("\n")
-        raw_result = raw_result[-1]
-        return raw_result
+            print(cmd_str)
+        raw_result = subprocess.run(cmd_str)
+        if raw_result.stderr == '':
+            raw_result = raw_result.split("\n")
+            raw_result = raw_result[-1]
+            return raw_result
+        else:
+            print("failed {}".format(std_err))
+            return "fail"
