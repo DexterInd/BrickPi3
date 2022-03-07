@@ -163,7 +163,7 @@ install_rfrtools_repo() {
   # if rfrtools is not bypassed then install it
   if [[ $install_rfrtools = "true" ]]; then
     curl --silent -kL https://raw.githubusercontent.com/DexterInd/RFR_Tools/$selectedbranch/scripts/install_tools.sh > $PIHOME/.tmp_rfrtools.sh
-    echo "Installing RFR_Tools. This might take a while.."
+    echo "Installing RFR_Tools. This might take a moment.."
     bash $PIHOME/.tmp_rfrtools.sh ${rfrtools_options[@]} # > /dev/null
     ret_val=$?
     rm $PIHOME/.tmp_rfrtools.sh
