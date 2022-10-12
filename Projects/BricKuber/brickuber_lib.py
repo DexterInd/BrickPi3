@@ -69,20 +69,20 @@ class BricKuberLib(object):
             self.SPIN_DIRECTION = -1
 
             # motor position constants
-            self.MOTOR_GRAB_POSITION_HOME      = -337
-            self.MOTOR_GRAB_POSITION_REST      = -337
+            self.MOTOR_GRAB_POSITION_HOME      = -312
+            self.MOTOR_GRAB_POSITION_REST      = -312
             self.MOTOR_GRAB_POSITION_FLIP_PUSH = -280
-            self.MOTOR_GRAB_POSITION_GRAB      = -240
-            self.MOTOR_GRAB_POSITION_FLIP      = -120
+            self.MOTOR_GRAB_POSITION_GRAB      = -220
+            self.MOTOR_GRAB_POSITION_FLIP      = -100
 
             # motor speed constants
-            self.MOTOR_GRAB_SPEED_GRAB = 400
-            self.MOTOR_GRAB_SPEED_FLIP = 600
-            self.MOTOR_GRAB_SPEED_REST = 400
+            self.MOTOR_GRAB_SPEED_GRAB = 200
+            self.MOTOR_GRAB_SPEED_FLIP = 240
+            self.MOTOR_GRAB_SPEED_REST = 160
         else:
             raise ValueError("Unsupported robot style")
 
-        self.BP.set_motor_limits(self.MOTOR_PORTS[self.MOTOR_TURN], 0, ((500 * self.TurnTableGear) / self.TurnTablePinion))
+        self.BP.set_motor_limits(self.MOTOR_PORTS[self.MOTOR_TURN], 0, ((250 * self.TurnTableGear) / self.TurnTablePinion))
 
         self.home_all()
 
