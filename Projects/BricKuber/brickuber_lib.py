@@ -12,9 +12,9 @@
 from __future__ import print_function # use python 3 syntax but make it compatible with python 2
 from __future__ import division       #                           ''
 
+import json
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
-# import commands # import system command support
 import subprocess
 
 debug_print_commands_on = False
@@ -41,6 +41,8 @@ class BricKuberLib(object):
 
     def __init__(self, robot_style, debug = False):
         self.debug = debug
+        self.rgb_values = {}
+
         if robot_style == "NXT1":
             # turn table gears
             self.TurnTablePinion = 24
@@ -196,6 +198,18 @@ class BricKuberLib(object):
         elif(cmd.find("L") != -1):
             FaceToTurn = 5
 
+        # 0 is side U
+        # 1 is side F
+        # 2 is side R
+        # 3 is side D
+        # 4 is side B
+        # 5 is side L
+        #
+        # In self.CCO:
+        # - the first entry in self.CCO is the side that is facing up
+        # - the second entry in self.CCO is the side that is facing the front
+        # - the third entry in self.CCO is the side that is facing the right
+
         if FaceToTurn == self.CCO[0]:
             # target is top
             # flip twice
@@ -268,54 +282,66 @@ class BricKuberLib(object):
             self.Move(cmd)
         self.run_to_position(self.MOTOR_GRAB, self.MOTOR_GRAB_POSITION_REST)
 
-    rgb_values = [[0, 0, 0] for c in range(54)]
-
     # Use the camera to read the RGB colors for each of the 9 squares on the face
     def CameraReadFaceColors(self, face):
         debug_print_commands("START: Read Face Colors: " + str(face))
-        # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 -o /tmp/BricKuber_%s_face.jpg' % face))
-        # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 --sharpness -100 --awb auto --imxfx cartoon -o /tmp/BricKuber_%s_face.jpg' % face))
-        # commands.getstatusoutput(('raspistill -w 300 -h 300 -t 1 --imxfx cartoon -o /tmp/BricKuber_%s_face.jpg' % face))
-        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
-        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--sharpness', '-100', '--awb', 'auto', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
-        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', '/tmp/BricKuber_{}_face.jpg'.format(face)])
+        filename = '/tmp/BricKuber_{}_face.jpg'.format(face)
+        # Choose one of these. Use the one which gives consistent results with the lighting available.
+        # subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', filename])
+        # subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--sharpness', '-100', '--awb', 'auto', '--imxfx', 'cartoon', '-o', filename])
+        # subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--imxfx', 'cartoon', '-o', filename])
+        subprocess.run(['raspistill', '-w', '300', '-h', '300', '-t', '1', '--sharpness', '-100', '-o', filename])
+
 
         debug_print_commands("Picture taken")
-        raw_result = subprocess.run(['rubiks-cube-tracker.py', '--filename', '/tmp/BricKuber_{}_face.jpg'.format(face)],capture_output=True, text=True)
-        if raw_result.stderr == '':
-            raw_result = raw_result.stdout
-            raw_result = raw_result.split("\n{")[1]
-            raw_result = raw_result.split("}")[0]
-            raw_results = raw_result.split("[")[1:]
-        else:
-            print("Failed in processing image: {}".format(raw_result.stderr))
-
-        for c in range(9):
-            raw_results[c] = raw_results[c].split("]")[0]
-        print(raw_results)
-
-        if face == "front":
-            numbers = [19, 20, 21, 22, 23, 24, 25, 26, 27]
-        elif face == "right":
-            numbers = [36, 35, 34, 33, 32, 31, 30, 29, 28]
-        elif face == "back":
-            numbers = [43, 40, 37, 44, 41, 38, 45, 42, 39]
+        if face == "top":
+            side_index = 0
+            side_name = "U"
         elif face == "left":
-            numbers = [16, 13, 10, 17, 14, 11, 18, 15, 12]
-        elif face == "top":
-            numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            side_index = 1
+            side_name = "L"
+        elif face == "front":
+            side_index = 2
+            side_name = "F"
+        elif face == "right":
+            side_index = 3
+            side_name = "R"
+        elif face == "back":
+            side_index = 4
+            side_name = "B"
         elif face == "bottom":
-            numbers = [46, 47, 48, 49, 50, 51, 52, 53, 54]
+            side_index = 5
+            side_name = "D"
+        else:
+            raise ValueError(face)
 
-        for c in range(9):
-            vals = raw_results[c].split(", ")
-            debug_print_commands("Vals" + str(vals))
-            for v in range(3):
-                self.rgb_values[numbers[c] - 1][v] = int(vals[v])
+        cmd = ['rubiks-cube-tracker.py', '--filename', filename, '--index', str(side_index), '--name', side_name]
+        raw_result = subprocess.check_output(cmd).decode("utf-8")
+
+        # raw_result will be a JSON string where the key is the square number and
+        # the value is a tuple of RGB ints
+        # {
+        #   "1": [234, 126, 92],
+        #   "2": [253, 246, 253],
+        #   "3": [253, 254, 252],
+        #   "4": [232, 123, 89],
+        #   "5": [34, 87, 189],
+        #   "6": [253, 252, 159],
+        #   "7": [230, 118, 87],
+        #   "8": [37, 85, 185],
+        #   "9": [253, 172, 131]
+        # }
+        raw_data = json.loads(raw_result)
+        debug_print_commands(raw_data)
+
+        for square, rgb in raw_data.items():
+            self.rgb_values[int(square)] = rgb
+
         debug_print_commands("END: Read Face Colors")
 
     # Read the entire cube, and retun the result as a string that can be fed directly into kociemba.
     def ReadCubeColors(self):
+        self.rgb_values = {}
         self.release()
         self.CameraReadFaceColors("top")
         self.flip(True)
@@ -324,30 +350,21 @@ class BricKuberLib(object):
         self.CameraReadFaceColors("bottom")
         self.spin(90)
         self.flip(True)
+        self.spin(180)
         self.CameraReadFaceColors("right")
+        self.spin(90)
+        self.flip(True)
         self.spin(-90)
-        self.flip(True)
         self.CameraReadFaceColors("back")
+        self.spin(90)
         self.flip(True)
+        self.spin(-90)
         self.CameraReadFaceColors("left")
-        self.CCO = [5, 1, 0]
+        self.CCO = [5, 3, 1]
 
-        str = "'{"
-        for c in range(54):
-            str += '"%d": [%d, %d, %d]' % ((c + 1), self.rgb_values[c][0], self.rgb_values[c][1], self.rgb_values[c][2])
-            if c == 53:
-                str += "}'"
-            else:
-                str += ', '
+        cmd = ['rubiks-color-resolver.py', '--rgb', json.dumps(self.rgb_values)]
 
-        cmd_str = ['rubiks-color-resolver.py', '--rgb', '{}'.format(str)]
         if self.debug:
-            print(cmd_str)
-        raw_result = subprocess.run(cmd_str)
-        if raw_result.stderr == '':
-            raw_result = raw_result.split("\n")
-            raw_result = raw_result[-1]
-            return raw_result
-        else:
-            print("failed {}".format(std_err))
-            return "fail"
+            print(cmd)
+
+        return subprocess.check_output(cmd).decode("utf-8")
