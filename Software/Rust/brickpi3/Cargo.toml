@@ -1,0 +1,22 @@
+[package]
+name = "brickpi3"
+version = "0.2.0"
+authors = ["<juhe@iki.fi>"]
+
+[dependencies]
+nix="0.6.0"
+spidev = "0.4.0"
+strum = "*"
+strum_macros = "*"
+bitflags="1.0"
+
+# for example codes
+ctrlc = "3"
+
+[patch.crates-io]
+
+# These overrides are here to enable building on MacOS. 
+# Current spidev 0.3.0 requires nix 0.6.0, which does not support MacOS.
+# There are two build warnings from this, but they can be ignored.
+#spidev = { path = "/Users/juhe/rust-spidev" }
+#nix = { path = "/Users/juhe/nix" }
