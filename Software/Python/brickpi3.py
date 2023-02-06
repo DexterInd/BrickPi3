@@ -295,7 +295,7 @@ class BrickPi3(object):
                 manufacturer = self.get_manufacturer()
                 board = self.get_board()
                 vfw = self.get_version_firmware()
-            except IOError():
+            except IOError:
                 raise IOError("No SPI response")
             if manufacturer != "Dexter Industries" or board != "BrickPi3":
                 raise IOError("No SPI response")
