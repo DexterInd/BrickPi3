@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2019 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
@@ -13,9 +13,6 @@
 #     Connect Line Follower sensor to the BrickPi3 Grove I2C port
 #     Connect left motor to BrickPi3 motor port B
 #     Connect right motor to BrickPi3 motor port C
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import sys      # import sys for sys.exit()
 import time     # import the time library for loop delay timing

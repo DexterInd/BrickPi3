@@ -1,6 +1,3 @@
-from __future__ import print_function
-from __future__ import division
-
 import scratch
 import re
 import string
@@ -16,7 +13,7 @@ try:
 except:
     pivotpi_available=False
 
-try: 
+try:
     sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Scratch/')
     import diSensorsScratch
     diSensorsScratch.detect_all()

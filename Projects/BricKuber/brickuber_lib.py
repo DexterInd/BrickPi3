@@ -1,16 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2017 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is a library of support functions for a Rubik's cube solving robot
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import json
 import time     # import the time library for the sleep function

@@ -1,15 +1,11 @@
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2017 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # Python drivers for the BrickPi3
-
-from __future__ import print_function
-from __future__ import division
-#from builtins import input
 
 import subprocess # for executing system calls
 import spidev

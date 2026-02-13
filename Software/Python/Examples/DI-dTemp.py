@@ -1,20 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for reading a Dexter Industries temperature sensor connected to PORT_1 of the BrickPi3
-# 
+#
 # Hardware: Connect .
-# 
+#
 # Results:  When you run this program, .
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
@@ -46,7 +43,7 @@ try:
                 # do the conversion from the raw value to degrees C
                 RtRt25 = (float)(value) / (4095 - value)
                 lnRtRt25 = math.log(RtRt25)
-                
+
                 if (RtRt25 > 3.277) :
                     i = 0
                 elif (RtRt25 > 0.3599) :
@@ -55,7 +52,7 @@ try:
                     i = 2
                 else :
                     i = 3
-                
+
                 temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
                 temp = temp - 273.15
                 print("Temperature: %.1fC" % temp) # print the temperature in degrees C
@@ -63,7 +60,7 @@ try:
                 print("Temperature: (disconnected)")
         except brickpi3.SensorError as error:
             print(error)
-        
+
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.

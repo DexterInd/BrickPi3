@@ -1,16 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for changing the address of a BrickPi3
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
@@ -24,7 +21,7 @@ try:
     BP3_2 = brickpi3.BrickPi3(2) # Create an instance of the BrickPi3 class. BP3_2 will be the BrickPi3 object for the BrickPi3 with address 2.
     BP3_3 = brickpi3.BrickPi3(3) # Create an instance of the BrickPi3 class. BP3_3 will be the BrickPi3 object for the BrickPi3 with address 3.
     BP3_4 = brickpi3.BrickPi3(4)
-    
+
     # Each of the following .get functions return a value that we want to display.
     print("BrickPi3 Address: 2")
     print("Manufacturer    : ", BP3_2.get_manufacturer()    ) # read and display the serial number
@@ -36,9 +33,9 @@ try:
     print("9v voltage      : ", BP3_2.get_voltage_9v()      ) # read and display the current 9v regulator voltage
     print("5v voltage      : ", BP3_2.get_voltage_5v()      ) # read and display the current 5v regulator voltage
     print("3.3v voltage    : ", BP3_2.get_voltage_3v3()     ) # read and display the current 3.3v regulator voltage
-    
+
     print("")
-    
+
     print("BrickPi3 Address: 3")
     print("Manufacturer    : ", BP3_3.get_manufacturer()    ) # read and display the serial number
     print("Board           : ", BP3_3.get_board()           ) # read and display the serial number
@@ -49,9 +46,9 @@ try:
     print("9v voltage      : ", BP3_3.get_voltage_9v()      ) # read and display the current 9v regulator voltage
     print("5v voltage      : ", BP3_3.get_voltage_5v()      ) # read and display the current 5v regulator voltage
     print("3.3v voltage    : ", BP3_3.get_voltage_3v3()     ) # read and display the current 3.3v regulator voltage
-    
+
     print("")
-    
+
     print("BrickPi3 Address: 4")
     print("Manufacturer    : ", BP3_4.get_manufacturer()    ) # read and display the serial number
     print("Board           : ", BP3_4.get_board()           ) # read and display the serial number
@@ -62,7 +59,7 @@ try:
     print("9v voltage      : ", BP3_4.get_voltage_9v()      ) # read and display the current 9v regulator voltage
     print("5v voltage      : ", BP3_4.get_voltage_5v()      ) # read and display the current 5v regulator voltage
     print("3.3v voltage    : ", BP3_4.get_voltage_3v3()     ) # read and display the current 3.3v regulator voltage
-    
+
 except IOError as error:
     print(error)
 

@@ -1,20 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for reading a Dexter Industries pressure sensor connected to PORT_1 of the BrickPi3
-# 
+#
 # Hardware: Connect a Dexter Industries dPressure 500 to sensor port 1 of the BrickPi3.
-# 
+#
 # Results:  When you run this program, the raw value of the sensor will be read, and it will then be converted to kPa and displayed.
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
@@ -41,7 +38,7 @@ try:
                 print("Pressure: (disconnected)")
         except brickpi3.SensorError as error:
             print(error)
-        
+
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 
 except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.

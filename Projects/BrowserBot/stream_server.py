@@ -1,16 +1,16 @@
-#!/usr/bin/env python
-###############################################################################################################                                                          
-# Program Name: Browser_Client_Coder.html                                     
-# ================================     
-# This code is for controlling a robot by a web browser using web sockets                            
-# http://www.dexterindustries.com/                                                                
+#!/usr/bin/env python3
+###############################################################################################################
+# Program Name: Browser_Client_Coder.html
+# ================================
+# This code is for controlling a robot by a web browser using web sockets
+# http://www.dexterindustries.com/
 # History
 # ------------------------------------------------
 # Author     Comments
 # Joshwa     Initial Authoring
-#                                                                  
+#
 # These files have been made available online through a Creative Commons Attribution-ShareAlike 3.0  license.
-# (http://creativecommons.org/licenses/by-sa/3.0/)           
+# (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 ###############################################################################################################
 
@@ -60,7 +60,7 @@ class MainHandler(tornado.web.RequestHandler):
 #Code for handling the data sent from the webpage
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
-        print 'connection opened...'
+        print('connection opened...')
         cameraStreamer.startStreaming()
     def check_origin(self,origin):
         return True
@@ -69,7 +69,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         global left_power
         global right_power
         cameraStreamer.update
-        print 'received:', message        # prints the revived from the webpage 
+        print(f'received: {message}')        # prints the revived from the webpage
         if message == "u":                # checks for the received data and assigns different values to c which controls the movement of robot.
             c = "8";
         if message == "d":
@@ -88,9 +88,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             c = "1"
         if message == "rd":
             c = "3"
-        print c
+        print(f'{c}')
         if c == '8' :
-            print "Running Forward"
+            print('Running Forward')
             # first check which side has higher power and set it to the lowest setting before increasing it
             if right_power > left_power:
                 right_power = left_power
@@ -100,10 +100,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power > 255:
                 right_power = 255
             left_power = right_power
-            BP.set_motor_power[BP.PORT_B] = left_power  #Set the speed of MotorB (-255 to 255)
-            BP.set_motor_power[BP.PORT_D] = right_power  #Set the speed of MotorD (-255 to 255)
+            BP.set_motor_power(BP.PORT_B, left_power)  #Set the speed of MotorB (-255 to 255)
+            BP.set_motor_power(BP.PORT_D, right_power)  #Set the speed of MotorD (-255 to 255)
         elif c == '2' :
-            print "Running Reverse"
+            print('Running Reverse')
             # first check which side has lower power and set it to the lowest setting before increasing it
             if right_power < left_power:
                 right_power = left_power
@@ -113,54 +113,54 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             if right_power < -255:
                 right_power = -255
             left_power = right_power
-            BP.set_motor_power(BP.PORT_B) = left_power  
-            BP.set_motor_power(BP.PORT_D) = right_power  
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
         elif c == '4' :
-            print "Turning Left"
+            print('Turning Left')
             left_power = left_power + 100
             right_power = 0
             if left_power > 255:
                 left_power = 255
-            BP.set_motor_power(BP.PORT_B) = left_power
-            BP.set_motor_power(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
         elif c == '7' :
-            print "Turning diagonal Left"
+            print('Turning diagonal Left')
             if right_power > 200:
                 right_power = 100
             right_power = right_power + 50
-            left_power = right_power / 2
+            left_power = right_power // 2
             if right_power > 255:
                 right_power = 255
-            BP.set_motor_power(BP.PORT_B) = left_power
-            BP.set_motor_power(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
         elif c == '6' :
-            print "Turning Right"
+            print('Turning Right')
             right_power = right_power + 100
             left_power = 0
             if right_power > 255:
                 right_power = 255
-            BP.set_motor_power(BP.PORT_B) = left_power  
-            BP.set_motor_power(BP.PORT_D) = right_power  
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
         elif c == '9' :
-            print "Turning diagonal Right"
+            print('Turning diagonal Right')
             if left_power > 200:
                 left_power = 100
             left_power = left_power + 50
-            right_power = left_power / 2
+            right_power = left_power // 2
             if left_power > 255:
                 left_power = 255
-            BP.set_motor_power(BP.PORT_B) = left_power
-            BP.set_motor_power(BP.PORT_D) = right_power
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
         elif c == '5' :
-            print "Stopped"
+            print('Stopped')
             right_power = 0
             left_power = 0
-            BP.set_motor_power(BP.PORT_B) = left_power
-            BP.set_motor_power(BP.PORT_D) = right_power
-        print "Values Updated"
+            BP.set_motor_power(BP.PORT_B, left_power)
+            BP.set_motor_power(BP.PORT_D, right_power)
+        print('Values Updated')
     def on_close(self):
         cameraStreamer.stopStreaming()
-        print 'connection closed...'
+        print('connection closed...')
 
 application = tornado.web.Application([
     (r'/ws', WSHandler),
@@ -175,7 +175,7 @@ class myThread (threading.Thread):
         self.name = name
         self.counter = counter
     def run(self):
-        print "Ready"
+        print('Ready')
         while running:
             time.sleep(.2)              # sleep for 200 ms
         cameraStreamer.stopStreaming()
@@ -184,11 +184,11 @@ if __name__ == "__main__":
     running = True
     thread1 = myThread(1, "Thread-1", 1)
     thread1.setDaemon(True)
-    thread1.start()  
+    thread1.start()
     application.listen(9093)          	#starts the websockets connection
-    
+
     cameraStreamer = camera_streamer.CameraStreamer()
-    
+
     tornado.ioloop.IOLoop.instance().start()
-  
+
 

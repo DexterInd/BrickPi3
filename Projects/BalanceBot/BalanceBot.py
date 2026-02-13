@@ -1,25 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2016 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
 # This code is an example for a balanging robot using the BrickPi3
-# 
+#
 # Hardware:
 #     Connect an EV3 infrared sensor to BrickPi3 sensor port 1.
 #     Connect a gyro sensor to BrickPi3 sensor port 4.
 #     Connect the left motor to BrickPi3 motor port A.
 #     Connect the right motor to BrickPi3 motor port D.
 #     Set EV3 infrared remote to channel 1.
-# 
+#
 # Results:  When you run this program, follow the instruction printed in the terminal.
-
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
@@ -78,15 +75,15 @@ def SafeExit():
 
 try:
     print("BrickPi3 BalanceBot.")
-    
+
     # make sure voltage is high enough
     if BP.get_voltage_battery() < 7:
         print("Battery voltage below 7v, too low to run motors reliably. Exiting.")
         SafeExit()
-    
+
     # un-configure the gyro sensor, and configure the IR sensor in remote mode, and wait for it to be configured.
     print("Configuring Infrared Receiver...")
-    
+
     BP.set_sensor_type(PORT_SENSOR_GYRO, BP.SENSOR_TYPE.NONE)
     BP.set_sensor_type(PORT_SENSOR_IR, BP.SENSOR_TYPE.EV3_INFRARED_REMOTE)
     time.sleep(0.25)
@@ -98,17 +95,17 @@ try:
         except brickpi3.SensorError:
             pass
         time.sleep(0.1)
-    
+
     # IR receiver is configured. Wait to continue until Red Up is pressed.
     print("Lay robot down so that it is perfectly still, then press Red Up on the remote.")
     while not BP.get_sensor(PORT_SENSOR_IR)[0][0]:
         time.sleep(0.1)
-    
+
     # configure gyro sensor in Degrees Per Second mode, and wait for it to be configured.
     print("Configuring Gyro Sensor... Keep robot still.")
-    
+
     gOffset = 0
-    
+
     if GYRO_TYPE == GYRO_EV3:
         BP.set_sensor_type(PORT_SENSOR_GYRO, BP.SENSOR_TYPE.EV3_GYRO_DPS)
         Continue = False
@@ -129,32 +126,32 @@ try:
             except brickpi3.SensorError:
                 pass
             time.sleep(0.1)
-    
+
     print("Stand robot up, then press Blue Up on the remote.")
     while not BP.get_sensor(PORT_SENSOR_IR)[0][2]:
         time.sleep(0.1)
-    
+
     print("Release Blue Up on the remote.")
-    
+
     while BP.get_sensor(PORT_SENSOR_IR)[0][2]:
         time.sleep(0.1)
-    
+
     if BP.get_sensor(PORT_SENSOR_IR)[0][0]:
         print("Release Red Up on the remote.")
         while BP.get_sensor(PORT_SENSOR_IR)[0][0]:
             time.sleep(0.1)
-    
+
     # reset the encoders
     BP.offset_motor_encoder(PORT_MOTOR_LEFT, BP.get_motor_encoder(PORT_MOTOR_LEFT))
     BP.offset_motor_encoder(PORT_MOTOR_RIGHT, BP.get_motor_encoder(PORT_MOTOR_RIGHT))
-    
+
     # get the current time in ms
     CurrentTick = int(round(time.time() * 1000))
-    
+
     tMotorPosOK = CurrentTick
     #tCalcStart = CurrentTick - LOOP_TIME
     NextBalanceTime = CurrentTick
-    
+
     gyroAngle = 0
     mrcSum = 0
     motorPos = 0
@@ -163,14 +160,14 @@ try:
     mrcDeltaP2 = 0
     mrcDeltaP3 = 0
     motorDiffTarget = 0
-    
+
     LastTime = time.time() - LOOP_TIME
     TimeOffset = 0
     tInterval = LOOP_TIME
-    
+
     print("Balancing, so let go of the robot.")
     print("Use Red and Blue Up and Down to drive the robot.")
-    
+
     while True:
         try:
             # loop at exactly the speed specified by LOOP_SPEED, and set tInterval to the actual loop time
@@ -183,36 +180,36 @@ try:
             tInterval = (CurrentTime - LastTime)
             LastTime = CurrentTime
             #print(tInterval, TimeOffset)
-            
+
             motorControlDrive = 0
             motorControlSteer = 0
-            
+
             Buttons = BP.get_sensor(PORT_SENSOR_IR)[0]
-            
+
             if Buttons[0]:
                 motorControlDrive -= DRIVE_SPEED
                 motorControlSteer -= STEER_SPEED
             elif Buttons[1]:
                 motorControlDrive += DRIVE_SPEED
                 motorControlSteer += STEER_SPEED
-            
+
             if Buttons[2]:
                 motorControlDrive -= DRIVE_SPEED
                 motorControlSteer += STEER_SPEED
             elif Buttons[3]:
                 motorControlDrive += DRIVE_SPEED
                 motorControlSteer -= STEER_SPEED
-            
+
             if GYRO_TYPE == GYRO_EV3:
                 gyroSpeed = BP.get_sensor(PORT_SENSOR_GYRO) - gOffset
             elif GYRO_TYPE == GYRO_HiTechnic:
                 gyroSpeed = BP.get_sensor(PORT_SENSOR_GYRO)[0] / 4 - gOffset
-            
+
             gOffset += (gyroSpeed * KGYROSPEEDCORRECT * tInterval)
-            
+
             gyroAngle += gyroSpeed * tInterval
             gyroAngle -= (gyroAngle * KGYROANGLECORRECT * tInterval)
-            
+
             mrcLeft = BP.get_motor_encoder(PORT_MOTOR_LEFT)
             mrcRight = BP.get_motor_encoder(PORT_MOTOR_RIGHT)
             mrcSumPrev = mrcSum
@@ -221,23 +218,23 @@ try:
             mrcDelta = mrcSum - mrcSumPrev
             motorPos += mrcDelta
             motorSpeed = mrcDelta / tInterval
-            
+
             motorPos -= motorControlDrive * tInterval
-            
+
             power = ((KGYROSPEED * gyroSpeed +                # (Deg/Sec from Gyro sensor
                      KGYROANGLE * gyroAngle) / WHEEL_RATIO +  # Deg from integral of gyro) / wheel ratio (tuned for 56mm wheels)
                      KPOS       * motorPos +                  # From MotorRotaionCount of both motors
                      KDRIVE     * motorControlDrive +         # To improve start/stop performance
                      KSPEED     * motorSpeed)                 # Motor speed in Deg/Sec
-            
+
             if abs(power) < 100:
                 tMotorPosOK = CurrentTime
-            
+
             motorDiffTarget += motorControlSteer * tInterval
             powerSteer = KSTEER * (motorDiffTarget - motorDiff)
             powerLeft = power + powerSteer
             powerRight = power - powerSteer
-            
+
             if powerLeft  >  100:
                 powerLeft  =  100
             if powerLeft  < -100:
@@ -246,18 +243,18 @@ try:
                 powerRight =  100
             if powerRight < -100:
                 powerRight = -100
-            
+
             BP.set_motor_power(PORT_MOTOR_LEFT , powerLeft)
             BP.set_motor_power(PORT_MOTOR_RIGHT, powerRight)
-            
+
             if (CurrentTime - tMotorPosOK) > TIME_FALL_LIMIT:
                 print("Oh no! Robot fell. Exiting.")
                 SafeExit()
-            
+
         except brickpi3.SensorError as error:
             print(error)
         except IOError as error:
             print(error)
-    
+
 except KeyboardInterrupt:
     SafeExit()
