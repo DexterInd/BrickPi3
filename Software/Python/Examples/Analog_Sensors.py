@@ -37,7 +37,7 @@ try:
             value4 = BP.get_sensor(BP.PORT_4)[0]
 
             ref5v = (4095.0 / BP.get_voltage_5v()) # read the reference to determine the analog sensor voltage
-            print("1R: %4d  1V: %5.3fV  2R: %4d  2V: %5.3fV  3R: %4d  3V: %5.3fV  4R: %4d  4V: %5.3fV" % (value1, (value1 / ref5v), value2, (value2 / ref5v), value3, (value3 / ref5v), value4, (value4 / ref5v))) # print the values
+            print(f"1R: {value1:4d}  1V: {value1 / ref5v:5.3f}V  2R: {value2:4d}  2V: {value2 / ref5v:5.3f}V  3R: {value3:4d}  3V: {value3 / ref5v:5.3f}V  4R: {value4:4d}  4V: {value4 / ref5v:5.3f}V") # print the values
 
         except brickpi3.SensorError as error:
             print(error)

@@ -43,7 +43,7 @@ try:
             temp = (float)((value[1] << 8) + value[0]) # join the MSB and LSB part
             temp = temp * 0.02 - 0.01                  # Converting to Celcius
             temp = temp - 273.15                       #          ''
-            print("Object Temp: %.1fC" % temp)         # print the temperature
+            print(f"Object Temp: {temp:.1f}C")         # print the temperature
         except brickpi3.SensorError as error:
             print(error)
 
@@ -54,7 +54,7 @@ try:
             temp = (float)((value[1] << 8) + value[0]) # join the MSB and LSB part
             temp = temp * 0.02 - 0.01                  # Converting to Celcius
             temp = temp - 273.15                       #          ''
-            print("Ambient Temp: %.1fC" % temp)        # print the temperature
+            print(f"Ambient Temp: {temp:.1f}C")        # print the temperature
         except brickpi3.SensorError as error:
             print(error)
 

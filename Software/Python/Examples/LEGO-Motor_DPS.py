@@ -36,7 +36,7 @@ try:
 
         BP.set_motor_dps(BP.PORT_A, target)             # set the target speed for motor A in Degrees Per Second
 
-        print(("Motor A Target Degrees Per Second: %d" % target), "  Motor A Status: ", BP.get_motor_status(BP.PORT_A))
+        print(f"Motor A Target Degrees Per Second: {target:d}  Motor A Status: {BP.get_motor_status(BP.PORT_A)}")
 
         time.sleep(0.02)
 

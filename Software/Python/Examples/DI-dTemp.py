@@ -55,7 +55,7 @@ try:
 
                 temp =  1.0 / (_a[i] + (_b[i] * lnRtRt25) + (_c[i] * lnRtRt25 * lnRtRt25) + (_d[i] * lnRtRt25 * lnRtRt25 * lnRtRt25))
                 temp = temp - 273.15
-                print("Temperature: %.1fC" % temp) # print the temperature in degrees C
+                print(f"Temperature: {temp:.1f}C") # print the temperature in degrees C
             else:             # else the value is 4095, so the sensor is disconnected
                 print("Temperature: (disconnected)")
         except brickpi3.SensorError as error:

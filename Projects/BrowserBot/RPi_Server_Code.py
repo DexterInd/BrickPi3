@@ -70,7 +70,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             c = "4"
         if message == "b":
             c = "5"
-        print(c)
+        print(f'{c}')
         if c == '8' :
             print("Running Forward")
             BP.set_motor_power(BP.PORT_A, 200)  #Set the speed of MotorA (-255 to 255)

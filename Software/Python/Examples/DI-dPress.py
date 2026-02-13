@@ -32,8 +32,8 @@ try:
         try:
             value = BP.get_sensor(BP.PORT_1)[0]
             if(value < 4095): # if the value is < 4095, the sensor is connected
-                print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.0018)) # print the value for the dPressure 500
-                #print("Pressure: %6.2fkPa" % (((value / 4095) - 0.04) / 0.00369)) # print the value for the dPressure 250
+                print(f"Pressure: {((value / 4095) - 0.04) / 0.0018:6.2f}kPa") # print the value for the dPressure 500
+                #print(f"Pressure: {((value / 4095) - 0.04) / 0.00369:6.2f}kPa") # print the value for the dPressure 250
             else:             # else the value is 4095, so the sensor is disconnected
                 print("Pressure: (disconnected)")
         except brickpi3.SensorError as error:

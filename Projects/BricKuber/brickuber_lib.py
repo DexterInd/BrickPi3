@@ -19,11 +19,11 @@ debug_motor_commands_on = False
 
 def debug_print_commands(string_in):
     if debug_print_commands_on:
-        print(str(string_in))
+        print(f'{string_in}')
 
 def debug_motor_commands(string_in):
     if debug_motor_commands_on:
-        print(str(string_in))
+        print(f'{string_in}')
 
 
 # class of methods for reading and manipulating a Rubik's cube.

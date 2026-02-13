@@ -18,7 +18,7 @@ BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be 
 
 try:
     while True:
-        print("Battery voltage: %6.3f  9v voltage: %6.3f  5v voltage: %6.3f  3.3v voltage: %6.3f" % (BP.get_voltage_battery(), BP.get_voltage_9v(), BP.get_voltage_5v(), BP.get_voltage_3v3())) # read and display the current voltages
+        print(f"Battery voltage: {BP.get_voltage_battery():6.3f}  9v voltage: {BP.get_voltage_9v():6.3f}  5v voltage: {BP.get_voltage_5v():6.3f}  3.3v voltage: {BP.get_voltage_3v3():6.3f}") # read and display the current voltages
 
         time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
 

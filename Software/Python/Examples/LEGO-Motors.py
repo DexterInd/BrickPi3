@@ -54,7 +54,7 @@ try:
 
         try:
             # Each of the following BP.get_motor_encoder functions returns the encoder value (what we want to display).
-            print("Encoder A: %6d  B: %6d  C: %6d  D: %6d" % (BP.get_motor_encoder(BP.PORT_A), BP.get_motor_encoder(BP.PORT_B), BP.get_motor_encoder(BP.PORT_C), BP.get_motor_encoder(BP.PORT_D)))
+            print(f"Encoder A: {BP.get_motor_encoder(BP.PORT_A):6d}  B: {BP.get_motor_encoder(BP.PORT_B):6d}  C: {BP.get_motor_encoder(BP.PORT_C):6d}  D: {BP.get_motor_encoder(BP.PORT_D):6d}")
         except IOError as error:
             print(error)
 

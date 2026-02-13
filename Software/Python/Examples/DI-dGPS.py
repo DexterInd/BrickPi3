@@ -106,7 +106,7 @@ try:
 
             satv = ((long)(value[0]<<24)) + ((long)(value[1]<<16)) + ((long)(value[2]<<8)) + (long)(value[3])
 
-            print('Status',status,'UTC',UTC,'Latitude %.6f'% lat,'Longitude %.6f'%lon,'Heading',head,'Velocity',velo,'Altitude',altitude,'HDOP',hdop,'Satellites in view',satv)
+            print(f'Status {status} UTC {UTC} Latitude {lat:.6f} Longitude {lon:.6f} Heading {head} Velocity {velo} Altitude {altitude} HDOP {hdop} Satellites in view {satv}')
 
         except brickpi3.SensorError as error:
             print(error)
