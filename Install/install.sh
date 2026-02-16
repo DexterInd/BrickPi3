@@ -1,6 +1,6 @@
 #! /bin/bash
 
-PIHOME=/home/pi
+PIHOME=$HOME
 DEXTER=Dexter
 DEXTER_PATH=$PIHOME/$DEXTER
 RASPBIAN=$PIHOME/di_update/Raspbian_For_Robots

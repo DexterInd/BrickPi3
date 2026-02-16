@@ -1,6 +1,6 @@
 BrickPi3
 ========
-The BrickPi3 connects LEGO Mindstorms with the Raspberry Pi.  You can learn [more about the BrickPi3 here.](https://www.dexterindustries.com/brickpi/)  
+The BrickPi3 connects LEGO Mindstorms with the Raspberry Pi.  You can learn [more about the BrickPi3 here.](https://www.dexterindustries.com/brickpi/)
 
 ![BrickPi3 Introduction Header](https://user-images.githubusercontent.com/29712567/32540756-0d9f7224-c487-11e7-9941-968fa33dd95a.png)
 
@@ -10,8 +10,6 @@ You can find more extensive documentation about setting up the BrickPi3 for the 
 
 Installation
 ------------
-
-On Raspbian for Robots, run `DI Software Update` to install or update - this is a more time-consuming option than the alternative instructions seen in the following section.
 
 Quick Install
 -------------

@@ -1,54 +1,48 @@
-## Installing
+# BrickPi3 Trixie Installation
 
 You need internet access for the following step(s).
 
-The quickest way for installing the BrickPi3 is to enter the following command:
-```
-curl -kL dexterindustries.com/update_brickpi3 | bash
-```
+## Cloning the Repository (Recommended)
 
-Since `dexterindustries.com/update_brickpi3` points to this folder's file called `update_brickpi3.sh` you can also go the classic route and clone the repository, change the directory to this folder and then run the following script:
-```
-bash update_brickpi3.sh
-```
+To install the BrickPi3 Trixie branch, first clone the repository and run the install script:
 
-By default, the BrickPi3 package is installed system-wide, [script_tools](https://github.com/DexterInd/script_tools) and [RFR_Tools](https://github.com/DexterInd/RFR_Tools) are updated each time the script is ran.
-
-An example using options appended to the command can be:
-```
-curl -kL dexterindustries.com/update_brickpi3 | bash -s -- --user-local --no-update-aptget --no-dependencies
-```
+1. Open a terminal and run:
+   ```bash
+   git clone -b trixie https://github.com/DexterInd/BrickPi3.git
+   cd BrickPi3/Install
+   ```
+2. Source the install script:
+   ```bash
+   source install_trixie.sh
+   ```
+   - By default, this installs all required software and GUI troubleshooting tools.
+   - To install only hardware/driver support (no GUI tools):
+     ```bash
+     source install_trixie.sh hardware=only
+     ```
 
 ## Command Options
 
-The options that can be appended to this command are:
+- `hardware=only` — Only install hardware/driver support, skip GUI troubleshooting tools.
+- `user` — Use a user-level Python virtual environment (default is project-level).
 
-* `--no-update-aptget` - to skip using `sudo apt-get update` before installing dependencies. For this to be useful, `--no-dependencies` has to be not used. Applies to RFR_Tools and the BrickPi3.
-* `--bypass-rfrtools` - skips installing RFR_Tools completely.
-    * `--bypass-python-rfrtools` - skips installing/updating the python package for  [RFR_Tools](https://github.com/DexterInd/RFR_Tools).
-    * `--bypass-gui-installation` - skips installing the GUI packages/dependencies from [RFR_Tools](https://github.com/DexterInd/RFR_Tools).
-* `--no-dependencies` - skip installing any dependencies for the BrickPi3. It's supposed to be used on each consecutive update after the initial install has gone through.
-* `--user-local` - install the python package for the BrickPi3 in the home directory of the user. This doesn't require any special read/write permissions: the actual command used is (`python setup.py install --force --user`).
-* `--env-local` - install the python package for the BrickPi3 within the given environment without elevated privileges: the actual command used is (`python setup.py install --force`).
-* `--system-wide` - install the python package for the BrickPi3 within the sytem-wide environment with `sudo`: the actual command used is (`sudo python setup.py install --force`).
-
-Important to remember is that `--user-local`, `--env-local` and `--system-wide` options are all mutually-exclusive - they cannot be used together.
-As a last thing, different versions of it can be pulled by appending a corresponding branch name or tag.
+## What Gets Installed
+- Python virtual environment (if not already active)
+- Latest BrickPi3 software from TestPyPI
+- (Default) GUI troubleshooting tools for diagnostics and support
 
 ## Minimal Installation
 
-Now, if you only want the absolute minimum in order to get going with the BrickPi3, you can run this command:
+If you only want the absolute minimum to get going with the BrickPi3 (no GUI tools):
 ```bash
-curl -kL dexterindustries.com/update_brickpi3 | bash -s -- --bypass-gui-installation
+source install_trixie.sh hardware=only
 ```
 
-This will only get you installed the BrickPi3 dependencies and nothing else. You still can use options such as `--user-local` or `--env-local` if you are working with a different kind of environment. Keep in mind that `--system-wide` is selected by default.
+## Updating
 
-## Subsequent Updates
+To update your BrickPi3 Trixie installation, simply re-source the install command. Dependencies and the Python package will be updated as needed.
 
-If the BrickPi3 has been installed either by using the full command or the one for the minimal installation, this means you have all the packages installed already and all dependencies put in. Therefore, on subsequent installation, you can skip installing any dependency and instead just reinstall the python package of the BrickPi3. To do this, you can run this command:
-```bash
-curl -kL dexterindustries.com/update_brickpi3 | bash -s -- --bypass-rfrtools --no-dependencies
-```
+---
 
-Or if this is too complex, you can always stick to the command meant for the full installation or the minimal one.
+For legacy installation instructions or more options, see the original README or the update_brickpi3.sh script.
+

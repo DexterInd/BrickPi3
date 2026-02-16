@@ -1,16 +1,16 @@
 <!--
-########################################################################                                                                 
-# Program Name: Browser_Client_Coder.html                                     
-# ================================     
-# This code is for controlling a robot by a web browser using web sockets                            
-# http://www.dexterindustries.com/                                                                
+########################################################################
+# Program Name: Browser_Client_Coder.html
+# ================================
+# This code is for controlling a robot by a web browser using web sockets
+# http://www.dexterindustries.com/
 # History
 # ------------------------------------------------
 # Author     Comments
 # Joshwa     Initial Authoring
-#                                                                  
+#
 # These files have been made available online through a Creative Commons Attribution-ShareAlike 3.0  license.
-# (http://creativecommons.org/licenses/by-sa/3.0/)           
+# (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 ########################################################################
 -->
@@ -20,33 +20,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebSockets Client</title>  
+  <title>WebSockets Client</title>
   <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  
+
 </head>
 <body>
 </br></br>
 </br>
 
-<p>            
-<!-- Creating press buttons  on the webpage-->                               
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 100px" type="button" value="Accelerate" onclick="accelerate(); " />
+<p>
+<!-- Creating press buttons  on the webpage-->
+<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 100px" type="button" value="Forward 'W'" onclick="accelerate(); " />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 450px; top: 200px" type="button" value="Steer Left" onclick="steer_left(); " />
+<p>
+<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 450px; top: 200px" type="button" value="Steer Left 'A'" onclick="steer_left(); " />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 200px" type="button" value="Stop" onclick="stop(); " />
+<p>
+<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 200px" type="button" value="Stop 'Space'" onclick="stop(); " />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 650px; top: 200px" type="button" value="Steer Right" onclick="steer_right(); " />
+<p>
+<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 650px; top: 200px" type="button" value="Steer Right 'D'" onclick="steer_right(); " />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 300px" type="button" value="Reverse" onclick="reverse(); " />
+<p>
+<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 550px; top: 300px" type="button" value="Reverse 'S'" onclick="reverse(); " />
 </p>
 
 </br></br></br></br>
@@ -58,13 +58,13 @@
     <input type="text" id="data" size="100"/><br>
 	<input id="clickMe" type="button" value="clickme" onclick="setup2()" />
 	</br></br>
-<p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>	
-<p>Press Up arrow key - Acceleraate </p>
-<p>Press Down arrow key - Reverse </p>
-<p>Press Right arrow key - Steer Right</p>
-<p>Press Left arrow key - Steer Left</p>
-<p>Press cltr/shift key to Stop</p>
-	
+<p><span style="font-weight:bold">Instructions for keyboard controls:</span></p>
+<p>Press Up arrow key or W - Forward </p>
+<p>Press Down arrow key or S - Reverse </p>
+<p>Press Right arrow key or D - Steer Right</p>
+<p>Press Left arrow key or A - Steer Left</p>
+<p>Press Ctrl/Shift key or Spacebar to Stop</p>
+
 </div>
 
 </div>
@@ -78,12 +78,12 @@ var right;
 var brakes;
 
 // defines a variable that controls the forward movement
-function accelerate()       
+function accelerate()
 {
-	up = "u";               // when up == "u" the bot moves forward 
+	up = "u";               // when up == "u" the bot moves forward
 	down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
     setup2();        		// Goes to websocket connection function
-}  
+}
 
 // defines a variable that controls the backward movement
 function reverse()
@@ -110,14 +110,14 @@ function steer_right()
 }
 
 // defines a variable that stops the robot
-function stop()       
+function stop()
 {
 	up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
 	setup2();
-}		 
+}
 
-// Creates the websockets connection 
-function setup2()         
+// Creates the websockets connection
+function setup2()
 {
 	var $txt = $("#data");      			// assigns the data(hostname/ip address) entered in the text box
 	name = $txt.val();          			// Variable name contains the string(hostname/ip address) entered in the text box
@@ -126,7 +126,7 @@ function setup2()
 	var $txt = $("#data");
 	var $btnSend = $("#sendtext");
 	$txt.focus();
-	
+
 	// event handlers for UI
 	$btnSend.on('click',function()
 	{
@@ -136,7 +136,7 @@ function setup2()
 			return;
 		}
 		$txt.val("");
-	});  
+	});
 	$txt
 	.keypress(function(evt)
 	{
@@ -158,11 +158,11 @@ function setup2()
 		}
 		//Send the button pressed backed to the Raspberry Pi
 		function buttons()
-		{	
+		{
 			if(up== "u")
 			{
 				socket.send("u");
-			}	
+			}
 
 			if(down== "d")
 			{
@@ -172,12 +172,12 @@ function setup2()
 			if(left== "l")
 			{
 				socket.send("l");
-			}	
+			}
 
 			if(right== "r")
 			{
 				socket.send("r");
-			}	
+			}
 
 			if(brakes == "b")
 			{
@@ -186,30 +186,41 @@ function setup2()
 		}
 		function arrows()
 		{
-			document.onkeyup = KeyCheck;       
+			document.onkeyup = KeyCheck;
 			function KeyCheck(event)
 			{
 				var KeyID = event.keyCode;
 				switch(KeyID)
 				{
-				case 16:
-				socket.send("b");
-				break; 
-				case 17:
-				socket.send("b");
-				break;
-				case 37:
-				socket.send("l");
-				break;
-				case 38:
-				socket.send("u");
-				break;
-				case 39:
-				socket.send("r");
-				break;
-				case 40:
-				socket.send("d");
-				break;
+				case 16: // Shift
+				case 17: // Ctrl
+				case 32: // Spacebar
+					socket.send("b");
+					break;
+				case 37: // Left arrow
+					socket.send("l");
+					break;
+				case 38: // Up arrow
+					socket.send("u");
+					break;
+				case 39: // Right arrow
+					socket.send("r");
+					break;
+				case 40: // Down arrow
+					socket.send("d");
+					break;
+				case 65: // A
+					socket.send("l");
+					break;
+				case 87: // W
+					socket.send("u");
+					break;
+				case 68: // D
+					socket.send("r");
+					break;
+				case 83: // S
+					socket.send("d");
+					break;
 				}
 			}
 		}
@@ -231,18 +242,18 @@ function setup2()
 	{
 		var p = document.createElement('p');
 		p.innerHTML = txt;
-		document.getElementById('output').appendChild(p); 
-	}	
-}   
+		document.getElementById('output').appendChild(p);
+	}
+}
 
 </script>
 </body>
 </html>
-<script>   
+<script>
 
 jQuery(function($)
 {
-  if (!("WebSocket" in window)) 
+  if (!("WebSocket" in window))
   {
     alert("Your browser does not support web sockets");
   }

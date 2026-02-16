@@ -1,0 +1,2 @@
+include README.md
+recursive-include brickpi3/Examples *.py
