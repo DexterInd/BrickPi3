@@ -9,7 +9,7 @@
 #
 # This code is an example for determining if a BrickPi3 is connected to the Raspberry Pi
 
-import time     # import the time library for the sleep function
+# import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
 
 try:

@@ -11,15 +11,17 @@ fi
 # Usage: source install_trixie.sh
 
 
-set -e
+# set -e
 
 # Check for Python virtual environment
-# Usage: bash install_trixie.sh [user]
+# Usage: bash install_trixie.sh [local|user]
 
-if [ "$1" = "user" ]; then
-	VENV_DIR="$HOME/.venv"
+# Default: user-level venv (~/.venv), unless 'local' is specified
+if [ "$1" = "local" ]; then
+    # Place venv in the parent folder of Install
+    VENV_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.venv"
 else
-	VENV_DIR="$(pwd)/.venv"
+    VENV_DIR="$HOME/.venv/brickpi3"
 fi
 
 if [ -z "$VIRTUAL_ENV" ]; then
@@ -68,18 +70,31 @@ done
 # After brickpi3 installation and test
 if [ "$INSTALL_GUI" -eq 1 ]; then
     echo "Installing GUI tools (trixie_setup_gui.sh)..."
-    bash "$(dirname "$0")/trixie_setup_gui.sh"
+    SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    bash "$SCRIPT_DIR/trixie_setup_gui.sh"
 
     # Desktop integration for Troubleshooter
-    # Determine source folder for .desktop and launch script
-    SRC_DIR="$(dirname "$0")/../Software/Python/brickpi3/troubleshooting"
+    SRC_DIR="$SCRIPT_DIR/../Software/Python/brickpi3/troubleshooting"
     DESKTOP_FILE="$SRC_DIR/BrickPi3_Troubleshooter.desktop"
     LAUNCH_SCRIPT="$SRC_DIR/launch_troubleshooter.sh"
     DESKTOP_TARGET="$HOME/Desktop/BrickPi3_Troubleshooter.desktop"
 
+
     if [ -f "$DESKTOP_FILE" ]; then
-        echo "Linking Troubleshooter desktop file to Desktop..."
-        ln -sf "$DESKTOP_FILE" "$DESKTOP_TARGET"
+        echo "Copying and patching Troubleshooter desktop file to Desktop..."
+        TMP_PATCHED_DESKTOP="/tmp/BrickPi3_Troubleshooter.desktop"
+        cp "$DESKTOP_FILE" "$TMP_PATCHED_DESKTOP"
+        LAUNCH_PATH="$LAUNCH_SCRIPT"
+        # Escape spaces for .desktop Exec line
+        LAUNCH_PATH_ESCAPED="${LAUNCH_PATH// /\\ }"
+        sed -i "s|^Exec=.*$|Exec=\"$LAUNCH_PATH_ESCAPED\"|" "$TMP_PATCHED_DESKTOP"
+
+        # Patch the Icon line to use the absolute path to BrickPi3.png in the BrickPi3 root
+        BRICKPI3_ROOT="$SCRIPT_DIR/.."
+        ICON_PATH="$BRICKPI3_ROOT/Software/Python/brickpi3/troubleshooting/BrickPi3.png"
+        sed -i "s|^Icon=.*$|Icon=$ICON_PATH|" "$TMP_PATCHED_DESKTOP"
+
+        mv "$TMP_PATCHED_DESKTOP" "$DESKTOP_TARGET"
     else
         echo "Troubleshooter desktop file not found at $DESKTOP_FILE"
     fi

@@ -7,32 +7,30 @@
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
-# This code is an example for reading an NXT light sensor connected to PORT_1 of the BrickPi3
+# This code is an example for reading an EV3 infrared sensor connected to PORT_1 of the BrickPi3
 #
-# Hardware: Connect an NXT light sensor to BrickPi3 Port 1.
+# Hardware: Connect an EV3 infrared sensor to BrickPi3 sensor port 1.
 #
-# Results:  When you run this program, you should see the value from the light sensor.
+# Results:  When you run this program, the infrared remote status will be printed.
 
 import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
 
 BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
 
-# Configure for an NXT light sensor.
+# Configure for an EV3 color sensor.
 # BP.set_sensor_type configures the BrickPi3 for a specific sensor.
 # BP.PORT_1 specifies that the sensor will be on sensor port 1.
-# BP.SENSOR_TYPE.NXT_LIGHT_ON specifies that the sensor will be an NXT light sensor.
-BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.NXT_LIGHT_ON)
+# BP.Sensor_TYPE.EV3_INFRARED_REMOTE specifies that the sensor will be an EV3 infrared sensor.
+BP.set_sensor_type(BP.PORT_1, BP.SENSOR_TYPE.EV3_INFRARED_REMOTE)
 
 try:
     while True:
-        # read and display the sensor value
         # BP.get_sensor retrieves a sensor value.
         # BP.PORT_1 specifies that we are looking for the value of sensor port 1.
         # BP.get_sensor returns the sensor value (what we want to display).
         try:
-            value = BP.get_sensor(BP.PORT_1)
-            print(value)                         # print the value
+            print(BP.get_sensor(BP.PORT_1))   # print the infrared values
         except brickpi3.SensorError as error:
             print(error)
 

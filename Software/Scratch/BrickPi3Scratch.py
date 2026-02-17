@@ -7,14 +7,14 @@ import sys
 import brickpi3
 import os # needed to create folders
 try:
-    sys.path.insert(0, '/home/pi/Dexter/PivotPi/Software/Scratch/')
+    sys.path.insert(0, os.path.join(os.path.expanduser("~"), 'Dexter/PivotPi/Software/Scratch/'))
     import PivotPiScratch
     pivotpi_available=True
 except:
     pivotpi_available=False
 
 try:
-    sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Scratch/')
+    sys.path.insert(0, os.path.join(os.path.expanduser("~"), 'Dexter/DI_Sensors/Scratch/'))
     import diSensorsScratch
     diSensorsScratch.detect_all()
     disensors_available=True
@@ -107,7 +107,7 @@ except:
     error_box("Unknown Error, closing Scratch Interpreter")
 
 SensorType = ["NONE", "NONE", "NONE", "NONE"]
-defaultCameraFolder="/home/pi/Desktop/"
+defaultCameraFolder = os.path.join(os.path.expanduser("~"), "Desktop/")
 cameraFolder = defaultCameraFolder
 
 # temperature conversion lists for the dTemp sensor

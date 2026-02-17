@@ -10,7 +10,7 @@ echo "[INFO] BrickPi3 root directory: $BRICKPI3_DIR"
 
 # Virtual environment locations
 VENV1="$BRICKPI3_DIR/.venv"
-VENV2="$HOME/.venv"
+VENV2="$HOME/.venv/brickpi3"
 
 # Function to activate venv and run troubleshooter
 run_troubleshooter() {

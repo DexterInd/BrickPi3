@@ -2,6 +2,6 @@
 Type=Application
 Name=BrickPi3 Troubleshooter
 Exec=/bin/bash -c '"$(dirname "$(readlink -f "%k")")/launch_troubleshooter.sh"'
-Icon=utilities-terminal
+Icon=BrickPi3.png
 Terminal=true
 Categories=Utility;
