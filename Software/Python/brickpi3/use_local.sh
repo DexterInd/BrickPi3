@@ -1,0 +1,1 @@
+export PYTHONPATH="/home/brickpi/BrickPi3/Software/Python:$PYTHONPATH"
