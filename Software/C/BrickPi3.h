@@ -316,6 +316,7 @@ int BrickPi3_set_address(int addr, const char *id){
   if(spi_transfer_array(19, spi_array_out, spi_array_in)){
     return -1;
   }
+  return 0;
 }
 
 class BrickPi3{

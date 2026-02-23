@@ -17,7 +17,7 @@
  *
  */
 
-#include "BrickPi3.cpp" // for BrickPi3
+#include "../BrickPi3.cpp" // for BrickPi3
 #include <stdio.h>      // for printf
 
 BrickPi3 BP; // Create a BrickPi3 instance with the default address of 1

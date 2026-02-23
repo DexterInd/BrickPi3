@@ -150,6 +150,7 @@ int BrickPi3::get_version_hardware(char *str){
     return error;
   }
   sprintf(str, "%d.%d.%d", (value / 1000000), ((value / 1000) % 1000), (value % 1000));
+  return 0;
 }
 
 int BrickPi3::get_version_firmware(char *str){

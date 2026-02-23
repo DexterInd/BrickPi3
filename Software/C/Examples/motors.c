@@ -10,7 +10,10 @@
  *
  *  Hardware: Connect EV3 or NXT motor(s) to any of the BrickPi3 motor ports.
  *
- *  Results:  When you run this program, you should see the encoder value for each motor. By manually rotating motor A, the other motor(s) will be controlled. Motor B power will be controlled, Motor C speed will be controlled, and motor D position will be controlled.
+ *  Results:  When you run this program, you should see the encoder value for each motor.
+ * By manually rotating motor A, the other motor(s) will be controlled.
+ * Motor B power will be controlled, Motor C speed will be controlled,
+ * and motor D position will be controlled.
  *
  *  Example compile command:
  *    g++ -o program "motors.c"
@@ -19,7 +22,7 @@
  *
  */
 
-#include "BrickPi3.cpp" // for BrickPi3
+#include "../BrickPi3.cpp" // for BrickPi3
 #include <stdio.h>      // for printf
 #include <unistd.h>     // for usleep
 #include <signal.h>     // for catching exit signals

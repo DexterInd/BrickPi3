@@ -19,7 +19,7 @@
  *
  */
 
-#include "BrickPi3.cpp" // for BrickPi3
+#include "../BrickPi3.cpp" // for BrickPi3
 #include <stdio.h>      // for printf
 #include <unistd.h>     // for usleep
 #include <signal.h>     // for catching exit signals
