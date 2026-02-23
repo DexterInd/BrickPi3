@@ -54,7 +54,7 @@ try:
         # BP.get_sensor returns the sensor value (what we want to display).
         try:
             value = BP.get_sensor(BP.PORT_1)
-            print(value)                         # print the distance in CM
+            print(f"Distance: {value:3.0f} cm")      # print the distance in CM
         except brickpi3.SensorError as error:
             print(error)
 

@@ -60,7 +60,7 @@ try:
         # BP.get_sensor returns the sensor value (what we want to display).
         try:
             value = BP.get_sensor(BP.PORT_1)
-            print(color[value])                # print the color
+            print(f"{color[value]}, {value}")                # print the color
         except brickpi3.SensorError as error:
             print(error)
 

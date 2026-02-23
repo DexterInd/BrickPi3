@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+#
+# https://www.dexterindustries.com/BrickPi/
+# https://github.com/DexterInd/BrickPi3
+#
+# Copyright (c) 2026 Modular Robotics Inc
+# Released under the MIT license (http://choosealicense.com/licenses/mit/).
+# For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
+#
+# This code is an example for running a motor to a target position set by the encoder of another motor.
+#
+# Hardware: Connect EV3 or NXT motors to the BrickPi3 motor ports B and C. Make sure that the BrickPi3 is running on a 9v power supply.
+#
+# Results:  When you run this program, motor C power will be controlled by the position of motor B. Manually rotate motor B, and motor C's power will change.
+
+print("USER INSTRUCTIONS:")
+print("Connect EV3 or NXT motors to BrickPi3 motor ports B and C.")
+print("Make sure the BrickPi3 is running on a 9V or 12V power supply.")
+print("This program will use motor B's encoder position to control motor C's power.")
+print("Motor B's encoder value is divided by 10 to set motor C's power level.")
+print("Power is automatically limited between -100% and 100%.")
+print("Manually rotate motor B to see motor C's power change in real-time.")
+print("The program will continuously monitor and adjust motor C's power.")
+print("Press Ctrl+C to stop the program.")
+input("Press Enter to continue...")
+
+import time     # import the time library for the sleep function
+import brickpi3 # import the BrickPi3 drivers
+
+BP = brickpi3.BrickPi3() # Create an instance of the BrickPi3 class. BP will be the BrickPi3 object.
+
+try:
+    try:
+        BP.offset_motor_encoder(BP.PORT_B, BP.get_motor_encoder(BP.PORT_B)) # reset encoder B
+    except IOError as error:
+        print(error)
+
+    while True:
+        # The following BP.get_motor_encoder function returns the encoder value (what we want to use to control motor C's power).
+        try:
+            power = BP.get_motor_encoder(BP.PORT_B) / 10
+            if power > 100:
+                power = 100
+            elif power < -100:
+                power = -100
+            print(f"Motor B encoder: {BP.get_motor_encoder(BP.PORT_B):6d}  Motor C power: {power:6.1f}%")
+        except IOError as error:
+            print(error)
+            power = 0
+        BP.set_motor_power(BP.PORT_C, power)
+
+        time.sleep(0.02)  # delay for 0.02 seconds (20ms) to reduce the Raspberry Pi CPU load.
+
+except KeyboardInterrupt: # except the program gets interrupted by Ctrl+C on the keyboard.
+    BP.reset_all()        # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.
