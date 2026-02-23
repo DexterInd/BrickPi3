@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # https://www.dexterindustries.com/BrickPi/
 # https://github.com/DexterInd/BrickPi3
 #
-# Copyright (c) 2019 Dexter Industries
+# Copyright (c) 2026 Modular Robotics Inc
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information, see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
 #
@@ -14,13 +14,14 @@
 #     Connect left motor to BrickPi3 motor port B
 #     Connect right motor to BrickPi3 motor port C
 
-from __future__ import print_function # use python 3 syntax but make it compatible with python 2
-from __future__ import division       #                           ''
-
 import sys      # import sys for sys.exit()
 import time     # import the time library for loop delay timing
 import brickpi3 # import the BrickPi3 drivers
-from di_sensors import easy_line_follower # import the Line Follower drivers
+try:
+    from di_sensors import easy_line_follower # import the Line Follower drivers
+except ImportError:
+    print("Error: The 'di_sensors' package is required. Install it with:\n    pip install di_sensors")
+    sys.exit(1)
 
 bp = brickpi3.BrickPi3()                   # bp will be the BrickPi3 object
 lf = easy_line_follower.EasyLineFollower() # lf will be the EasyLineFollower object
@@ -36,7 +37,7 @@ def LoopDelay(hz):
     CurrentTime = time.time()
     SleepTime = LoopTime - CurrentTime
     if SleepTime > 0: # delay if necessary
-        time.sleep(LoopTime - CurrentTime)
+        time.sleep(SleepTime)
     else: # Attempting to loop faster than possible. Don't get behind.
         LoopTime = CurrentTime
     LoopTime += (1 / hz)
@@ -44,7 +45,7 @@ def LoopDelay(hz):
 def SafeExit():
     ''' This method is called to stop the BrickPi3 and perform a clean program exit '''
     bp.reset_all()        # Unconfigure the sensors, disable the motors, and restore the LED to the control of the BrickPi3 firmware.
-    sys.exit()
+    sys.exit(0)
 
 try:
     print("BrickPi3 Tracked Line Follower.")
@@ -69,15 +70,13 @@ try:
             bp.set_motor_dps(PORT_MOTOR_RIGHT, 0)
         else:
             Error = -(LineFollowerState[0] - 0.5) * 2
-            if Error > 1:
-                Error = 1
-            elif Error < -1:
-                Error = -1
-
+            Error = max(min(Error, 1), -1)
             Correction = Error * 3
-
             bp.set_motor_dps(PORT_MOTOR_LEFT, (DRIVE_BASE_SPEED - (DRIVE_BASE_SPEED * Correction)))
             bp.set_motor_dps(PORT_MOTOR_RIGHT, (DRIVE_BASE_SPEED + (DRIVE_BASE_SPEED * Correction)))
 
 except KeyboardInterrupt:
+    SafeExit()
+except Exception as e:
+    print(f"Error: {e}")
     SafeExit()

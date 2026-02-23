@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brickpi3"
+version = "4.0.6"
+description = "Drivers and examples for using the BrickPi3 in Python"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = "MIT"
+authors = [
+    {name = "Modular Robotics Inc", email = "info@modrobotics.com"}
+]
+maintainers = [
+    {name = "Modular Robotics Inc", email = "info@modrobotics.com"}
+]
+keywords = [
+    "brickpi",
+    "brickpi3",
+    "lego",
+    "mindstorms",
+    "ev3",
+    "nxt",
+    "raspberry pi",
+    "robotics",
+    "education"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Hardware",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "spidev",
+]
+
+[project.optional-dependencies]
+gui = [
+    "wxPython",
+]
+
+[project.urls]
+Homepage = "https://www.dexterindustries.com/BrickPi/"
+Documentation = "https://www.dexterindustries.com/brickpi3-tutorials-documentation/"
+Repository = "https://github.com/DexterInd/BrickPi3"
+"Bug Tracker" = "https://github.com/DexterInd/BrickPi3/issues"
+
+[tool.setuptools]
+packages = ["brickpi3"]
+
+[tool.setuptools.package-data]
+brickpi3 = ["examples/*.py", "scripts/*.sh", "troubleshooting/*"]

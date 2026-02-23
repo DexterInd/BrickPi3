@@ -11,7 +11,7 @@ software) is released under the [MIT License].**
 
 MIT License
 
-Copyright (c) 2019 Dexter Industries
+Copyright (c) 2026 Modular Robotics Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

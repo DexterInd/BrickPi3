@@ -1,6 +1,3 @@
-from __future__ import print_function
-from __future__ import division
-
 import scratch
 import re
 import string
@@ -10,14 +7,14 @@ import sys
 import brickpi3
 import os # needed to create folders
 try:
-    sys.path.insert(0, '/home/pi/Dexter/PivotPi/Software/Scratch/')
+    sys.path.insert(0, os.path.join(os.path.expanduser("~"), 'Dexter/PivotPi/Software/Scratch/'))
     import PivotPiScratch
     pivotpi_available=True
 except:
     pivotpi_available=False
 
-try: 
-    sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Scratch/')
+try:
+    sys.path.insert(0, os.path.join(os.path.expanduser("~"), 'Dexter/DI_Sensors/Scratch/'))
     import diSensorsScratch
     diSensorsScratch.detect_all()
     disensors_available=True
@@ -104,13 +101,13 @@ except brickpi3.FirmwareVersionError as error:
     sys.exit()
 except IOError as error:
     error_box("Connection Error: {}".format(error.args[0]))
-    print(error.args[0], ". Exiting...")
+    print(f"{error.args[0]}. Exiting...")
     sys.exit()
 except:
     error_box("Unknown Error, closing Scratch Interpreter")
 
 SensorType = ["NONE", "NONE", "NONE", "NONE"]
-defaultCameraFolder="/home/pi/Desktop/"
+defaultCameraFolder = os.path.join(os.path.expanduser("~"), "Desktop/")
 cameraFolder = defaultCameraFolder
 
 # temperature conversion lists for the dTemp sensor
@@ -370,13 +367,13 @@ def handle_BrickPi_msg(msg):
             # don't return sensor Type as it seems useless and just makes a busier sensor value list
             # return_dict["S{} Type".format(incoming_sensor_port)] = sensor_type_string
             if en_debug:
-                print("Setting sensor port {} to sensor {}".format(incoming_sensor_port, sensor_type_string))
+                print(f"Setting sensor port {incoming_sensor_port} to sensor {sensor_type_string}")
             time.sleep(0.010)
 
         return_dict.update(read_sensor(port_index))
 
         if en_debug:
-            print("Reading sensor port {}".format(incoming_sensor_port))
+            print(f"Reading sensor port {incoming_sensor_port}")
 
     # SET MOTOR SPEED
     elif incoming_motor_port is not None :
@@ -451,7 +448,7 @@ def handle_BrickPi_msg(msg):
 
     else:
         if en_debug:
-            print("Unexpected error: {}".format(msg))
+            print(f"Unexpected error: {msg}")
 
     # if en_debug:
     #     print("Returning ", return_dict)
@@ -518,7 +515,7 @@ if __name__ == '__main__':
 
 
             if en_debug:
-                print("Rx:{}".format(msg))
+                print(f"Rx:{msg}")
 
             if is_BrickPi_msg(msg_nospace):
                 sensors = handle_BrickPi_msg(msg_nospace)
@@ -603,7 +600,7 @@ if __name__ == '__main__':
                 print("BrickPi Scratch: Disconnected from Scratch")
             break
         except (scratch.scratch.ScratchConnectionError, NameError) as e:
-            print("exception error: ", e)
+            print(f"exception error: {e}")
             while True:
                 # thread1.join(0)
                 if en_debug:
@@ -621,4 +618,4 @@ if __name__ == '__main__':
         except:
             e = sys.exc_info()[0]
             if en_debug:
-                print("BrickPi Scratch: Error %s" % e)
+                print(f"BrickPi Scratch: Error {e}")

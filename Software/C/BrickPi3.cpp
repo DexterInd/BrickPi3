@@ -2,7 +2,7 @@
  *  https://www.dexterindustries.com/BrickPi/
  *  https://github.com/DexterInd/BrickPi3
  *
- *  Copyright (c) 2017 Dexter Industries
+ *  Copyright (c) 2026 Modular Robotics Inc
  *  Released under the MIT license (http://choosealicense.com/licenses/mit/).
  *  For more information see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
  *
@@ -221,6 +221,7 @@ int BrickPi3::get_version_hardware(char *str){
     return error;
   }
   sprintf(str, "%d.%d.%d", (value / 1000000), ((value / 1000) % 1000), (value % 1000));
+  return 0;
 }
 
 int BrickPi3::get_version_firmware(char *str){

@@ -2,7 +2,7 @@
  *  https://www.dexterindustries.com/BrickPi/
  *  https://github.com/DexterInd/BrickPi3
  *
- *  Copyright (c) 2017 Dexter Industries
+ *  Copyright (c) 2026 Modular Robotics Inc
  *  Released under the MIT license (http://choosealicense.com/licenses/mit/).
  *  For more information see https://github.com/DexterInd/BrickPi3/blob/master/LICENSE.md
  *
@@ -244,6 +244,33 @@ struct sensor_infrared_t{
   uint8_t  remote[4];
 };
 
+// Set a BrickPi3's address to allow stacking
+int BrickPi3_set_address(int addr, const char *id){
+  if(addr < 1 || addr > 255){
+    fatal_error("BrickPi3_set_address error: invalid address. Must be in the range of 1 to 255");
+    return -1;
+  }
+
+  spi_array_out[0] = 0;                         // use address 0 so all BrickPi3s will listen, regardless of current address
+  spi_array_out[1] = BPSPI_MESSAGE_SET_ADDRESS;
+  spi_array_out[2] = addr;
+  for(uint8_t i = 0; i < 16; i++){
+    if(strlen(id) == 32){
+      char id_str[2];
+      id_str[0] = *(id + (i * 2));
+      id_str[1] = *(id + (i * 2) + 1);
+      spi_array_out[3 + i] = strtol(id_str, NULL, 16);
+    }else if(strlen(id) == 0){
+      spi_array_out[3 + i] = 0;
+    }else{
+      fatal_error("BrickPi3_set_address error: wrong serial number id length. Must be a 32-digit hex string.");
+    }
+  }
+  if(spi_transfer_array(19, spi_array_out, spi_array_in)){
+    return -1;
+  }
+  return 0;
+}
 
 class BrickPi3{
   public:

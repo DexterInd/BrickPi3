@@ -7,7 +7,7 @@ on Raspbian), everything should be ready for you to update the firmware.
 
 Run the firmware update script:
 
-    sudo bash /home/pi/Dexter/BrickPi3/Firmware/brickpi3samd_flash_firmware.sh
+    sudo bash ~/BrickPi3/Firmware/brickpi3samd_flash_firmware.sh
 
 Towards the bottom of the output (third line from the end), you should see
 `** Verified OK **` which means the firmware was flashed and verified successfully.
