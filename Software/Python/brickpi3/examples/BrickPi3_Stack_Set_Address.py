@@ -16,56 +16,42 @@ print("You will need to modify the serial number IDs in the code to match your d
 print("Use the Read_Info.py example to find the serial number of each BrickPi3 unit.")
 input("Press Enter to continue...")
 
-# import time     # import the time library for the sleep function
 import brickpi3 # import the BrickPi3 drivers
 
-#brickpi3.set_address(2, "") # set all attached BrickPi3s to address 2
-brickpi3.set_address(2, "7FCDC951514D4D5439202020FF0E0911")
-brickpi3.set_address(3, "192A0F96514D4D5438202020FF080C23") # set BrickPi3 with serial number ID "192A0F96514D4D5438202020FF080C23" to address 3
-brickpi3.set_address(4, "84FBCC9D514D4D5439202020FF0E070F")
+# Map of address -> serial number for the BrickPi3 units to configure.
+# Valid addresses are 1, 2, 3, and 4. Address 1 is the default address.
+# Include only the units you want to set; comment out the others.
+# Use Read_Info.py to find the serial number of each BrickPi3 unit.
+SERIAL_NUMBERS = {
+    1: "3B21D237504D5741372E3120FF0E2910",  # default address (use to reset a unit back to address 1)
+    # 2: "3B21D237504D5741372E3120FF0E2910",
+    # 3: "192A0F96514D4D5438202020FF080C23",
+    # 4: "84FBCC9D514D4D5439202020FF0E070F",
+}
+
+if not SERIAL_NUMBERS:
+    raise ValueError("SERIAL_NUMBERS must contain at least one entry.")
+if not all(addr in (1, 2, 3, 4) for addr in SERIAL_NUMBERS):
+    raise ValueError("Addresses must be 1, 2, 3, or 4.")
+
+# Assign addresses for only the specified units
+for address, serial in SERIAL_NUMBERS.items():
+    brickpi3.set_address(address, serial)
 
 try:
-    BP3_2 = brickpi3.BrickPi3(2) # Create an instance of the BrickPi3 class. BP3_2 will be the BrickPi3 object for the BrickPi3 with address 2.
-    BP3_3 = brickpi3.BrickPi3(3) # Create an instance of the BrickPi3 class. BP3_3 will be the BrickPi3 object for the BrickPi3 with address 3.
-    BP3_4 = brickpi3.BrickPi3(4)
+    bp3_instances = {address: brickpi3.BrickPi3(address) for address in SERIAL_NUMBERS}
 
-    # Each of the following .get functions return a value that we want to display.
-    print("BrickPi3 Address: 2")
-    print(f"Manufacturer    : {BP3_2.get_manufacturer()}") # read and display the serial number
-    print(f"Board           : {BP3_2.get_board()}") # read and display the serial number
-    print(f"Serial Number   : {BP3_2.get_id()}") # read and display the serial number
-    print(f"Hardware version: {BP3_2.get_version_hardware()}") # read and display the hardware version
-    print(f"Firmware version: {BP3_2.get_version_firmware()}") # read and display the firmware version
-    print(f"Battery voltage : {BP3_2.get_voltage_battery()}") # read and display the current battery voltage
-    print(f"9v voltage      : {BP3_2.get_voltage_9v()}") # read and display the current 9v regulator voltage
-    print(f"5v voltage      : {BP3_2.get_voltage_5v()}") # read and display the current 5v regulator voltage
-    print(f"3.3v voltage    : {BP3_2.get_voltage_3v3()}") # read and display the current 3.3v regulator voltage
-
-    print("")
-
-    print("BrickPi3 Address: 3")
-    print(f"Manufacturer    : {BP3_3.get_manufacturer()}") # read and display the serial number
-    print(f"Board           : {BP3_3.get_board()}") # read and display the serial number
-    print(f"Serial Number   : {BP3_3.get_id()}") # read and display the serial number
-    print(f"Hardware version: {BP3_3.get_version_hardware()}") # read and display the hardware version
-    print(f"Firmware version: {BP3_3.get_version_firmware()}") # read and display the firmware version
-    print(f"Battery voltage : {BP3_3.get_voltage_battery()}") # read and display the current battery voltage
-    print(f"9v voltage      : {BP3_3.get_voltage_9v()}") # read and display the current 9v regulator voltage
-    print(f"5v voltage      : {BP3_3.get_voltage_5v()}") # read and display the current 5v regulator voltage
-    print(f"3.3v voltage    : {BP3_3.get_voltage_3v3()}") # read and display the current 3.3v regulator voltage
-
-    print("")
-
-    print("BrickPi3 Address: 4")
-    print(f"Manufacturer    : {BP3_4.get_manufacturer()}") # read and display the serial number
-    print(f"Board           : {BP3_4.get_board()}") # read and display the serial number
-    print(f"Serial Number   : {BP3_4.get_id()}") # read and display the serial number
-    print(f"Hardware version: {BP3_4.get_version_hardware()}") # read and display the hardware version
-    print(f"Firmware version: {BP3_4.get_version_firmware()}") # read and display the firmware version
-    print(f"Battery voltage : {BP3_4.get_voltage_battery()}") # read and display the current battery voltage
-    print(f"9v voltage      : {BP3_4.get_voltage_9v()}") # read and display the current 9v regulator voltage
-    print(f"5v voltage      : {BP3_4.get_voltage_5v()}") # read and display the current 5v regulator voltage
-    print(f"3.3v voltage    : {BP3_4.get_voltage_3v3()}") # read and display the current 3.3v regulator voltage
+    for address, bp in bp3_instances.items():
+        print(f"\nBrickPi3 Address: {address}")
+        print(f"Manufacturer    : {bp.get_manufacturer()}")
+        print(f"Board           : {bp.get_board()}")
+        print(f"Serial Number   : {bp.get_id()}")
+        print(f"Hardware version: {bp.get_version_hardware()}")
+        print(f"Firmware version: {bp.get_version_firmware()}")
+        print(f"Battery voltage : {bp.get_voltage_battery()}")
+        print(f"9v voltage      : {bp.get_voltage_9v()}")
+        print(f"5v voltage      : {bp.get_voltage_5v()}")
+        print(f"3.3v voltage    : {bp.get_voltage_3v3()}")
 
 except IOError as error:
     print(error)
