@@ -60,7 +60,7 @@ Version is specified in `pyproject.toml`:
 
 ```toml
 [project]
-version = "4.0.5"
+version = "4.0.6"
 ```
 
 Update this for each release before building.
@@ -75,8 +75,8 @@ python -m build
 ```
 
 This creates:
-- `dist/brickpi3-4.0.5.tar.gz` (source distribution)
-- `dist/brickpi3-4.0.5-py3-none-any.whl` (wheel)
+- `dist/brickpi3-4.0.6.tar.gz` (source distribution)
+- `dist/brickpi3-4.0.6-py3-none-any.whl` (wheel)
 
 ## Publishing
 

@@ -47,9 +47,9 @@ echo "Starting installation for BrickPi3 ($BRANCH branch)"
 
 # The brickpi3 installation command has been moved here
 
-echo "Installing brickpi3 from TestPyPI..."
-if ! python3 -m pip install --upgrade --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple brickpi3; then
-	echo "Failed to install brickpi3 from TestPyPI."
+echo "Installing brickpi3 from PyPI..."
+if ! python3 -m pip install --upgrade brickpi3; then
+	echo "Failed to install brickpi3 from PyPI."
 	exit 1
 fi
 
