@@ -16,6 +16,7 @@ class BrickPi3Troubleshooter(tk.Tk):
         min_height = 12 * 20 + 260
         min_width = 800  # Wider window for long lines
         self.minsize(min_width, min_height)
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
 
     def create_widgets(self):
         # Use grid for better layout control
@@ -42,6 +43,8 @@ class BrickPi3Troubleshooter(tk.Tk):
         self.feedback_text.bind("<Button-3>", self.show_context_menu)
         # Context menu for the feedback_text
         self.context_menu = tk.Menu(self, tearoff=0)
+        self.context_menu.add_command(label="Select All", command=self.select_all_feedback_text)
+        self.context_menu.add_command(label="Copy", command=self.copy_selected_text)
         self.context_menu.add_command(label="Copy All", command=self.copy_feedback_text)
         self.context_menu.add_command(label="Clear", command=self.clear_feedback_text)
         # Ensure the feedback_text expands, and the Exit button is always at the bottom right
@@ -75,8 +78,11 @@ class BrickPi3Troubleshooter(tk.Tk):
         self.feedback_text.delete(1.0, tk.END)
         try:
             import brickpi3
+            brickpi3_path = getattr(brickpi3, '__file__', 'Path not available')
             version = getattr(brickpi3, '__version__', 'unknown')
-            self.feedback_text.insert(tk.END, f"brickpi3 import successful!\nVersion: {version}\n")
+            self.feedback_text.insert(tk.END, f"brickpi3 import successful!\n")
+            self.feedback_text.insert(tk.END, f"Version: {version}\n")
+            self.feedback_text.insert(tk.END, f"Library path: {brickpi3_path}\n")
         except Exception as e:
             self.feedback_text.insert(tk.END, f"Failed to import brickpi3:\n{e}\n")
 
@@ -182,19 +188,39 @@ class BrickPi3Troubleshooter(tk.Tk):
         finally:
             self.context_menu.grab_release()
 
-    def copy_feedback_text(self):
+    def copy_selected_text(self):
         try:
             selected = self.feedback_text.get(tk.SEL_FIRST, tk.SEL_LAST)
+            self.clipboard_clear()
+            self.clipboard_append(selected)
         except tk.TclError:
-            selected = self.feedback_text.get("1.0", tk.END)
+            # No text is selected, do nothing
+            pass
+
+    def copy_feedback_text(self):
+        # First select all text using the same logic as select_all_feedback_text
+        self.select_all_feedback_text()
+        # Then copy the selected text
+        selected = self.feedback_text.get(tk.SEL_FIRST, tk.SEL_LAST)
         self.clipboard_clear()
         self.clipboard_append(selected)
+
+    def select_all_feedback_text(self):
+        self.feedback_text.tag_add(tk.SEL, "1.0", tk.END)
+        self.feedback_text.mark_set(tk.INSERT, "1.0")
+        self.feedback_text.focus_set()
 
     def clear_feedback_text(self):
         self.feedback_text.delete(1.0, tk.END)
 
     def on_exit(self):
         self.kill_current_process()
+        try:
+            import brickpi3
+            bp = brickpi3.BrickPi3()
+            bp.reset_all()
+        except Exception:
+            pass
         self.destroy()
 
 if __name__ == "__main__":

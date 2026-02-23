@@ -2,7 +2,7 @@ import wx
 import os
 import subprocess
 
-ICON_PATH = os.path.join(os.path.expanduser("~"), "BrickPi3/Software/Python/brickpi3/Examples/icons/")
+ICON_PATH = os.path.join(os.path.expanduser("~"), "BrickPi3/Software/Python/brickpi3/examples/icons/")
 
 
 class MainPanel(wx.Panel):

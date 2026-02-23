@@ -4,8 +4,8 @@
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Find the BrickPi3 root directory (4 levels up)
-BRICKPI3_DIR="$(dirname $(dirname $(dirname $(dirname "$SCRIPT_DIR"))))"
+# Find the BrickPi3 root directory (1 levels up)
+BRICKPI3_DIR="$(dirname "$SCRIPT_DIR"))))"
 echo "[INFO] BrickPi3 root directory: $BRICKPI3_DIR"
 
 # Virtual environment locations
