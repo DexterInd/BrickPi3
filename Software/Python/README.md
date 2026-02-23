@@ -35,10 +35,11 @@ pip install -e .
 ```
 Software/Python/
 ├── pyproject.toml    # Modern package configuration (PEP 517/518)
-├── setup.py          # Legacy compatibility (deprecated)
 ├── MANIFEST.in       # Additional files to include in distribution
 ├── brickpi3.py       # Main driver module
-└── Examples/         # Example scripts (not included in package)
+├── scripts/          # Install scripts
+├── troubleshooting/  # Troubleshooting scripts
+└── examples/         # Example scripts
 ```
 
 ## Configuration Details
@@ -59,7 +60,7 @@ Version is specified in `pyproject.toml`:
 
 ```toml
 [project]
-version = "4.0.0"
+version = "4.0.5"
 ```
 
 Update this for each release before building.
@@ -74,8 +75,8 @@ python -m build
 ```
 
 This creates:
-- `dist/brickpi3-4.0.0.tar.gz` (source distribution)
-- `dist/brickpi3-4.0.0-py3-none-any.whl` (wheel)
+- `dist/brickpi3-4.0.5.tar.gz` (source distribution)
+- `dist/brickpi3-4.0.5-py3-none-any.whl` (wheel)
 
 ## Publishing
 
