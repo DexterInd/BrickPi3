@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=BrickPi3 Troubleshooter
-Exec=/bin/bash -c '"$(dirname "$(readlink -f "%k")")/launch_troubleshooter.sh"'
+Exec=/bin/bash -c '"$(dirname "$(readlink -f "%k")")/launch_brickpi3_troubleshooter.sh"'
 Icon=BrickPi3.png
 Terminal=true
 Categories=Utility;

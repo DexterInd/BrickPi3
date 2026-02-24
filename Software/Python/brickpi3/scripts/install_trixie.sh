@@ -102,14 +102,16 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
     # Desktop integration for Troubleshooter
     SRC_DIR="$SCRIPT_DIR/../troubleshooting"
     DESKTOP_FILE="$SRC_DIR/BrickPi3_Troubleshooter.desktop"
-    LAUNCH_SCRIPT="$SRC_DIR/launch_troubleshooter.sh"
+    LAUNCH_SCRIPT="$SRC_DIR/launch_brickpi3_troubleshooter.sh"
     DESKTOP_TARGET="$HOME/Desktop/BrickPi3_Troubleshooter.desktop"
 
 
     if [ -f "$LAUNCH_SCRIPT" ]; then
-        echo "Copying launch_troubleshooter.sh to $HOME..."
-        LAUNCH_SCRIPT_COPY="$HOME/launch_troubleshooter.sh"
+        echo "Copying launch_brickpi3_troubleshooter.sh to $HOME..."
+        LAUNCH_SCRIPT_COPY="$HOME/launch_brickpi3_troubleshooter.sh"
         cp "$LAUNCH_SCRIPT" "$LAUNCH_SCRIPT_COPY"
+        # Patch the placeholder with the actual venv path used by this install
+        sed -i "s|@@VENV_DIR@@|$VENV_DIR|" "$LAUNCH_SCRIPT_COPY"
         chmod +x "$LAUNCH_SCRIPT_COPY"
     else
         echo "Troubleshooter launch script not found at $LAUNCH_SCRIPT"
@@ -119,7 +121,7 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         echo "Copying and patching Troubleshooter desktop file to Desktop..."
         TMP_PATCHED_DESKTOP="/tmp/BrickPi3_Troubleshooter.desktop"
         cp "$DESKTOP_FILE" "$TMP_PATCHED_DESKTOP"
-        LAUNCH_PATH="$HOME/launch_troubleshooter.sh"
+        LAUNCH_PATH="$HOME/launch_brickpi3_troubleshooter.sh"
         # Escape spaces for .desktop Exec line
         LAUNCH_PATH_ESCAPED="${LAUNCH_PATH// /\\ }"
         sed -i "s|^Exec=.*$|Exec=\"$LAUNCH_PATH_ESCAPED\"|" "$TMP_PATCHED_DESKTOP"
