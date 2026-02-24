@@ -24,7 +24,11 @@ The same command can be used for updating the `BrickPi3` to the latest version.
 
 If you want to install the bare minimum for the `BrickPi3` to work, you can run the following command:
 ```python -m pip install brickpi3```
-Please note that you are required to set up your own virtual environment and install the `brickpi3` package in that environment.  The `brickpi3` package is not available globally, so you will not be able to import it in a python script without activating the virtual environment first.
+Please note that, with this simplified installation, you are required to set up your own virtual environment and install the `brickpi3` package in that environment.  The `brickpi3` package is not available globally, so you will not be able to import it in a python script without activating the virtual environment first.
+
+If you want to install the `BrickPi3` package on Trixie Lite, you can run the following command:
+```cd BrickPi3/Software/Python/brickpi3/scripts
+source install_trixie.sh hardware=only```
 
 Compatibility
 -------------
