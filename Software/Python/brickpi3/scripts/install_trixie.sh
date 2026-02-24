@@ -45,6 +45,32 @@ fi
 BRANCH="trixie"
 echo "Starting installation for BrickPi3 ($BRANCH branch)"
 
+# Enable SPI, I2C and VNC interfaces via raspi-config
+echo "Enabling SPI interface..."
+if sudo raspi-config nonint do_spi 0; then
+    echo "SPI enabled."
+else
+    echo "Warning: Failed to enable SPI. You may need to enable it manually in raspi-config."
+fi
+
+echo "Enabling I2C interface..."
+if sudo raspi-config nonint do_i2c 0; then
+    echo "I2C enabled."
+else
+    echo "Warning: Failed to enable I2C. You may need to enable it manually in raspi-config."
+fi
+
+if grep -qi "Lite" /etc/os-release 2>/dev/null; then
+    echo "Raspberry Pi OS Lite detected — skipping VNC (no desktop environment)."
+else
+    echo "Enabling VNC interface..."
+    if sudo raspi-config nonint do_vnc 0; then
+        echo "VNC enabled."
+    else
+        echo "Warning: Failed to enable VNC. You may need to enable it manually in raspi-config."
+    fi
+fi
+
 # The brickpi3 installation command has been moved here
 
 echo "Installing brickpi3 from PyPI..."
