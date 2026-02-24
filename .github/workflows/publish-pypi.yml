@@ -1,0 +1,41 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v*'   # triggers on tags like v4.0.7, v1.2.3, etc.
+
+jobs:
+  build-and-publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+
+    # Required for PyPI Trusted Publishing (OIDC) — no API token needed
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install build tools
+        run: pip install --upgrade build twine
+
+      - name: Build distribution
+        working-directory: Software/Python
+        run: python -m build
+
+      - name: Check distribution
+        working-directory: Software/Python
+        run: twine check dist/*
+
+      - name: Publish to PyPI (Trusted Publishing)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: Software/Python/dist/
