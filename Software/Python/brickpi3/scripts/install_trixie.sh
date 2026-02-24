@@ -18,7 +18,7 @@ set -e
 
 # Default: user-level venv (~/.venv), unless 'local' is specified
 if [ "$1" = "local" ]; then
-    # Place venv in the parent folder of Install
+    # Place venv in Software/Python/brickpi3 (one level up from scripts/)
     VENV_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.venv"
 else
     VENV_DIR="$HOME/.venv/brickpi3"
@@ -80,11 +80,20 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
     DESKTOP_TARGET="$HOME/Desktop/BrickPi3_Troubleshooter.desktop"
 
 
+    if [ -f "$LAUNCH_SCRIPT" ]; then
+        echo "Copying launch_troubleshooter.sh to $HOME..."
+        LAUNCH_SCRIPT_COPY="$HOME/launch_troubleshooter.sh"
+        cp "$LAUNCH_SCRIPT" "$LAUNCH_SCRIPT_COPY"
+        chmod +x "$LAUNCH_SCRIPT_COPY"
+    else
+        echo "Troubleshooter launch script not found at $LAUNCH_SCRIPT"
+    fi
+
     if [ -f "$DESKTOP_FILE" ]; then
         echo "Copying and patching Troubleshooter desktop file to Desktop..."
         TMP_PATCHED_DESKTOP="/tmp/BrickPi3_Troubleshooter.desktop"
         cp "$DESKTOP_FILE" "$TMP_PATCHED_DESKTOP"
-        LAUNCH_PATH="$LAUNCH_SCRIPT"
+        LAUNCH_PATH="$HOME/launch_troubleshooter.sh"
         # Escape spaces for .desktop Exec line
         LAUNCH_PATH_ESCAPED="${LAUNCH_PATH// /\\ }"
         sed -i "s|^Exec=.*$|Exec=\"$LAUNCH_PATH_ESCAPED\"|" "$TMP_PATCHED_DESKTOP"
@@ -97,13 +106,6 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         mv "$TMP_PATCHED_DESKTOP" "$DESKTOP_TARGET"
     else
         echo "Troubleshooter desktop file not found at $DESKTOP_FILE"
-    fi
-
-    if [ -f "$LAUNCH_SCRIPT" ]; then
-        echo "Setting execution flag on launch_troubleshooter.sh..."
-        chmod +x "$LAUNCH_SCRIPT"
-    else
-        echo "Troubleshooter launch script not found at $LAUNCH_SCRIPT"
     fi
 else
     echo "Skipping GUI tools installation (hardware=only mode)"
