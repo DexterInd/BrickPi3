@@ -19,6 +19,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"   # strips leading 'v', e.g. v4.0.7 → 4.0.7
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          sed -i "s/^version = .*/version = \"$VERSION\"/" Software/Python/pyproject.toml
+          sed -i "s/^__version__ = .*/__version__ = \"$VERSION\"/" Software/Python/brickpi3/__init__.py
+          sed -i "s/version = \"[0-9.]\+\"/version = \"$VERSION\"/" Software/Python/README.md
+          sed -i "s/brickpi3-[0-9.]\+/brickpi3-$VERSION/g" Software/Python/README.md
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
