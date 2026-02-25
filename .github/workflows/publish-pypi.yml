@@ -22,6 +22,10 @@ jobs:
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"   # strips leading 'v', e.g. v4.0.7 → 4.0.7
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Tag '$GITHUB_REF_NAME' does not match expected format vX.Y.Z (got version '$VERSION')"
+            exit 1
+          fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           sed -i "s/^version = .*/version = \"$VERSION\"/" Software/Python/pyproject.toml
           sed -i "s/^__version__ = .*/__version__ = \"$VERSION\"/" Software/Python/brickpi3/__init__.py

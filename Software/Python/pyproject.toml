@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brickpi3"
-version = "4.0.6"
+version = "4.0.8"
 description = "Drivers and examples for using the BrickPi3 in Python"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = "MIT"

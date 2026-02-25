@@ -18,8 +18,8 @@ set -e
 
 # Default: user-level venv (~/.venv), unless 'local' is specified
 if [ "$1" = "local" ]; then
-    # Place venv in Software/Python/brickpi3 (one level up from scripts/)
-    VENV_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.venv"
+    # Place venv at the BrickPi3 repo root (four levels up from scripts/)
+    VENV_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)/.venv"
 else
     VENV_DIR="$HOME/.venv/brickpi3"
 fi
