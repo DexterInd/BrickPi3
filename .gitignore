@@ -2,3 +2,16 @@
 
 *.d
 BrickPi 3 SAMD/BrickPi 3 SAMD Firmware/BrickPi 3 SAMD Firmware/Debug/*
+Software/Python/dist
+Software/Python/brickpi3.egg-info
+Software/Scratch
+documentation/RP-008370-DS-1-rp1-peripherals.pdf
+documentation/spi_doc.txt
+Firmware/brickpi3_firmware.1.4.8.bin.old
+Firmware/brickpi3_firmware.1.5.0.bin.new
+activate.ps1
+pypi_token.txt
+.gitignore
+PYPI_PUBLISHING.md
+pypitest_token.txt
+.github/workflows
