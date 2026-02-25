@@ -7,13 +7,13 @@ VENV_DIR="@@VENV_DIR@@"
 
 # Activate the venv if not already active
 if [ -z "$VIRTUAL_ENV" ]; then
-    if [ -d "$VENV_DIR" ]; then
+    if [ -f "$VENV_DIR/bin/activate" ]; then
         # shellcheck disable=SC1090
-        source "$VENV_DIR/bin/activate"
+        source "$VENV_DIR/bin/activate" || { echo "[ERROR] Failed to activate virtual environment at $VENV_DIR"; exit 1; }
         export VENV_INFO="Activated virtual environment: $VENV_DIR"
         echo "[INFO] $VENV_INFO"
     else
-        echo "[ERROR] Virtual environment not found at $VENV_DIR"
+        echo "[ERROR] Virtual environment activate script not found at $VENV_DIR/bin/activate"
         exit 1
     fi
 else
@@ -30,4 +30,12 @@ if [ ! -f "$TROUBLESHOOTER_GUI" ]; then
 fi
 
 echo "[INFO] Launching: $TROUBLESHOOTER_GUI"
+
+# Verify a display is available before launching the GUI
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+    echo "[ERROR] No display found (\$DISPLAY and \$WAYLAND_DISPLAY are unset)."
+    echo "        Run this from the desktop or use 'ssh -X' for X11 forwarding."
+    exit 1
+fi
+
 python3 "$TROUBLESHOOTER_GUI"

@@ -73,10 +73,14 @@ fi
 
 # The brickpi3 installation command has been moved here
 
-echo "Installing brickpi3 from PyPI..."
-if ! python3 -m pip install --upgrade brickpi3; then
-	echo "Failed to install brickpi3 from PyPI."
-	exit 1
+if python3 -c "import brickpi3" 2>/dev/null; then
+    echo "brickpi3 is already installed — skipping pip install."
+else
+    echo "Installing brickpi3 from PyPI..."
+    if ! python3 -m pip install --upgrade brickpi3; then
+        echo "Failed to install brickpi3 from PyPI."
+        exit 1
+    fi
 fi
 
 echo "Testing brickpi3 installation..."
@@ -110,8 +114,9 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         echo "Copying launch_brickpi3_troubleshooter.sh to $HOME..."
         LAUNCH_SCRIPT_COPY="$HOME/launch_brickpi3_troubleshooter.sh"
         cp "$LAUNCH_SCRIPT" "$LAUNCH_SCRIPT_COPY"
-        # Patch the placeholder with the actual venv path used by this install
-        sed -i "s|@@VENV_DIR@@|$VENV_DIR|" "$LAUNCH_SCRIPT_COPY"
+        # Use the actual active venv path if one was already active, otherwise the default
+        EFFECTIVE_VENV="${VIRTUAL_ENV:-$VENV_DIR}"
+        sed -i "s|@@VENV_DIR@@|$EFFECTIVE_VENV|" "$LAUNCH_SCRIPT_COPY"
         chmod +x "$LAUNCH_SCRIPT_COPY"
     else
         echo "Troubleshooter launch script not found at $LAUNCH_SCRIPT"
@@ -122,9 +127,7 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         TMP_PATCHED_DESKTOP="/tmp/BrickPi3_Troubleshooter.desktop"
         cp "$DESKTOP_FILE" "$TMP_PATCHED_DESKTOP"
         LAUNCH_PATH="$HOME/launch_brickpi3_troubleshooter.sh"
-        # Escape spaces for .desktop Exec line
-        LAUNCH_PATH_ESCAPED="${LAUNCH_PATH// /\\ }"
-        sed -i "s|^Exec=.*$|Exec=\"$LAUNCH_PATH_ESCAPED\"|" "$TMP_PATCHED_DESKTOP"
+        sed -i "s|^Exec=.*$|Exec=/bin/bash $LAUNCH_PATH|" "$TMP_PATCHED_DESKTOP"
 
         # Patch the Icon line to use the absolute path to BrickPi3.png in the BrickPi3 root
         BRICKPI3_ROOT="$SCRIPT_DIR/.."
@@ -132,6 +135,9 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         sed -i "s|^Icon=.*$|Icon=$ICON_PATH|" "$TMP_PATCHED_DESKTOP"
 
         mv "$TMP_PATCHED_DESKTOP" "$DESKTOP_TARGET"
+        chmod +x "$DESKTOP_TARGET"
+        # Mark as trusted so modern Raspberry Pi OS desktop environments will execute it
+        gio set "$DESKTOP_TARGET" "metadata::trusted" true 2>/dev/null || true
     else
         echo "Troubleshooter desktop file not found at $DESKTOP_FILE"
     fi
