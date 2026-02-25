@@ -25,11 +25,18 @@ else
 fi
 
 if [ -z "$VIRTUAL_ENV" ]; then
-	if [ -d "$VENV_DIR" ]; then
+	if [ -f "$VENV_DIR/bin/activate" ]; then
 		echo "No Python virtual environment detected, but $VENV_DIR exists. Activating it..."
 		# shellcheck disable=SC1090
 		source "$VENV_DIR/bin/activate"
 		echo "Activated existing virtual environment at $VENV_DIR."
+	elif [ -f "$HOME/.venv/bin/activate" ]; then
+		# Also check the common $HOME/.venv location (user may have created their own venv there)
+		echo "No Python virtual environment detected, but $HOME/.venv exists. Activating it..."
+		# shellcheck disable=SC1090
+		source "$HOME/.venv/bin/activate"
+		echo "Activated existing virtual environment at $HOME/.venv."
+		VENV_DIR="$HOME/.venv"
 	else
 		echo "No Python virtual environment detected. Creating one at $VENV_DIR..."
 		python3 -m venv "$VENV_DIR"
