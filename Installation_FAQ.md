@@ -83,7 +83,7 @@ This is the recommended approach for most users. You flash a standard Raspberry 
 ### Test it
 
 ```bash
-python3 -c "import brickpi3; print('BrickPi3 installed successfully!')"
+python3 -c 'import brickpi3; print("BrickPi3 installed successfully!")'
 ```
 
 ---
@@ -117,9 +117,17 @@ The setup steps are identical to Option A — the only difference is how the lib
    source Software/Python/brickpi3/scripts/install_trixie.sh
    ```
 
+5. **Test it**
+
+```bash
+python3 -c 'import brickpi3; print("BrickPi3 installed successfully!")'
+```
+
 ### Explore the examples
 
 The `Projects/` folder inside the cloned repository contains ready-to-run example programs for motors, sensors, and more.
+
+
 
 ---
 
