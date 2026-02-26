@@ -78,9 +78,6 @@ This creates:
 - `dist/brickpi3-4.0.6.tar.gz` (source distribution)
 - `dist/brickpi3-4.0.6-py3-none-any.whl` (wheel)
 
-## Publishing
-
-See [PYPI_PUBLISHING.md](../../PYPI_PUBLISHING.md) for detailed instructions on publishing to PyPI.
 
 ## Requirements
 
