@@ -41,55 +41,148 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import copy
-import os
-import os.path
-import subprocess
-import time
+import asyncio
+import io
 import logging
+import threading
 
-#---------------------------------------------------------------------------------------------------
+import tornado.iostream
+import tornado.web
+
+# picamera2 is pre-installed on Raspberry Pi OS Trixie:
+#   sudo apt install python3-picamera2   (if missing)
+from picamera2 import Picamera2
+from picamera2.encoders import MJPEGEncoder
+from picamera2.outputs import FileOutput
+
+log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)s %(levelname)s: %(message)s')
+
+STREAM_WIDTH  = 320
+STREAM_HEIGHT = 240
+STREAM_FPS    = 15
+
+# Log detected cameras at import time so issues are visible immediately
+_detected_cameras = Picamera2.global_camera_info()
+if _detected_cameras:
+    for _i, _cam in enumerate(_detected_cameras):
+        log.info(f"Camera {_i} detected: {_cam}")
+else:
+    log.warning("No cameras detected by libcamera. "
+                "Check cable connection and run: libcamera-hello --list-cameras")
+
+
+# ---------------------------------------------------------------------------
+class _StreamingOutput(io.BufferedIOBase):
+    """Thread-safe buffer that holds the most-recent JPEG frame."""
+
+    def __init__(self):
+        self.frame = None
+        self.condition = threading.Condition()
+
+    def write(self, buf):
+        with self.condition:
+            self.frame = buf
+            self.condition.notify_all()
+
+
+# ---------------------------------------------------------------------------
+class MJPEGHandler(tornado.web.RequestHandler):
+    """Tornado request handler that pushes an MJPEG stream to the browser.
+
+    Register it in your Tornado application like this:
+        (r'/stream', camera_streamer.MJPEGHandler, {'camera_streamer': cameraStreamer})
+    """
+
+    def initialize(self, camera_streamer):
+        self._cs = camera_streamer
+
+    async def get(self):
+        self.set_header('Content-Type',
+                        'multipart/x-mixed-replace; boundary=frame')
+        self.set_header('Cache-Control', 'no-cache')
+        self.set_header('Pragma', 'no-cache')
+        self.set_header('Access-Control-Allow-Origin', '*')
+
+        output = self._cs.output
+        if output is None:
+            self.set_status(503, 'Stream not started')
+            return
+
+        loop = asyncio.get_running_loop()
+
+        def _wait_frame():
+            with output.condition:
+                output.condition.wait(timeout=5)
+                return output.frame
+
+        try:
+            while True:
+                frame = await loop.run_in_executor(None, _wait_frame)
+                if frame is None:
+                    continue
+                self.write(b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n')
+                self.write(frame)
+                self.write(b'\r\n')
+                await self.flush()
+        except tornado.iostream.StreamClosedError:
+            pass
+
+
+# ---------------------------------------------------------------------------
 class CameraStreamer:
+    """Manages a picamera2 MJPEG capture session.
 
-    """A class to look after streaming images from the Raspberry Pi camera.
-       Ideally, the camera should only be on when somebody wants to stream images.
-       Therefore, startStreaming must be called periodically. If startStreaming
-       is not called before a timeout period expires then the streaming will stop"""
-
-    DEFAULT_TIMEOUT = 4.0
+    Call startStreaming() when the first WebSocket client connects and
+    stopStreaming() when the last one disconnects.  The MJPEG frames are
+    served by MJPEGHandler over the existing Tornado server at /stream.
+    """
 
     #-----------------------------------------------------------------------------------------------
-    def __init__( self, timeout=DEFAULT_TIMEOUT ):
-
-        self.cameraStreamerProcess = None
-        self.streamingStartTime = 0
-        self.streamingTimeout = timeout
+    def __init__( self ):
+        self.camera = None
+        self.output = None
+        self._started = False
 
     #-----------------------------------------------------------------------------------------------
     def __del__( self ):
-
         self.stopStreaming()
 
     #-----------------------------------------------------------------------------------------------
     def startStreaming( self ):
-
-        # Start raspberry_pi_camera_streamer if needed
-        if self.cameraStreamerProcess == None or self.cameraStreamerProcess.poll() != None:
-
-            self.cameraStreamerProcess = subprocess.Popen(
-                [ "/usr/local/bin/raspberry_pi_camera_streamer","-w 320","-h 240" ] )
-
-        self.streamingStartTime = time.time()
+        if self._started:
+            return
+        cameras = Picamera2.global_camera_info()
+        if not cameras:
+            log.warning("No camera detected — streaming disabled.")
+            return
+        self.output = _StreamingOutput()
+        self.camera = Picamera2()
+        config = self.camera.create_video_configuration(
+            main={"size": (STREAM_WIDTH, STREAM_HEIGHT)},
+            controls={"FrameRate": STREAM_FPS},
+        )
+        self.camera.configure(config)
+        self.camera.start_recording(MJPEGEncoder(), FileOutput(self.output))
+        self._started = True
+        log.info("Camera streaming started")
 
     #-----------------------------------------------------------------------------------------------
     def update( self ):
-
-        if time.time() - self.streamingStartTime > self.streamingTimeout:
-
-            self.stopStreaming()
+        pass  # no external process to poll; camera runs until stopStreaming()
 
     #-----------------------------------------------------------------------------------------------
     def stopStreaming( self ):
-
-        if self.cameraStreamerProcess != None:
-            self.cameraStreamerProcess.terminate()
+        if not self._started:
+            return
+        try:
+            self.camera.stop_recording()
+            self.camera.close()
+        except Exception as exc:
+            log.warning(f"Error stopping camera: {exc}")
+        self.camera = None
+        self.output = None
+        self._started = False
+        log.info("Camera streaming stopped")

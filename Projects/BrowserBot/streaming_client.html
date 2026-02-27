@@ -1,16 +1,16 @@
 <!--
-########################################################################                                                                 
-# Program Name: Browser_Client_Coder.html                                     
-# ================================     
-# This code is for controlling a robot by a web browser using web sockets                            
-# http://www.dexterindustries.com/                                                                
+########################################################################
+# Program Name: Browser_Client_Coder.html
+# ================================
+# This code is for controlling a robot by a web browser using web sockets
+# http://www.dexterindustries.com/
 # History
 # ------------------------------------------------
 # Author     Comments
 # Joshwa     Initial Authoring
-#                                                                  
+#
 # These files have been made available online through a Creative Commons Attribution-ShareAlike 3.0  license.
-# (http://creativecommons.org/licenses/by-sa/3.0/)           
+# (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 ########################################################################
 -->
@@ -21,73 +21,66 @@
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebSockets Client</title>  
-  <style type="text/css">
+  <title>WebSockets Client</title>
+  <style>
   	        #camera {
             width: 640px;
             height: 480px;
         }
  	</style>
  	<link href="css/style.css" rel="stylesheet">
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
  	<script>
  		function layoutControls() {
  			var cameraImage = $('#camera');
  			cameraImage.css( 'max-width', 640 );
  		}
- 		
+
  		$(window).on( "orientationchange", function() {
             setTimeout( layoutControls, 300 ); } );
-            
- 		$(document).ready(function() {
- 			cameraURL = "http://192.168.1.56:8080/?action=stream";
- 			$("#camera").attr( "src", cameraURL );
- 			
- 		  setInterval( function() { 
-         $("#camera").attr( "src", cameraURL );
-                }, 1000 );
-                
-      layoutControls();
- 		});
-                
- 		
+
+		$(document).ready(function() {
+			layoutControls();
+		});
+
+
  	</script>
 </head>
 <body>
 	<p><img id="camera" src=""/></p>
 
-<p>            
-<!-- Creating press buttons  on the webpage-->                               
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 20px" type="button" value="Accelerate" onclick="accelerate(); " />
+<p>
+<!-- Creating press buttons  on the webpage-->
+<input id="btn-accelerate" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 20px" type="button" value="Accelerate" onclick="accelerate();" />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 650px; top: 120px" type="button" value="Steer Left" onclick="steer_left(); " />
+<p>
+<input id="btn-steer-left" style="height: 100px; width: 100px; position: absolute; left: 650px; top: 120px" type="button" value="Steer Left" onclick="steer_left();" />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 120px" type="button" value="Stop" onclick="stop(); " />
+<p>
+<input id="btn-stop" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 120px" type="button" value="Stop" onclick="stop();" />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 850px; top: 120px" type="button" value="Steer Right" onclick="steer_right(); " />
+<p>
+<input id="btn-steer-right" style="height: 100px; width: 100px; position: absolute; left: 850px; top: 120px" type="button" value="Steer Right" onclick="steer_right();" />
 </p>
 
-<p>                                        
-<input id="touch" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 220px" type="button" value="Reverse" onclick="reverse(); " />
+<p>
+<input id="btn-reverse" style="height: 100px; width: 100px; position: absolute; left: 750px; top: 220px" type="button" value="Reverse" onclick="reverse();" />
 </p>
 <div id="send">
 
 Enter the hostname/ip address to make the websocket connection <br>
     <input type="text" id="data" size="100"/><br>
-	<input id="clickMe" type="button" value="clickme" onclick="setup2()" /></br>
-<p><span style="font-weight:bold">Instructions for keyboard controls:</span></br>	
-Press Up arrow key - Accelerate </br>
-Press Down arrow key - Reverse/Slow down </br>
-Press Right arrow key - Steer Right</br>
-Press Left arrow key - Steer Left</br>
+	<input id="clickMe" type="button" value="clickme" onclick="setup2()" /><br>
+<p><span style="font-weight:bold">Instructions for keyboard controls:</span></br>
+Press Up arrow key - Accelerate <br>
+Press Down arrow key - Reverse/Slow down <br>
+Press Right arrow key - Steer Right<br>
+Press Left arrow key - Steer Left<br>
 Press center/cltr/shift key to Stop</p>
-	
+
 </div>
 
 </div>
@@ -99,14 +92,15 @@ var down;
 var left;
 var right;
 var brakes;
+var cameraURL = "";
 
 // defines a variable that controls the forward movement
-function accelerate()       
+function accelerate()
 {
-	up = "u";               // when up == "u" the bot moves forward 
+	up = "u";               // when up == "u" the bot moves forward
 	down = "aaa";left = "aaa";right = "aaa";brakes = "aaa";       // When up button is pressed other buttons(variables) should be turned off.
     setup2();        		// Goes to websocket connection function
-}  
+}
 
 // defines a variable that controls the backward movement
 function reverse()
@@ -133,23 +127,27 @@ function steer_right()
 }
 
 // defines a variable that stops the robot
-function stop()       
+function stop()
 {
 	up = "aaa";down = "aaa";left = "aaa";right = "aaa";brakes = "b";
 	setup2();
-}		 
+}
 
-// Creates the websockets connection 
-function setup2()         
+// Creates the websockets connection
+function setup2()
 {
 	var $txt = $("#data");      			// assigns the data(hostname/ip address) entered in the text box
-	name = $txt.val();          			// Variable name contains the string(hostname/ip address) entered in the text box
-	var host =  "ws://"+name+":9093/ws"; 	// combines the three string and creates a new string
+	name = $txt.val() || document.getElementById("data").value;
+	// Always use http:// for the stream URL — works from file:// pages in Chrome/Edge.
+	// (window.location.protocol would be "file:" when opened locally, breaking the URL.)
+	cameraURL = "http://" + name + ":9093/stream";
+	var host = "ws://" + name + ":9093/ws"; 	// combines the three string and creates a new string
 	var socket = new WebSocket(host);
+	socket.binaryType = 'blob'; // receive JPEG frames as Blobs
 	var $txt = $("#data");
 	var $btnSend = $("#sendtext");
 	$txt.focus();
-	
+
 	// event handlers for UI
 	$btnSend.on('click',function()
 	{
@@ -159,7 +157,7 @@ function setup2()
 			return;
 		}
 		$txt.val("");
-	});  
+	});
 	$txt
 	.keypress(function(event)
 	{
@@ -181,11 +179,11 @@ function setup2()
 		}
 		//Send the button pressed backed to the Raspberry Pi
 		function buttons()
-		{	
+		{
 			if(up== "u")
 			{
 				socket.send("u");
-			}	
+			}
 
 			if(down== "d")
 			{
@@ -195,12 +193,12 @@ function setup2()
 			if(left== "l")
 			{
 				socket.send("l");
-			}	
+			}
 
 			if(right== "r")
 			{
 				socket.send("r");
-			}	
+			}
 
 			if(brakes == "b")
 			{
@@ -209,63 +207,42 @@ function setup2()
 		}
 		function arrows()
 		{
-			document.onkeyup = KeyCheck;       
-			function KeyCheck()
+			document.onkeyup = function(event)
 			{
-				var KeyID = event.keyCode;
-				switch(KeyID)
+				switch(event.key)
 				{
-				case 16: // shift
-				socket.send("b");
-				break; 
-				case 17: // ctrl
-				socket.send("b");
-				break;
-				case 37: // left arrow
-				socket.send("l");
-				break;
-				case 38: // up arrow
-				socket.send("u");
-				break;
-				case 39: // right arrow
-				socket.send("r");
-				break;
-				case 40: // down arrow
-				socket.send("d");
-				break;
-				case  104: // numpad 8
-				socket.send("u");
-				break;
-				case  98: // numpad 2
-				socket.send("d");
-				break;
-				case 100: // numpad 4
-				socket.send("l");
-				break;
-				case 102: // numpad 6
-				socket.send("r");
-				break;
-				case 101: // numpad 5
-				socket.send("b");
-				break;
-				case 103: // numpad 7
-				socket.send("lu");
-				break;
-				case 105: // numpad 9
-				socket.send("ru");
-				break;
-				case 97: // numpad 1
-				socket.send("ld");
-				break;
-				case 99: // numpad 3
-				socket.send("rd");
-				break;
+				case "Shift":    socket.send("b"); break;
+				case "Control":  socket.send("b"); break;
+				case "ArrowLeft":  socket.send("l"); break;
+				case "ArrowUp":    socket.send("u"); break;
+				case "ArrowRight": socket.send("r"); break;
+				case "ArrowDown":  socket.send("d"); break;
 				}
-			}
+				switch(event.code)
+				{
+				case "Numpad8": socket.send("u");  break;
+				case "Numpad2": socket.send("d");  break;
+				case "Numpad4": socket.send("l");  break;
+				case "Numpad6": socket.send("r");  break;
+				case "Numpad5": socket.send("b");  break;
+				case "Numpad7": socket.send("lu"); break;
+				case "Numpad9": socket.send("ru"); break;
+				case "Numpad1": socket.send("ld"); break;
+				case "Numpad3": socket.send("rd"); break;
+				}
+			};
 		}
 		socket.onmessage = function(msg)
 		{
-			//showServerResponse(msg.data);
+			if (msg.data instanceof Blob) {
+				// Binary frame from the Pi — render it in the camera img element
+				var url = URL.createObjectURL(msg.data);
+				var img = document.getElementById('camera');
+				var prev = img._prevUrl;
+				img.src = url;
+				img._prevUrl = url;
+				if (prev) URL.revokeObjectURL(prev);
+			}
 		}
 		socket.onclose = function()
 		{
@@ -281,21 +258,17 @@ function setup2()
 	{
 		var p = document.createElement('p');
 		p.innerHTML = txt;
-		document.getElementById('output').appendChild(p); 
-	}	
-}   
+		document.getElementById('output').appendChild(p);
+	}
+}
 
 </script>
+
+<script>
+if (!window.WebSocket) {
+	alert("Your browser does not support web sockets");
+}
+</script>
+
 </body>
 </html>
-<script>   
-
-jQuery(function($)
-{
-  if (!("WebSocket" in window)) 
-  {
-    alert("Your browser does not support web sockets");
-  }
-});
-
-</script>

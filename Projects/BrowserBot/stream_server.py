@@ -35,6 +35,7 @@
 #		"kill -9 pid"
 #	If the error does not go away, try changin the port number '9093' both in the client and server code
 
+import asyncio
 import brickpi3 #import BrickPi3.py file to use BrickPi3 operations
 BP = brickpi3.BrickPi3()
 import threading
@@ -43,8 +44,9 @@ import tornado.web
 import tornado.websocket
 import tornado.template
 import camera_streamer
+import time
 
-cameraStreamer = None
+cameraStreamer = camera_streamer.CameraStreamer()
 c=0
 global left_power
 global right_power
@@ -61,14 +63,39 @@ class MainHandler(tornado.web.RequestHandler):
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print('connection opened...')
-        cameraStreamer.startStreaming()
+        cameraStreamer.startStreaming()  # no-op if already started
+        # Stream JPEG frames as binary WebSocket messages so any browser
+        # can display them regardless of mixed-content/HTTPS-Only restrictions.
+        tornado.ioloop.IOLoop.current().spawn_callback(self.send_frames)
+
+    async def send_frames(self):
+        """Push individual JPEG frames to this WebSocket client as binary messages."""
+        output = cameraStreamer.output
+        if output is None:
+            return
+        loop = asyncio.get_running_loop()
+        def _wait_frame():
+            with output.condition:
+                output.condition.wait(timeout=5)
+                return output.frame
+        try:
+            while True:
+                frame = await loop.run_in_executor(None, _wait_frame)
+                if frame is None:
+                    continue
+                self.write_message(frame, binary=True)
+        except tornado.websocket.WebSocketClosedError:
+            pass
+        except Exception as e:
+            print(f'send_frames ended: {e}')
+
     def check_origin(self,origin):
         return True
     def on_message(self, message):      # receives the data from the webpage and is stored in the variable message
         global c
         global left_power
         global right_power
-        cameraStreamer.update
+        cameraStreamer.update()
         print(f'received: {message}')        # prints the revived from the webpage
         if message == "u":                # checks for the received data and assigns different values to c which controls the movement of robot.
             c = "8";
@@ -164,7 +191,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 application = tornado.web.Application([
     (r'/ws', WSHandler),
+    (r'/stream', camera_streamer.MJPEGHandler, {'camera_streamer': cameraStreamer}),
     (r'/', MainHandler),
+    (r'/streaming_client.html', tornado.web.StaticFileHandler, {'path': './streaming_client.html'}),
     (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./resources"}),
 ])
 
@@ -182,13 +211,12 @@ class myThread (threading.Thread):
 
 if __name__ == "__main__":
     running = True
+    cameraStreamer.startStreaming()     # start camera immediately so /stream is ready
     thread1 = myThread(1, "Thread-1", 1)
-    thread1.setDaemon(True)
+    thread1.daemon = True
     thread1.start()
     application.listen(9093)          	#starts the websockets connection
 
-    cameraStreamer = camera_streamer.CameraStreamer()
-
-    tornado.ioloop.IOLoop.instance().start()
+    tornado.ioloop.IOLoop.current().start()
 
 

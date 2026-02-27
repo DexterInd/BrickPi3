@@ -1,2 +1,11 @@
+# System packages — pre-installed on Raspberry Pi OS Trixie, but install if missing:
+#   sudo apt install python3-picamera2 python3-libcamera
+#
+# If picamera2 pip install fails due to native dependencies, recreate the venv
+# so it can see system packages:
+#   python3 -m venv --system-site-packages /home/brickpi/.venv/brickpi3
+
+# Python packages
 brickpi3
 tornado>=6.0
+picamera2
