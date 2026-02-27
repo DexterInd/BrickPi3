@@ -38,8 +38,8 @@ if [ -z "$VIRTUAL_ENV" ]; then
 		echo "Activated existing virtual environment at $HOME/.venv."
 		VENV_DIR="$HOME/.venv"
 	else
-		echo "No Python virtual environment detected. Creating one at $VENV_DIR..."
-		python3 -m venv "$VENV_DIR"
+		echo "No Python virtual environment detected. Creating one with --system-site-packages at $VENV_DIR..."
+		python3 -m venv --system-site-packages "$VENV_DIR"
 		# shellcheck disable=SC1090
 		source "$VENV_DIR/bin/activate"
 		echo "Virtual environment created and activated at $VENV_DIR."
@@ -52,26 +52,35 @@ fi
 BRANCH="trixie"
 echo "Starting installation for BrickPi3 ($BRANCH branch)"
 
-# Enable SPI, I2C and VNC interfaces via raspi-config
-echo "Enabling SPI interface..."
-if sudo raspi-config nonint do_spi 0; then
-    echo "SPI enabled."
+# Enable SPI, I2C and VNC interfaces.
+# We edit /boot/firmware/config.txt directly for SPI and I2C rather than
+# using 'raspi-config nonint do_spi/do_i2c', which rewrites the entire file
+# on Trixie and strips essential settings like camera_auto_detect=1.
+CONFIG=/boot/firmware/config.txt
+
+echo "Checking SPI interface..."
+if grep -qE "^dtparam=spi=on" "$CONFIG"; then
+    echo "SPI is already enabled — skipping."
 else
-    echo "Warning: Failed to enable SPI. You may need to enable it manually in raspi-config."
+    echo "dtparam=spi=on" | sudo tee -a "$CONFIG" > /dev/null
+    echo "SPI enabled."
 fi
 
-echo "Enabling I2C interface..."
-if sudo raspi-config nonint do_i2c 0; then
-    echo "I2C enabled."
+echo "Checking I2C interface..."
+if grep -qE "^dtparam=i2c_arm=on" "$CONFIG"; then
+    echo "I2C is already enabled — skipping."
 else
-    echo "Warning: Failed to enable I2C. You may need to enable it manually in raspi-config."
+    echo "dtparam=i2c_arm=on" | sudo tee -a "$CONFIG" > /dev/null
+    echo "I2C enabled."
 fi
 
 if grep -qi "Lite" /etc/os-release 2>/dev/null; then
     echo "Raspberry Pi OS Lite detected — skipping VNC (no desktop environment)."
 else
-    echo "Enabling VNC interface..."
-    if sudo raspi-config nonint do_vnc 0; then
+    echo "Checking VNC interface..."
+    if sudo raspi-config nonint get_vnc | grep -q "^0$"; then
+        echo "VNC is already enabled — skipping."
+    elif sudo raspi-config nonint do_vnc 0; then
         echo "VNC enabled."
     else
         echo "Warning: Failed to enable VNC. You may need to enable it manually in raspi-config."
