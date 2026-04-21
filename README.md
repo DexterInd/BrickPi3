@@ -11,6 +11,8 @@ You can find more extensive documentation about setting up the BrickPi3 for the 
 Installation
 ------------
 
+For full installation options and instructions, see the [Installation FAQ](Installation_FAQ.md).
+
 Quick Install
 -------------
 
@@ -18,7 +20,7 @@ In order to quickly install the `BrickPi3` repository, open up a terminal and ty
 ```
 git clone https://github.com/DexterInd/BrickPi3.git
 cd BrickPi3/Software/Python/brickpi3/scripts
-source install_trixie.sh user
+source install_trixie.sh
 ```
 The same command can be used for updating the `BrickPi3` to the latest version.
 
