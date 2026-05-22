@@ -1,9 +1,9 @@
 # Check if the script is being sourced or executed
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
-	echo "Warning: This script is not being sourced. Any virtual environment activation will not persist in the shell after the script ends."
+    echo "Warning: This script is not being sourced. Any virtual environment activation will not persist in the shell after the script ends."
     echo "To activate the virtual environment in your current shell, run: source install_trixie.sh"
     echo "or activate the virtual environment manually: source .venv/bin/activate upon completion."
-	read -n 1 -s -r -p "Press SPACE to continue..." key
+    read -n 1 -s -r -p "Press SPACE to continue..." key
     echo
 fi
 
@@ -25,27 +25,27 @@ else
 fi
 
 if [ -z "$VIRTUAL_ENV" ]; then
-	if [ -f "$VENV_DIR/bin/activate" ]; then
-		echo "No Python virtual environment detected, but $VENV_DIR exists. Activating it..."
-		# shellcheck disable=SC1090
-		source "$VENV_DIR/bin/activate"
-		echo "Activated existing virtual environment at $VENV_DIR."
-	elif [ -f "$HOME/.venv/bin/activate" ]; then
-		# Also check the common $HOME/.venv location (user may have created their own venv there)
-		echo "No Python virtual environment detected, but $HOME/.venv exists. Activating it..."
-		# shellcheck disable=SC1090
-		source "$HOME/.venv/bin/activate"
-		echo "Activated existing virtual environment at $HOME/.venv."
-		VENV_DIR="$HOME/.venv"
-	else
-		echo "No Python virtual environment detected. Creating one with --system-site-packages at $VENV_DIR..."
-		python3 -m venv --system-site-packages "$VENV_DIR"
-		# shellcheck disable=SC1090
-		source "$VENV_DIR/bin/activate"
-		echo "Virtual environment created and activated at $VENV_DIR."
-	fi
+    if [ -f "$VENV_DIR/bin/activate" ]; then
+        echo "No Python virtual environment detected, but $VENV_DIR exists. Activating it..."
+        # shellcheck disable=SC1090
+        source "$VENV_DIR/bin/activate"
+        echo "Activated existing virtual environment at $VENV_DIR."
+    elif [ -f "$HOME/.venv/bin/activate" ]; then
+        # Also check the common $HOME/.venv location (user may have created their own venv there)
+        echo "No Python virtual environment detected, but $HOME/.venv exists. Activating it..."
+        # shellcheck disable=SC1090
+        source "$HOME/.venv/bin/activate"
+        echo "Activated existing virtual environment at $HOME/.venv."
+        VENV_DIR="$HOME/.venv"
+    else
+        echo "No Python virtual environment detected. Creating one with --system-site-packages at $VENV_DIR..."
+        python3 -m venv --system-site-packages "$VENV_DIR"
+        # shellcheck disable=SC1090
+        source "$VENV_DIR/bin/activate"
+        echo "Virtual environment created and activated at $VENV_DIR."
+    fi
 else
-	echo "Python virtual environment detected at $VIRTUAL_ENV."
+    echo "Python virtual environment detected at $VIRTUAL_ENV."
 fi
 
 # Print info
@@ -74,8 +74,8 @@ else
     echo "I2C enabled."
 fi
 
-if grep -qi "Lite" /etc/os-release 2>/dev/null; then
-    echo "Raspberry Pi OS Lite detected — skipping VNC (no desktop environment)."
+if ! dpkg -s lightdm >/dev/null 2>&1; then
+    echo "No desktop environment available — skipping VNC."
 else
     echo "Checking VNC interface..."
     if sudo raspi-config nonint get_vnc | grep -q "^0$"; then
@@ -85,6 +85,12 @@ else
     else
         echo "Warning: Failed to enable VNC. You may need to enable it manually in raspi-config."
     fi
+fi
+
+# Install python3-dev (required to build the spidev C extension)
+echo "Installing python3-dev..."
+if ! sudo apt-get install -y python3-dev; then
+    echo "Warning: Failed to install python3-dev. The spidev build may fail."
 fi
 
 # The brickpi3 installation command has been moved here
@@ -101,17 +107,40 @@ fi
 
 echo "Testing brickpi3 installation..."
 if ! python3 -c "import brickpi3; print('brickpi3 import successful, software driver version:', getattr(brickpi3, '__version__', 'unknown'))"; then
-	echo "brickpi3 import failed!"
-	exit 1
+    echo "brickpi3 import failed!"
+    exit 1
 fi
 
-# Check for hardware=only parameter
+# Install lgpio (GPIO library for Linux)
+echo "Installing lgpio..."
+if python3 -c "import lgpio" 2>/dev/null; then
+    echo "lgpio is already installed — skipping pip install."
+else
+    if ! python3 -m pip install --upgrade lgpio; then
+        echo "Warning: Failed to install lgpio from PyPI."
+    fi
+fi
+
+# Install smbus2 (I2C/SMBus library)
+echo "Installing smbus2..."
+if python3 -c "import smbus2" 2>/dev/null; then
+    echo "smbus2 is already installed — skipping pip install."
+else
+    if ! python3 -m pip install --upgrade smbus2; then
+        echo "Warning: Failed to install smbus2 from PyPI."
+    fi
+fi
+
+# Check for hardware=only parameter or Lite OS (no desktop environment)
 INSTALL_GUI=1
 for arg in "$@"; do
     if [ "$arg" = "hardware=only" ]; then
         INSTALL_GUI=0
     fi
 done
+if ! dpkg -s lightdm >/dev/null 2>&1; then
+    INSTALL_GUI=0
+fi
 
 # After brickpi3 installation and test
 if [ "$INSTALL_GUI" -eq 1 ]; then
@@ -158,7 +187,7 @@ if [ "$INSTALL_GUI" -eq 1 ]; then
         echo "Troubleshooter desktop file not found at $DESKTOP_FILE"
     fi
 else
-    echo "Skipping GUI tools installation (hardware=only mode)"
+    echo "Skipping GUI tools installation (hardware=only or Lite mode)"
 fi
 
 echo "Installation for $BRANCH branch complete!"

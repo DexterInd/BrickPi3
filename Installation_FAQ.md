@@ -61,7 +61,7 @@ This is the recommended approach for most users. You flash a standard Raspberry 
 3. **Create and activate a virtual environment** (see the [Setting up a Python virtual environment](#setting-up-a-python-virtual-environment) section below):
 
    ```bash
-   python3 -m venv ~/.venv/brickpi
+   python3 -m venv --system-site-packages ~/.venv/brickpi
    source ~/.venv/brickpi/bin/activate
    ```
 
@@ -83,7 +83,7 @@ This is the recommended approach for most users. You flash a standard Raspberry 
 ### Test it
 
 ```bash
-python3 -c 'import brickpi3; print("BrickPi3 installed successfully!")'
+python3 -c 'import brickpi3; bp=brickpi3.BrickPi3(); print(f"Firmware version: {bp.get_version_firmware()}"); print("BrickPi3 installed successfully!")'
 ```
 
 ---
@@ -237,6 +237,19 @@ source ~/.venv/brickpi/bin/activate
 
 If you haven't created one yet, see the [Setting up a Python virtual environment](#setting-up-a-python-virtual-environment) section earlier in this guide.
 As a last resort you can force the install with `--break-system-packages`, but using a virtual environment is the right approach.
+
+### `pip install brickpi3` fails with `fatal error: Python.h: No such file or directory`
+
+The `spidev` dependency needs to compile a C extension and requires the Python development headers, which are not installed by default on Raspberry Pi OS Lite (Trixie).
+
+Install them first, then retry:
+
+```bash
+sudo apt install -y python3-dev
+pip install brickpi3
+```
+
+> If you used `install_trixie.sh` from a `git clone` (Option B), this step is handled automatically. The issue only arises when running `pip install brickpi3` manually before the script has run.
 
 ### My laptop can't find `brickpi.local`.
 - Give the Pi a full minute to finish booting.

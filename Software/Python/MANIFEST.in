@@ -1,4 +1,0 @@
-include README.md
-recursive-include brickpi3/examples *.py
-recursive-include brickpi3/troubleshooting *.py
-recursive-include brickpi3/scripts *.sh
