@@ -15,3 +15,4 @@ pypi_token.txt
 PYPI_PUBLISHING.md
 pypitest_token.txt
 .github/workflows
+.pypirc
