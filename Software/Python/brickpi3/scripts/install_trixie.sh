@@ -14,7 +14,7 @@ fi
 set -e
 
 # Check for Python virtual environment
-# Usage: bash install_trixie.sh [local|user]
+# Usage: source install_trixie.sh [local|user]
 
 # Default: user-level venv (~/.venv), unless 'local' is specified
 if [ "$1" = "local" ]; then
@@ -112,14 +112,14 @@ if ! python3 -c "import brickpi3; print('brickpi3 import successful, software dr
 fi
 
 # Install lgpio (GPIO library for Linux)
-echo "Installing lgpio..."
-if python3 -c "import lgpio" 2>/dev/null; then
-    echo "lgpio is already installed — skipping pip install."
-else
-    if ! python3 -m pip install --upgrade lgpio; then
-        echo "Warning: Failed to install lgpio from PyPI."
-    fi
-fi
+# echo "Installing lgpio..."
+# if python3 -c "import lgpio" 2>/dev/null; then
+    # echo "lgpio is already installed — skipping pip install."
+# else
+    # if ! python3 -m pip install --upgrade lgpio; then
+        # echo "Warning: Failed to install lgpio from PyPI."
+    # fi
+#fi
 
 # Install smbus2 (I2C/SMBus library)
 echo "Installing smbus2..."

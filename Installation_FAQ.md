@@ -68,7 +68,7 @@ This is the recommended approach for most users. You flash a standard Raspberry 
 4. **Install BrickPi3**:
 
    ```bash
-   pip install brickpi3
+   python -m pip install brickpi3
    ```
 
 5. **Run the setup script** to enable SPI, I2C, VNC, and other required interfaces.
